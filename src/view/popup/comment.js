@@ -1,4 +1,4 @@
-export const comment = ({srcEmoji, content, username, date}) => `
+export const createComment = ({srcEmoji, content, username, date}) => `
   <li class="film-details__comment">
     <span class="film-details__comment-emoji">
       <img src=${srcEmoji} width="55" height="55" alt="emoji-smile">

@@ -1,5 +1,5 @@
-import {control} from './control.js';
-import {connectElements} from '../../util.js';
+import {createControl} from './control.js';
+import {renderAll} from '../../util.js';
 
 const dataControls = [
   {classActive: '', id: 'watchlist', content: 'Add to watchlist'},
@@ -7,7 +7,7 @@ const dataControls = [
   {classActive: '', id: 'favorite', content: 'Add to favorites'},
 ];
 
-export const blockControls = () => `
+export const createBlockControls = () => `
   <section class="film-details__controls">
-    ${connectElements(dataControls, control)}
+    ${renderAll(dataControls, createControl)}
   </section>`;

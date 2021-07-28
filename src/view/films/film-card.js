@@ -1,4 +1,4 @@
-export const filmCard = (
+export const createFilmCard = (
   {title, rating, date, duration, genres, srcPoster, description, commentCount},
 ) => `
 <article class="film-card">

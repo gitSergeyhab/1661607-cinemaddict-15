@@ -1,4 +1,4 @@
-export const newComment = () => `
+export const createNewComment = () => `
   <div class="film-details__new-comment">
     <div class="film-details__add-emoji-label"></div>
 

@@ -1,4 +1,4 @@
-const filmData1 = {
+const filmMock = {
   title: 'The Dance of Life',
   originalTitle: 'The Dance of Life',
   director: 'Anthony Mann',
@@ -15,17 +15,17 @@ const filmData1 = {
   ageRaring: '18+',
 };
 
-const comment1 = {
+const commentMock = {
   srcEmoji: './images/emoji/smile.png',
   content: 'Interesting setting and a good cast',
   username: 'Tim Macoveev',
   date: '2019/12/31 23:59',
 };
 
-const comments = [comment1, comment1, comment1, comment1];
+const comments = [commentMock, commentMock, commentMock, commentMock];
 
-const allFilms = [filmData1, filmData1, filmData1, filmData1, filmData1];
-const topFilms = [filmData1, filmData1];
-const mostFilms = [filmData1, filmData1];
+const allFilms = [filmMock, filmMock, filmMock, filmMock, filmMock];
+const topFilms = [filmMock, filmMock];
+const mostFilms = [filmMock, filmMock];
 
 export {allFilms, topFilms, mostFilms, comments};

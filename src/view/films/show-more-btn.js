@@ -1,1 +1,1 @@
-export const showMoreBtn = () => '<button class="films-list__show-more">Show more</button>';
+export const createShowMoreBtn = () => '<button class="films-list__show-more">Show more</button>';

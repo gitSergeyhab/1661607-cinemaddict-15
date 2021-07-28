@@ -1,5 +1,5 @@
-import {filmList} from './film-list.js';
-import {showMoreBtn} from './show-more-btn.js';
+import {createFilmList} from './film-list.js';
+import {createShowMoreBtn} from './show-more-btn.js';
 import {allFilms, topFilms, mostFilms} from '../../fake-data.js';
 
 const listFeatures = [
@@ -8,9 +8,9 @@ const listFeatures = [
   {title: 'Most commented', hiddenClass: '', extra: 'films-list--extra'},
 ];
 
-export const films = () => `
+export const createFilmsSections = () => `
   <section class="films">
-    ${filmList(listFeatures[0], allFilms, showMoreBtn())}
-    ${filmList(listFeatures[1], topFilms, '')}
-    ${filmList(listFeatures[2], mostFilms, '')}
+    ${createFilmList(listFeatures[0], allFilms, createShowMoreBtn())}
+    ${createFilmList(listFeatures[1], topFilms, '')}
+    ${createFilmList(listFeatures[2], mostFilms, '')}
   </section>`;

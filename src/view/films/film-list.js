@@ -1,12 +1,12 @@
-import {filmsListTitle} from './films-list-title.js';
-import {filmCard} from './film-card.js';
-import {connectElements} from '../../util.js';
+import {createFilmsListTitle} from './films-list-title.js';
+import {createFilmCard} from './film-card.js';
+import {renderAll} from '../../util.js';
 
-export const filmList = (listFeatures, dataFilms, btn) => `
+export const createFilmList = (listFeatures, dataFilms, btn) => `
   <section class="films-list ${listFeatures.extra}">
-    ${filmsListTitle(listFeatures)}
+    ${createFilmsListTitle(listFeatures)}
     <div class="films-list__container">
-    ${connectElements(dataFilms, filmCard)}
+    ${renderAll(dataFilms, createFilmCard)}
     </div>
     ${btn}
   </section>`;

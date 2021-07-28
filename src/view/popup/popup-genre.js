@@ -1,1 +1,1 @@
-export const popupGenre = (genre) => `<span class="film-details__genre">${genre}</span>`;
+export const createGenreBlock = (genre) => `<span class="film-details__genre">${genre}</span>`;

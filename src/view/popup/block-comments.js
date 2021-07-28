@@ -1,18 +1,18 @@
-import {commentsTitle} from './comments-title.js';
-import {comment} from './comment.js';
-import {connectElements} from '../../util.js';
+import {createCommentsTitle} from './comments-title.js';
+import {createComment} from './comment.js';
+import {renderAll} from '../../util.js';
 import {comments} from '../../fake-data.js';
-import { newComment } from './new-comment.js';
+import {createNewComment} from './new-comment.js';
 
 
-export const blockComments = () => `
+export const createBlockComments = () => `
   <div class="film-details__bottom-container">
     <section class="film-details__comments-wrap">
-      ${commentsTitle(comments.length)}
+      ${createCommentsTitle(comments.length)}
       <ul class="film-details__comments-list">
-        ${connectElements(comments, comment)}
+        ${renderAll(comments, createComment)}
       </ul>
-      ${newComment()}
+      ${createNewComment()}
     </section>
   </div>`;
 
