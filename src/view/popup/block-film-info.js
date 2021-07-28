@@ -1,8 +1,5 @@
-import {createGenreBlock} from './popup-genre.js';
-import {renderAll} from '../../util.js';
-
 export const createBlockFilmInfo = (
-  {title, originalTitle, director, writers, actors, rating, ageRaring, date, country, duration, description, genres, srcPoster},
+  {title, originalTitle, director, writers, actors, rating, ageRaring, date, country, duration, description, srcPoster},
 ) => `
   <div class="film-details__info-wrap">
     <div class="film-details__poster">
@@ -46,8 +43,7 @@ export const createBlockFilmInfo = (
         </tr>
         <tr class="film-details__row">
           <td class="film-details__term">Genres</td>
-          <td class="film-details__cell">
-            ${renderAll(genres, createGenreBlock)}
+          <td class="film-details__cell js-genres">
           </td>
         </tr>
       </table>

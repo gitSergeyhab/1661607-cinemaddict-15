@@ -1,16 +1,28 @@
-import {createFilmList} from './film-list.js';
-import {createShowMoreBtn} from './show-more-btn.js';
-import {allFilms, topFilms, mostFilms} from '../../fake-data.js';
+export const createFilmsSections = () =>  `
+<section class="films">
+  <section class="films-list">
+    <h2 class="films-list__title visually-hidden">All movies. Upcoming</h2>
 
-const listFeatures = [
-  {title: '', hiddenClass: 'visually-hidden', extra: ''},
-  {title: 'Top rated', hiddenClass: '', extra: 'films-list--extra'},
-  {title: 'Most commented', hiddenClass: '', extra: 'films-list--extra'},
-];
+    <div class="films-list__container">
+    </div>
 
-export const createFilmsSections = () => `
-  <section class="films">
-    ${createFilmList(listFeatures[0], allFilms, createShowMoreBtn())}
-    ${createFilmList(listFeatures[1], topFilms, '')}
-    ${createFilmList(listFeatures[2], mostFilms, '')}
-  </section>`;
+  </section>
+
+  <section class="films-list films-list--extra">
+    <h2 class="films-list__title">Top rated</h2>
+
+    <div class="films-list__container">
+    </div>
+
+  </section>
+
+  <section class="films-list films-list--extra">
+    <h2 class="films-list__title">Most commented</h2>
+
+    <div class="films-list__container">
+    </div>
+
+  </section>
+</section>`;
+
+
