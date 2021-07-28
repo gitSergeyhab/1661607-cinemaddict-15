@@ -1,7 +1,7 @@
 # Проект «Киноман»
 
 * Студент: [Сергей Голик](https://up.htmlacademy.ru/ecmascript/15/user/1661607).
-* Наставник: `Неизвестно`.
+* Наставник: [Даниил Царёв](https://htmlacademy.ru/profile/id945835).
 
 ---
 
