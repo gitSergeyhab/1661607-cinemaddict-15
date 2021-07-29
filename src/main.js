@@ -12,7 +12,6 @@ import {createBlockFilmInfo} from './view/popup/block-film-info.js';
 import {createGenreBlock} from './view/popup/popup-genre.js';
 import {createBlockComments} from './view/popup/block-comments.js';
 import {createControl} from './view/popup/control.js';
-import {createControlsSection} from './view/popup/controls-section.js';
 import {createComment} from './view/popup/comment.js';
 
 import {allFilms, topFilms, mostFilms, comments} from './fake-data.js';
@@ -54,16 +53,14 @@ render(RenderPosition.header, createProfile(Ratings.movieBuff));
 //main
 //menu
 render(RenderPosition.main, createMenu());
-const mainNavigation = RenderPosition.main.querySelector('.main-navigation');
-const mainNavigationItems = mainNavigation.querySelector('.main-navigation__items');
+const mainNavigationItems = RenderPosition.main.querySelector('.main-navigation__items');
 render(mainNavigationItems, renderAll(dataNavItems, createNavigationItem));
 const sort = RenderPosition.main.querySelector('.sort');
 render(sort, renderAll(dataSortItems, createSortButton));
 
 // film block
 render(RenderPosition.main, createFilmsSections());
-const films = RenderPosition.main.querySelector('.films');
-const [allFilmsContainer, topFilmsContainer, mostFilmsContainer] = films.querySelectorAll('.films-list__container');
+const [allFilmsContainer, topFilmsContainer, mostFilmsContainer] = RenderPosition.main.querySelectorAll('.films-list__container');
 render(allFilmsContainer, renderAll(allFilms, createFilmCard));
 render(allFilmsContainer, createShowMoreBtn(), 'afterend');
 render(topFilmsContainer, renderAll(topFilms, createFilmCard));
@@ -72,13 +69,13 @@ render(mostFilmsContainer, renderAll(mostFilms, createFilmCard));
 //popup
 render(RenderPosition.footer, createFilmPopup(), 'afterend');
 const popup = document.querySelector('.film-details');
+const controls = popup.querySelector('.film-details__controls');
 const filmPopupContainer = popup.querySelector('.film-details__top-container');
-render(filmPopupContainer, createBlockFilmInfo(allFilms[0]));
+render(controls, createBlockFilmInfo(allFilms[0]), 'beforebegin');
 const genreBlock = filmPopupContainer.querySelector('.js-genres');
 render(genreBlock, renderAll(allFilms[0].genres, createGenreBlock));
-render(filmPopupContainer, createControlsSection());
-const controls = filmPopupContainer.querySelector('.film-details__controls');
 render(controls, renderAll(dataControls, createControl));
+
 render(filmPopupContainer, createBlockComments(comments.length));
 const commentsList = popup.querySelector('.film-details__comments-list');
 render(commentsList, renderAll(comments, createComment));
