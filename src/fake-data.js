@@ -26,6 +26,8 @@ const comments = [commentMock, commentMock, commentMock, commentMock];
 
 const allFilms = [filmMock, filmMock, filmMock, filmMock, filmMock];
 const topFilms = [filmMock, filmMock];
-const mostFilms = [filmMock, filmMock];
+const popFilms = [filmMock, filmMock];
 
-export {allFilms, topFilms, mostFilms, comments};
+const menuData = {watchlistLength: 11, historyLength: 2, favoritestLength: 3};
+
+export {allFilms, topFilms, popFilms, comments, menuData};

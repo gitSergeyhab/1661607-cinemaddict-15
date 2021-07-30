@@ -1,5 +1,5 @@
 export const createBlockFilmInfo = (
-  {title, originalTitle, director, writers, actors, rating, ageRaring, date, country, duration, description, srcPoster},
+  {title, originalTitle, director, writers, actors, rating, ageRaring, date, country, duration, description, srcPoster, genres},
 ) => `
   <div class="film-details__info-wrap">
     <div class="film-details__poster">
@@ -43,7 +43,7 @@ export const createBlockFilmInfo = (
         </tr>
         <tr class="film-details__row">
           <td class="film-details__term">Genres</td>
-          <td class="film-details__cell js-genres">
+          <td class="film-details__cell js-genres">${(genres || []).map((genre) => `<span class="film-details__genre">${genre}</span>`).join('\n') /**Может, все-таки вынести в отдельную ф-цию? */}
           </td>
         </tr>
       </table>
