@@ -15,7 +15,7 @@ import {createComment} from './view/popup/comment.js';
 import {allFilms, topFilms, popFilms, comments, menuData} from './fake-data.js';
 import {renderAll} from './util.js';
 
-
+// НИЧЕГО НЕ ИЗМЕНИЛОСЬ
 const Rating = {
   NOBODY: '',
   NOTICE: 'Novice',
