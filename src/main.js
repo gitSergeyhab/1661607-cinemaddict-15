@@ -39,7 +39,7 @@ const main = document.querySelector('main.main');
 const footer = document.querySelector('footer.footer');
 
 // header
-render(header, createProfile(Rating.movieBuff));
+render(header, createProfile(Rating.MOVIE_BUFF));
 
 //menu
 render(main, createMenu(menuData));
