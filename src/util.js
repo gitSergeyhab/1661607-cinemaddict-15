@@ -1,4 +1,7 @@
-const renderAll = (data = [], templateFunction = () => '') => data.map(templateFunction).join('\n').trim();
+import dayjs from 'dayjs';
+
+
+const renderAll = (data = [], templateFunction = () => '') => data.map((item) => templateFunction(item || '')).join('\n').trim();
 
 const getRandomInt = (min, max) => {
   [min, max] = [Math.min(min, max), Math.max(min, max)];
@@ -19,4 +22,19 @@ const getRandomListNoRepeat = (num, list) => {
   return offers;
 };
 
-export {renderAll, getRandomInt, getRandFromList, getRandomListNoRepeat};
+
+const getHoursAndMinutes = (minutes) => minutes ? `${Math.floor(minutes/60)}h ${minutes % 60}m` : '';
+
+const getYear = (dateStamp) => dateStamp ? dayjs(dateStamp).format('YYYY') : '';
+
+const getDayMonthYear = (dateStamp) => dateStamp ? dayjs(dateStamp).format('DD MMMM YYYY') : '';
+
+const getFullDate = (dateStamp) => dateStamp ? dayjs(dateStamp).format('YYYY/MM/DD hh:mm') : '';
+
+
+const makeActivatingFunc = (classActive) => (param) => param ? classActive : '';
+
+
+export {renderAll, getRandomInt, getRandFromList, getRandomListNoRepeat,
+  getHoursAndMinutes, getYear, getDayMonthYear, getFullDate,
+  makeActivatingFunc};

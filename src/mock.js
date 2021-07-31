@@ -1,27 +1,12 @@
-/* eslint-disable camelcase*/ // в тз написано, что данные с сервера будут приходить в snake_case, так что  вот...
+/* eslint-disable camelcase*/ // с сервера данные приходят в snake_case, так что  вот...
 import {getRandomInt, getRandFromList, getRandomListNoRepeat} from './util.js';
 
-const Counts = {
-  COMMENT: {
-    MIN: 0,
-    MAX: 5,
-  },
-  FILM: {
-    MIN: 15,
-    MAX: 20,
-  },
-  NAMES: {
-    MIN: 0,
-    MAX: 3,
-  },
-  RUNTIME: {
-    MIN: 10,
-    MAX: 300,
-  },
-  GENRE: {
-    MIN: 0,
-    MAX: 4,
-  },
+export const Counts = {
+  COMMENT: {MIN: 0, MAX: 5},
+  FILM: {MIN: 15, MAX: 20},
+  NAMES: {MIN: 0, MAX: 3},
+  RUNTIME: {MIN: 10, MAX: 300},
+  GENRE: {MIN: 0, MAX: 4},
 };
 
 const REJECT_PERCENTAGE = 0.2;
@@ -52,7 +37,7 @@ const emotions = ['smile', 'sleeping', 'puke', 'angry'];
 
 const description = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra. Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum. Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui. Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus';
 const descriptions = description.split('. ');
-const commentAutors = ['Tim Macoveev', 'John Doe', 'Ilya O\'Reilly', '', 'anonim', 'I', 'Lenin Vladimir Ilyich', 'Pablo Diego José Francisco de Paula Juan Nepomuceno María de los Remedios Cipriano de la Santísima Trinidad Mártir Patricio Ruizy Picasso'];
+const commentAutors = ['Tim Macoveev', 'John Doe', 'Ilya O\'Reilly', 'anonim', 'I', 'Lenin Vladimir Ilyich', 'Pablo Diego José Francisco de Paula Juan Nepomuceno María de los Remedios Cipriano de la Santísima Trinidad Mártir Patricio Ruizy Picasso'];
 
 const names = ['Фрэнсис Форд Коппола', 'Кристофер Нолан', 'Питер Джексон', 'Квентин Тарантино', 'Серджо Леоне', 'Дэвид Финчер', 'Чарли Чаплин'];
 const countries = ['USA', 'USSR', 'UK', 'France', 'Italy'];
@@ -71,9 +56,9 @@ const getGetId = () => {
 const getFilmId = getGetId();
 const getCommentId = getGetId();
 
-const getRandDateStamp = () => getRandomInt(-(new Date() - 0), new Date() - 0);
+const getRandDateStamp = () => getRandomInt(-(new Date()), new Date());
 
-const getMockDataArr = (cteateObjFunc, maxLen, minLen = 0) => new Array(getRandomInt(minLen, maxLen)).fill().map(cteateObjFunc);
+export const getMockDataArr = (cteateObjFunc, maxLen, minLen = 0) => new Array(getRandomInt(minLen, maxLen)).fill().map(cteateObjFunc);
 
 const createMockComment = () => ({
   id: getCommentId(),
@@ -84,7 +69,7 @@ const createMockComment = () => ({
 });
 
 
-const createMockFilm = () => ({
+export const createMockFilm = () => ({
   id: getFilmId(),
   comments: getMockDataArr(createMockComment, Counts.COMMENT.MAX),
   film_info: {
@@ -112,7 +97,6 @@ const createMockFilm = () => ({
   },
 });
 
-export const mockFilms = getMockDataArr(createMockFilm, Counts.FILM.MAX, Counts.FILM.MIN);
 
 // портим данные
 export const crippleData = (data) => {
@@ -124,7 +108,3 @@ export const crippleData = (data) => {
     }
   }
 };
-
-for (let i=0; i<mockFilms.length; i++) {
-  crippleData(mockFilms[i]); // испортить данные мэпом или фор-офом почему-то не получается
-}

@@ -1,14 +1,18 @@
-/* eslint-disable camelcase*/ // в тз написано, что данные с сервера будут приходить в snake_case, так что  вот...
-import dayjs from 'dayjs';
+/* eslint-disable camelcase*/ // с сервера данные приходят в snake_case, так что  вот...
+import {getHoursAndMinutes, getYear, makeActivatingFunc} from '../../util.js';
+import {DEFAULT_POSTER, ActiveClasses} from '../../setup.js';
 
-const CLASS_CONTROL_ACTIVE = 'film-card__controls-item--active';
-const DEFAULT_POSTER = 'https://cdn.fishki.net/upload/post/2017/04/09/2263249/8-10.jpg';
 
-const getHoursAndMinutes = (minutes) => minutes ? `${Math.floor(minutes/60)}h ${minutes % 60}m` : '';
+const makeItemActive = makeActivatingFunc(ActiveClasses.CARD);
 
-const getYear = (dateStamp) => dateStamp ? dayjs(dateStamp).format('YYYY') : '';
-
-const makeActive = (param) => param ? CLASS_CONTROL_ACTIVE : '';
+const cutOffDescription = (description) => {
+  if (!description) {
+    return '';
+  } else if (description.length > 139) {
+    return `${description.slice(0, 139)}...`;
+  }
+  return description;
+};
 
 export const createFilmCard = ({
   id, comments,
@@ -24,11 +28,11 @@ export const createFilmCard = ({
     <span class="film-card__genre">${genre[0] || ''}</span>
   </p>
   <img src=${poster || DEFAULT_POSTER} alt="" class="film-card__poster">
-  <p class="film-card__description">${description || ''}</p>
+  <p class="film-card__description">${cutOffDescription(description)}</p>
   <a class="film-card__comments">${comments.length} comments</a>
   <div class="film-card__controls">
-    <button class="film-card__controls-item film-card__controls-item--add-to-watchlist ${makeActive(watchlist)}" type="button">Add to watchlist</button>
-    <button class="film-card__controls-item film-card__controls-item--mark-as-watched ${makeActive(already_watched)}" type="button">Mark as watched</button>
-    <button class="film-card__controls-item film-card__controls-item--favorite ${makeActive(favorite)}" type="button">Mark as favorite</button>
+    <button class="film-card__controls-item film-card__controls-item--add-to-watchlist ${makeItemActive(watchlist)}" type="button">Add to watchlist</button>
+    <button class="film-card__controls-item film-card__controls-item--mark-as-watched ${makeItemActive(already_watched)}" type="button">Mark as watched</button>
+    <button class="film-card__controls-item film-card__controls-item--favorite ${makeItemActive(favorite)}" type="button">Mark as favorite</button>
   </div>
 </article>`;

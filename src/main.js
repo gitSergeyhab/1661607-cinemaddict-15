@@ -7,17 +7,12 @@ import {createExtraFilmsBlock} from './view/films/extra-films-block.js';
 import {createFilmCard} from './view/films/film-card.js';
 import {createShowMoreBtn} from './view/films/show-more-btn.js';
 
-// import {createFilmPopup} from './view/popup/film-popup.js';
-// import {createBlockFilmInfo} from './view/popup/block-film-info.js';
-// import {createBlockComments} from './view/popup/block-comments.js';
-// import {createComment} from './view/popup/comment.js';
-
-// import {allFilms, topFilms, popFilms, comments, menuData} from './fake-data.js';
-// import {menuData} from './fake-data.js';
+import {createFilmPopup} from './view/popup/film-popup.js';
+import {createComment} from './view/popup/comment.js';
 
 import {renderAll} from './util.js';
+import {Counts, getMockDataArr, createMockFilm, crippleData} from './mock.js';
 
-import {mockFilms} from './mock.js';
 
 const Rating = {
   NOBODY: '',
@@ -33,18 +28,25 @@ const RenderPosition = {
   AFTER_END: 'afterend',
 };
 
-const render = (container, htmlText, place = RenderPosition.BEFORE_END) => container.insertAdjacentHTML(place, htmlText);
-
-
-const header = document.querySelector('header.header');
-const main = document.querySelector('main.main');
-// const footer = document.querySelector('footer.footer');
-
 const filmCounts = {
   first: 0,
   last: 5,
   plus: 5,
 };
+
+
+const render = (container, htmlText, place = RenderPosition.BEFORE_END) => container.insertAdjacentHTML(place, htmlText);
+
+
+const header = document.querySelector('header.header');
+const main = document.querySelector('main.main');
+const footer = document.querySelector('footer.footer');
+
+const mockFilms = getMockDataArr(createMockFilm, Counts.FILM.MAX, Counts.FILM.MIN);
+
+for (let i=0; i<mockFilms.length; i++) {
+  crippleData(mockFilms[i]); // испортить данные мэпом или фор-офом почему-то не получается
+}
 
 // header
 render(header, createProfile(Rating.MOVIE_BUFF));
@@ -74,15 +76,12 @@ const popFilms = mockFilms.slice().sort((a, b) => b.comments.length - a.comments
 render(popFilmsContainer, renderAll(popFilms, createFilmCard));
 
 //popup
-// render(footer, createFilmPopup(), RenderPosition.AFTER_END);
-// const popup = document.querySelector('.film-details');
-// const controls = popup.querySelector('.film-details__controls');
-// const filmPopupContainer = popup.querySelector('.film-details__top-container');
-// render(controls, createBlockFilmInfo(allFilms[0]), RenderPosition.BEFORE_BEGIN);
+render(footer, createFilmPopup(mockFilms[0]), RenderPosition.AFTER_END);
+const commentsList = document.querySelector('.film-details__comments-list');
+render(commentsList, renderAll(mockFilms[0].comments, createComment));
 
-// render(filmPopupContainer, createBlockComments(comments.length));
-// const commentsList = popup.querySelector('.film-details__comments-list');
-// render(commentsList, renderAll(comments, createComment));
+const statistic = footer.querySelector('.footer__statistics');
+statistic.textContent = `${mockFilms.length} movies inside`;
 
 
 const btnShowMore = filmSection.querySelector('.films-list__show-more');
