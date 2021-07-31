@@ -7,10 +7,10 @@ export const Counts = {
   NAMES: {MIN: 0, MAX: 3},
   RUNTIME: {MIN: 10, MAX: 300},
   GENRE: {MIN: 0, MAX: 4},
+  RATING: {MIN: 0, MAX: 10, DEV: 10},
 };
 
 const REJECT_PERCENTAGE = 0.2;
-const messValue = (value) => [value, undefined][+(Math.random() < REJECT_PERCENTAGE)];
 
 const filmNames = [
   'Побег из Шоушенка','Крёстный отец', 'Крёстный отец 2', '12 разгневанных мужчин', 'Список Шиндлера',
@@ -64,7 +64,7 @@ const createMockComment = () => ({
   id: getCommentId(),
   author: getRandFromList(commentAutors),
   comment: getRandFromList(descriptions),
-  date: new Date() - 0,
+  date: new Date(),
   emotion: getRandFromList(emotions),
 });
 
@@ -75,7 +75,7 @@ export const createMockFilm = () => ({
   film_info: {
     title: getRandFromList(filmNames),
     alternative_title: getRandFromList(filmNames),
-    total_rating: getRandomInt(0, 100) / 10,
+    total_rating: getRandomInt(Counts.RATING.MIN, Counts.RATING.MAX * Counts.RATING.DEV) / Counts.RATING.DEV,
     poster: getRandFromList(posters),
     age_rating: getRandFromList(ageRatings),
     director: getRandFromList(names),
@@ -87,7 +87,7 @@ export const createMockFilm = () => ({
     },
     runtime: getRandomInt(Counts.RUNTIME.MIN, Counts.RUNTIME.MAX),
     genre: getRandomListNoRepeat(getRandomInt(Counts.GENRE.MIN, Counts.GENRE.MAX), genres),
-    description: getRandomListNoRepeat(getRandomInt(0, 7), descriptions).join('. '),
+    description: getRandomListNoRepeat(getRandomInt(0, descriptions.length - 1), descriptions).join('. '),
   },
   user_details: {
     watchlist: tossCoin(),
@@ -99,6 +99,7 @@ export const createMockFilm = () => ({
 
 
 // портим данные
+const messValue = (value) => [value, undefined][+(Math.random() < REJECT_PERCENTAGE)];
 export const crippleData = (data) => {
   for (const key of Object.keys(data)) {
     if (data[key] instanceof Object) {
