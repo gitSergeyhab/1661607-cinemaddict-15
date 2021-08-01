@@ -12,13 +12,14 @@ import {createComment} from './view/popup/comment.js';
 
 import {renderAll} from './util.js';
 import {Counts, getMockDataArr, createMockFilm, crippleData} from './mock.js';
+import {LEN_ADDITIONAL_BLOCK} from './setup.js';
 
 
 const Rating = {
-  NOBODY: '',
-  NOTICE: 'Novice',
-  FAN: 'Fan',
-  MOVIE_BUFF: 'Movie Buff',
+  NOBODY: {name: '', count: -1},
+  NOTICE: {name: 'Novice', count: 0},
+  FAN: {name: 'Fan', count: 10},
+  MOVIE_BUFF: {name: 'Movie Buff', count: 20},
 };
 
 const RenderPosition = {
@@ -37,6 +38,17 @@ const filmCounts = {
 
 const render = (container, htmlText, place = RenderPosition.BEFORE_END) => container.insertAdjacentHTML(place, htmlText);
 
+const getRatingByWatched = (count) => {
+  if (count > Rating.MOVIE_BUFF.count) {
+    return Rating.MOVIE_BUFF.name;
+  } else if (count > Rating.FAN.count) {
+    return Rating.FAN.name;
+  } else if (count > Rating.NOTICE.count) {
+    return Rating.NOTICE.name;
+  }
+  return Rating.NOBODY.name;
+};
+
 
 const header = document.querySelector('header.header');
 const main = document.querySelector('main.main');
@@ -44,21 +56,21 @@ const footer = document.querySelector('footer.footer');
 
 const mockFilms = getMockDataArr(createMockFilm, Counts.FILM.MAX, Counts.FILM.MIN);
 
-for (let i=0; i<mockFilms.length; i++) {
-  crippleData(mockFilms[i]); // испортить данные мэпом или фор-офом почему-то не получается
-}
-
-// header
-render(header, createProfile(Rating.MOVIE_BUFF));
-
-//menu
-const menuData = {
+const useDetails = { // или это тоже перечисление ?
   watchlistLength: mockFilms.filter((film) => film.user_details.watchlist).length,
   historyLength: mockFilms.filter((film) => film.user_details.already_watched).length,
   favoritestLength: mockFilms.filter((film) => film.user_details.favorite).length,
 };
 
-render(main, createMenu(menuData));
+for (let i=0; i<mockFilms.length; i++) {
+  crippleData(mockFilms[i]); // испортить данные мэпом или фор-офом почему-то не получается
+}
+
+// header
+render(header, createProfile(getRatingByWatched(useDetails.historyLength)));
+
+//menu
+render(main, createMenu(useDetails));
 
 // film block
 render(main, createFilmsSections());
@@ -72,7 +84,7 @@ renderMainFilms();
 render(allFilmsContainer, createShowMoreBtn(), RenderPosition.AFTER_END);
 const topFilms = mockFilms.slice().sort((a, b) => (b.film_info.total_rating || 0) - (a.film_info.total_rating || 0)).slice(0, 2);
 render(topFilmsContainer, renderAll(topFilms, createFilmCard));
-const popFilms = mockFilms.slice().sort((a, b) => b.comments.length - a.comments.length).slice(0, 2);
+const popFilms = mockFilms.slice().sort((a, b) => b.comments.length - a.comments.length).slice(0, LEN_ADDITIONAL_BLOCK);
 render(popFilmsContainer, renderAll(popFilms, createFilmCard));
 
 //popup

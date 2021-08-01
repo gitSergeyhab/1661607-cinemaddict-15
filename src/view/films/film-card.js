@@ -1,6 +1,6 @@
 /* eslint-disable camelcase*/ // с сервера данные приходят в snake_case, так что  вот...
 import {getHoursAndMinutes, getYear, makeActivatingFunc} from '../../util.js';
-import {DEFAULT_POSTER, ActiveClasses} from '../../setup.js';
+import {DEFAULT_POSTER, MAX_LEN_DESCRIPTION, ActiveClasses} from '../../setup.js';
 
 
 const makeItemActive = makeActivatingFunc(ActiveClasses.CARD);
@@ -8,8 +8,8 @@ const makeItemActive = makeActivatingFunc(ActiveClasses.CARD);
 const cutOffDescription = (description) => {
   if (!description) {
     return '';
-  } else if (description.length > 139) {
-    return `${description.slice(0, 139)}...`;
+  } else if (description.length > MAX_LEN_DESCRIPTION) {
+    return `${description.slice(0, MAX_LEN_DESCRIPTION - 1)}...`;
   }
   return description;
 };
