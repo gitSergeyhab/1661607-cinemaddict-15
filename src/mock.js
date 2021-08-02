@@ -1,27 +1,55 @@
-/* eslint-disable camelcase*/ // с сервера данные приходят в snake_case, так что  вот...
-import {getRandomInt, getRandFromList, getRandomListNoRepeat} from './util.js';
+import {
+  getRandomBoolean,
+  getRandomInt,
+  getRandFromList,
+  getRandomListNoRepeat,
+  getRandomListWithoutNull
+} from './utils/utils.js';
+import {
+  getRandomDateStamp
+} from './utils/date-time-utils.js';
 
-export const Counts = {
-  COMMENT: {MIN: 0, MAX: 5},
-  FILM: {MIN: 15, MAX: 20},
-  NAMES: {MIN: 0, MAX: 3},
-  RUNTIME: {MIN: 10, MAX: 300},
-  GENRE: {MIN: 0, MAX: 4},
-  RATING: {MIN: 0, MAX: 10, DEV: 10},
+
+//CONSTANTS
+
+export const COUNTS = {
+  COMMENT: {
+    MIN: 0,
+    MAX: 5,
+  },
+  FILM: {
+    MIN: 15,
+    MAX: 20,
+  },
+  NAMES: {
+    MIN: 1,
+    MAX: 3,
+  },
+  RUNTIME: {
+    MIN: 10,
+    MAX: 300,
+  },
+  GENRE: {
+    MIN: 0,
+    MAX: 4,
+  },
+  RATING: {
+    MIN: 0,
+    MAX: 10,
+    DEV: 10,
+  },
 };
 
-const REJECT_PERCENTAGE = 0.2;
-
-const filmNames = [
-  'Побег из Шоушенка','Крёстный отец', 'Крёстный отец 2', '12 разгневанных мужчин', 'Список Шиндлера',
-  'Властелин колец: Возвращение короля','Криминальное чтиво','Хороший, плохой, злой','Властелин колец: Братство Кольца',
+const FILM_NAMES = [
+  'Побег из Шоушенка', 'Крёстный отец', 'Крёстный отец 2', '12 разгневанных мужчин', 'Список Шиндлера',
+  'Властелин колец: Возвращение короля', 'Криминальное чтиво', 'Хороший, плохой, злой', 'Властелин колец: Братство Кольца',
   'Бойцовский клуб', 'Форрест Гамп', 'Начало', 'Властелин колец: Две крепости', 'Славные парни',
   'Пролетая над гнездом кукушки', 'Семь самураев', 'Семь', 'Жизнь прекрасна', 'Город Бога', 'Молчание ягнят',
   'Эта прекрасная жизнь', 'Спасти рядового Райана', 'Зелёная миля', 'Унесённые призраками', 'Интерстеллар', 'Паразиты',
-  'Леон', 'Доктор Стрейнджлав, или Как я перестал бояться и полюбил бомбу', 'М',
+  'Леон', 'Доктор Стрейнджлав, или Как я перестал бояться и полюбил бомбу', 'М', '',
 ];
 
-const posters = [
+const POSTERS = [
   './images/posters/made-for-each-other.png',
   './images/posters/popeye-meets-sinbad.png',
   './images/posters/sagebrush-trail.jpg',
@@ -29,83 +57,62 @@ const posters = [
   './images/posters/the-dance-of-life.jpg',
   './images/posters/the-great-flamarion.jpg',
   './images/posters/the-man-with-the-golden-arm.jpg',
+  '',
 ];
 
-const ageRatings = ['0+', '6+', '12+', '16+', '18+'];
+const AGE_RATINGS = ['0+', '6+', '12+', '16+', '18+', ''];
 
-const emotions = ['smile', 'sleeping', 'puke', 'angry'];
+const EMOTIONS = ['smile', 'sleeping', 'puke', 'angry', ''];
 
-const description = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra. Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum. Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui. Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus';
-const descriptions = description.split('. ');
-const commentAutors = ['Tim Macoveev', 'John Doe', 'Ilya O\'Reilly', 'anonim', 'I', 'Lenin Vladimir Ilyich', 'Pablo Diego José Francisco de Paula Juan Nepomuceno María de los Remedios Cipriano de la Santísima Trinidad Mártir Patricio Ruizy Picasso'];
+const DESCRIPTION = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra. Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum. Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui. Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus';
 
-const names = ['Фрэнсис Форд Коппола', 'Кристофер Нолан', 'Питер Джексон', 'Квентин Тарантино', 'Серджо Леоне', 'Дэвид Финчер', 'Чарли Чаплин'];
-const countries = ['USA', 'USSR', 'UK', 'France', 'Italy'];
-const genres = ['thriller', 'horror', 'comedy', 'fantasy', 'action', 'animation'];
+const DESCRIPTIONS = DESCRIPTION.split('. '); //??? вроде это все-таки вычисляемое значение ???
 
-const tossCoin = () => Math.random() > 0.5;
+const COMMENT_AUTORS = ['', 'Tim Macoveev', 'John Doe', 'Ilya O\'Reilly', 'anonim', 'I', 'Lenin Vladimir Ilyich', 'Pablo Diego José Francisco de Paula Juan Nepomuceno María de los Remedios Cipriano de la Santísima Trinidad Mártir Patricio Ruizy Picasso'];
 
-const getGetId = () => {
-  let id = 0;
-  return () => {
-    id++;
-    return id;
-  };
-};
+const NAMES = ['', 'Фрэнсис Форд Коппола', 'Кристофер Нолан', 'Питер Джексон', 'Квентин Тарантино', 'Серджо Леоне', 'Дэвид Финчер', 'Чарли Чаплин'];
 
-const getFilmId = getGetId();
-const getCommentId = getGetId();
+const COUNTRIES = ['USA', 'USSR', 'UK', 'France', 'Italy', ''];
 
-const getRandDateStamp = () => getRandomInt(-(new Date()), new Date());
+const GENRES = ['thriller', 'horror', 'comedy', 'fantasy', 'action', 'animation', ''];
 
-export const getMockDataArr = (cteateObjFunc, maxLen, minLen = 0) => new Array(getRandomInt(minLen, maxLen)).fill().map(cteateObjFunc);
 
-const createMockComment = () => ({
-  id: getCommentId(),
-  author: getRandFromList(commentAutors),
-  comment: getRandFromList(descriptions),
+// FUNCTIONS
+
+const createMockComment = (id) => ({
+  id,
+  author: getRandFromList(COMMENT_AUTORS),
+  comment: getRandFromList(DESCRIPTIONS),
   date: new Date(),
-  emotion: getRandFromList(emotions),
+  emotion: getRandFromList(EMOTIONS),
 });
 
 
-export const createMockFilm = () => ({
-  id: getFilmId(),
-  comments: getMockDataArr(createMockComment, Counts.COMMENT.MAX),
-  film_info: {
-    title: getRandFromList(filmNames),
-    alternative_title: getRandFromList(filmNames),
-    total_rating: getRandomInt(Counts.RATING.MIN, Counts.RATING.MAX * Counts.RATING.DEV) / Counts.RATING.DEV,
-    poster: getRandFromList(posters),
-    age_rating: getRandFromList(ageRatings),
-    director: getRandFromList(names),
-    writers: getRandomListNoRepeat(getRandomInt(Counts.NAMES.MIN, Counts.NAMES.MAX), names),
-    actors: getRandomListNoRepeat(getRandomInt(Counts.NAMES.MIN, Counts.NAMES.MAX), names),
+export const createMockFilm = (id) => ({
+  id,
+  comments: new Array(getRandomInt(COUNTS.COMMENT.MIN, COUNTS.COMMENT.MAX)).fill().map((item, i) => createMockComment(`${id}-${i}`)),
+  filmInfo: {
+    // ??? С сервера приходит snake_case. Потом опять переписывать или делать адаптеры, в которых все равно будет snake_case ???
+    title: getRandFromList(FILM_NAMES),
+    alternativeTitle: getRandFromList(FILM_NAMES),
+    totalRating: getRandomInt(COUNTS.RATING.MIN, COUNTS.RATING.MAX * COUNTS.RATING.DEV) / COUNTS.RATING.DEV,
+    poster: getRandFromList(POSTERS),
+    ageRating: getRandFromList(AGE_RATINGS),
+    director: getRandFromList(NAMES),
+    writers: getRandomListWithoutNull(NAMES, COUNTS.NAMES.MIN, COUNTS.NAMES.MAX),
+    actors: getRandomListWithoutNull(NAMES, COUNTS.NAMES.MIN, COUNTS.NAMES.MAX),
     release: {
-      date: getRandDateStamp(),
-      release_country: getRandFromList(countries),
+      date: getRandomDateStamp(),
+      releaseCountry: getRandFromList(COUNTRIES),
     },
-    runtime: getRandomInt(Counts.RUNTIME.MIN, Counts.RUNTIME.MAX),
-    genre: getRandomListNoRepeat(getRandomInt(Counts.GENRE.MIN, Counts.GENRE.MAX), genres),
-    description: getRandomListNoRepeat(getRandomInt(0, descriptions.length - 1), descriptions).join('. '),
+    runtime: getRandomInt(COUNTS.RUNTIME.MIN, COUNTS.RUNTIME.MAX),
+    genre: getRandomListNoRepeat(getRandomInt(COUNTS.GENRE.MIN, COUNTS.GENRE.MAX), GENRES),
+    description: getRandomListNoRepeat(getRandomInt(0, DESCRIPTIONS.length - 1), DESCRIPTIONS).join('. '),
   },
-  user_details: {
-    watchlist: tossCoin(),
-    already_watched: tossCoin(),
-    watching_date: getRandDateStamp(),
-    favorite: tossCoin(),
+  userDetails: {
+    watchList: getRandomBoolean(),
+    alreadyWatched: getRandomBoolean(),
+    watchingDate: getRandomDateStamp(),
+    favorite: getRandomBoolean(),
   },
 });
-
-
-// портим данные
-const messValue = (value) => [value, undefined][+(Math.random() < REJECT_PERCENTAGE)];
-export const crippleData = (data) => {
-  for (const key of Object.keys(data)) {
-    if (data[key] instanceof Object) {
-      crippleData(data[key]);
-    } else {
-      data[key] = messValue(data[key]);
-    }
-  }
-};
