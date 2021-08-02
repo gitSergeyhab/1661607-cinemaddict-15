@@ -16,7 +16,8 @@ const makeItemActive = (value) => value ? ActiveClass.CARD : '';
 const cutOffDescription = (description) => {
   if (!description) {
     return '';
-  } else if (description.length > MAX_DESCRIPTION_LENGTH) {
+  }
+  if (description.length > MAX_DESCRIPTION_LENGTH) {
     return `${description.slice(0, MAX_DESCRIPTION_LENGTH - 1)}...`;
   }
   return description;

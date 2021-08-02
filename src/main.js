@@ -108,9 +108,11 @@ const sortAndCut = (films, sortFunction, length = ADDITIONAL_BLOCK_LENGTH) => fi
 const getRatingByWatched = (count) => {
   if (count >= Rating.MOVIE_BUFF.count) {
     return Rating.MOVIE_BUFF.name;
-  } else if (count >= Rating.FAN.count) {
+  }
+  if (count >= Rating.FAN.count) {
     return Rating.FAN.name;
-  } else if (count >= Rating.NOVICE.count) {
+  }
+  if (count >= Rating.NOVICE.count) {
     return Rating.NOVICE.name;
   }
   return '';
