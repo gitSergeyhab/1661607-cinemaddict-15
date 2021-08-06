@@ -17,13 +17,12 @@ const getRandomListNoRepeat = (num, list) => {
 
 const getRandomBoolean = () => Math.random() > 0.5;
 
-const getRandomListWithoutNull = (arr, min, max) => getRandomListNoRepeat(getRandomInt(min, max), arr.filter(Boolean));
-
+const getListWithoutNull = (list) => list ? list.filter(Boolean).join(', ') : '';
 
 export {
   getRandomInt,
   getRandFromList,
   getRandomListNoRepeat,
   getRandomBoolean,
-  getRandomListWithoutNull
+  getListWithoutNull
 };

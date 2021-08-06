@@ -1,4 +1,8 @@
-export const createMenu = (watchListLength, historyLength, favoritestLength) => `
+import {
+  createElement
+} from '../utils/dom-utils.js';
+
+const createMenu = (watchListLength, historyLength, favoritestLength) => `
   <nav class="main-navigation">
 
     <div class="main-navigation__items">
@@ -15,3 +19,27 @@ export const createMenu = (watchListLength, historyLength, favoritestLength) => 
     <li><a href="#" class="sort__button">Sort by date</a></li>
     <li><a href="#" class="sort__button">Sort by rating</a></li>
   </ul>`;
+
+export default class Menu {
+  constructor(watchListLength, historyLength, favoritestLength) {
+    this._watchListLength = watchListLength;
+    this._historyLength = historyLength;
+    this._favoritestLength = favoritestLength;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createMenu(this._watchListLength, this._historyLength, this._favoritestLength);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

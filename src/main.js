@@ -1,46 +1,25 @@
-import {
-  createProfile
-} from './view/profile.js';
-
-import {
-  createMenu
-} from './view/menu.js';
-import {
-  createFilmsSections
-} from './view/films/films.js';
-import {
-  createMainFilmsBlock
-} from './view/films/main-films-block.js';
-import {
-  createExtraFilmsBlock
-} from './view/films/extra-films-block.js';
-import {
-  createFilmCard
-} from './view/films/film-card.js';
-import {
-  createShowMoreBtn
-} from './view/films/show-more-btn.js';
-
-import {
-  createFilmPopup
-} from './view/popup/film-popup.js';
-import {
-  createComment
-} from './view/popup/comment.js';
-import {
-  createFooterStatistic
-} from './view/films/footer-statistic.js';
+import Profile from './view/profile.js';
+import Menu from './view/menu.js';
+import FilmSection from './view/films/films.js';
+import MainFilmsBlock from './view/films/main-films-block.js';
+import ExtraFilmsBlock from './view/films/extra-films-block.js';
+import BtnShowMore from'./view/films/show-more-btn.js';
+import FilmCard from './view/films/film-card.js';
+import FooterStatistic from './view/films/footer-statistic.js';
+import FilmPopup from './view/popup/film-popup.js';
+import Comment from './view/popup/comment.js';
 
 import {
   getRandomInt
 } from './utils/utils.js';
 import {
-  renderAll
+  render
 } from './utils/dom-utils.js';
 import {
   COUNTS,
   createMockFilm
 } from './mock.js';
+import {RenderPosition} from './constants.js';
 
 
 // CONSTANTS
@@ -60,13 +39,6 @@ const Rating = {
     name: 'Movie Buff',
     count: 21,
   },
-};
-
-const RenderPosition = {
-  BEFORE_BEGIN: 'beforebegin',
-  BEFORE_END: 'beforeend',
-  AFTER_BEGIN: 'afterbegin',
-  AFTER_END: 'afterend',
 };
 
 const UserDetailFields = {
@@ -98,10 +70,11 @@ const statistic = footer.querySelector('.footer__statistics');
 //фильерует фильмы по значениям в film.userDetails
 const filterFilmsByDetailField = (films, field) => films.filter((film) => film.userDetails[field]);
 
-const render = (container, htmlText, place = RenderPosition.BEFORE_END) => container.insertAdjacentHTML(place, htmlText);
+// аппендит даннные в контеенер
+const renderListToContainer = (container, className, list = []) => list.forEach((item) => container.append(new className(item).getElement()));
 
 // функция для рендеринга списка фильмов в Main Block по частям:
-const renderMainFilms = (container, films) => render(container, renderAll(films.slice(filmsShownIndexes.first, filmsShownIndexes.last), createFilmCard));
+const renderMainFilms = (container, films) => renderListToContainer(container, FilmCard, films.slice(filmsShownIndexes.first, filmsShownIndexes.last));
 
 const sortAndCut = (films, sortFunction, length = ADDITIONAL_BLOCK_LENGTH) => films.slice().sort(sortFunction).slice(0, length);
 
@@ -122,6 +95,7 @@ const getRatingByWatched = (count) => {
 //. START
 
 const mockFilms = new Array(getRandomInt(COUNTS.FILM.MIN, COUNTS.FILM.MAX)).fill().map((item, i) => createMockFilm(i));
+
 // отсортированные и отрезаные куски фильмов для блока Top rated и Most commented
 const topFilms = sortAndCut(mockFilms, (a, b) => (b.filmInfo.totalRating || 0) - (a.filmInfo.totalRating || 0));
 
@@ -138,77 +112,69 @@ const favorites = filterFilmsByDetailField(mockFilms, UserDetailFields.FAVORITE)
 //1.РЕНДЕРИНГ
 
 // 1.1.header
-
-render(header, createProfile(getRatingByWatched(history.length)));
+render(header, new Profile(getRatingByWatched(history.length)).getElement());
 
 
 //1.2.menu
 
-render(main, createMenu(watchList.length, history.length, favorites.length));
+render(main, new Menu(watchList.length, history.length, favorites.length).getElement());
 
 
 // 1.3.film block
 
 // 1.3.1.рендеринг секций для всех блоков фильмов
-
-render(main, createFilmsSections());
+const filmSection = new FilmSection();
+render(main, filmSection.getElement());
 
 
 // 1.3.2.рендеринг Main, Top rated, Most commented Film Blocks
 
-const filmSection = main.querySelector('.films');
+const mainFilmsBlock = new MainFilmsBlock();
+render(filmSection.getElement(), mainFilmsBlock.getElement());
 
-render(filmSection, createMainFilmsBlock());
+const topFilmBlock = new ExtraFilmsBlock('Top rated');
+render(filmSection.getElement(), topFilmBlock.getElement());
 
-render(filmSection, createExtraFilmsBlock('Top rated'));
-
-render(filmSection, createExtraFilmsBlock('Most commented'));
-
-
-//1.3.3.рендеринг фильмов в блоки
-
-// Main, Top rated, Most commented Film Blocks:
-const [allFilmsContainer, topFilmsContainer, popFilmsContainer] = filmSection.querySelectorAll('.films-list__container');
-
-renderMainFilms(allFilmsContainer, mockFilms); // рендерит первые 5 фильмов в основной блок
-
-render(allFilmsContainer, createShowMoreBtn(), RenderPosition.AFTER_END); // ... кнопка
+const popFilmBlock = new ExtraFilmsBlock('Most commented');
+render(filmSection.getElement(), popFilmBlock.getElement());
 
 
-//  рендеринг фильмов в блоки Top rated и Most commented и их рендеринг
+// //1.3.3.рендеринг фильмов в блоки
 
-render(topFilmsContainer, renderAll(topFilms, createFilmCard));
+renderMainFilms(mainFilmsBlock.getContainer(), mockFilms); // рендерит первые 5 фильмов в основной блок
 
-render(popFilmsContainer, renderAll(popFilms, createFilmCard));
+renderListToContainer(topFilmBlock.getContainer(), FilmCard, topFilms);
+
+renderListToContainer(popFilmBlock.getContainer(), FilmCard, popFilms);
 
 
 //1.4.footer statistic
 
-render(statistic, createFooterStatistic(mockFilms.length));
+render(statistic, new FooterStatistic(mockFilms.length).getElement());
 
 
 //1.5.popup
+const filmPopup = new FilmPopup(mockFilms[0]);
 
-render(footer, createFilmPopup(mockFilms[0]), RenderPosition.AFTER_END);
+render(footer, filmPopup.getElement(), RenderPosition.AFTER_END);
 
-const commentsList = document.querySelector('.film-details__comments-list');
-
-render(commentsList, renderAll(mockFilms[0].comments, createComment));
+renderListToContainer(filmPopup.getContainer(), Comment, mockFilms[0].comments);
 
 
 //2. СОБЫТИЯ
 
 //2.1 отображения фильмов при нажатии на btnShowMore
 
-const btnShowMore = filmSection.querySelector('.films-list__show-more');
+const btnShowMore = new BtnShowMore(); // ... кнопка
+render(mainFilmsBlock.getElement(), btnShowMore.getElement(), RenderPosition.AFTER_END);
 
-btnShowMore.addEventListener('click', () => {
+btnShowMore.getElement().addEventListener('click', () => {
   filmsShownIndexes.first += filmsShownIndexes.plus;
   filmsShownIndexes.last += filmsShownIndexes.plus;
 
-  renderMainFilms(allFilmsContainer, mockFilms);
+  renderMainFilms(mainFilmsBlock.getContainer(), mockFilms);
 
   if (filmsShownIndexes.last >= mockFilms.length) {
-    btnShowMore.style.display = 'none';
+    btnShowMore.getElement().style.display = 'none';
   }
 });
