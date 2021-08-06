@@ -18,7 +18,10 @@ const SELECTOR_CLOSE_POPUP = '.film-details__close-btn';
 
 const renderListToContainer = (container, className, list = []) => list.forEach((item) => container.append(new className(item).getElement()));
 
-const closePopup = (popup) => popup.remove();
+const closePopup = (popup) => {
+  popup.remove();
+  document.body.classList.remove('hide-overflow');
+};
 
 const findOpenPopup = () => document.querySelector(SELECTOR_POPUP); //ищет незакрытый попап
 
@@ -34,6 +37,7 @@ export const openPopup = (films, id) => {
 
   const btnClose = filmPopupElement.querySelector(SELECTOR_CLOSE_POPUP);
   btnClose.addEventListener('click', () => closePopup(filmPopupElement));
+  document.body.classList.add('hide-overflow');
 
   render(footer, filmPopupElement, RenderPosition.AFTER_END);
 
