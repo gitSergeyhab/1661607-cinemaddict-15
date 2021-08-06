@@ -14,9 +14,16 @@ const RenderPosition = {
 
 const FILM_CONTAINER_SELECTOR = '.films-list__container';
 
+const filmsShownIndexes = {
+  first: 0, // индекс 1-го вновь отрисовываемого фильма
+  last: 5, // индекс фильма до которого нужно отрисовывать
+  plus: 5, // на сколько нужно увеличить предыдущие значения
+};
+
 export {
   ActiveClass,
   DEFAULT_POSTER,
   RenderPosition,
-  FILM_CONTAINER_SELECTOR
+  FILM_CONTAINER_SELECTOR,
+  filmsShownIndexes
 };
