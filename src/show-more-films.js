@@ -1,21 +1,16 @@
-
-import {
-  mockFilms,
-  renderMainFilms
-} from './main.js';
 import {
   filmsShownIndexes
 } from './constants.js';
 
 
-export const showMoreFilms = (btn, container) => {
+export const showMoreFilms = (films, btn, renderFunction, container) => {
   btn.addEventListener('click', () => {
     filmsShownIndexes.first += filmsShownIndexes.plus;
     filmsShownIndexes.last += filmsShownIndexes.plus;
 
-    renderMainFilms(container, mockFilms);
+    renderFunction(container, films);
 
-    if (filmsShownIndexes.last >= mockFilms.length) {
+    if (filmsShownIndexes.last >= films.length) {
       btn.style.display = 'none';
     }
   });

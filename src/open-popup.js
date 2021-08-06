@@ -4,38 +4,38 @@ import Comment from './view/popup/comment.js';
 import {
   render
 } from './utils/dom-utils.js';
-
 import {
   RenderPosition
 } from './constants.js';
 import {
-  mockFilms
-} from './main.js';
-import {
   footer
 } from './dom-elements.js';
+
+
+const SELECTOR_POPUP = 'section.film-details';
+const SELECTOR_CLOSE_POPUP = '.film-details__close-btn';
 
 
 const renderListToContainer = (container, className, list = []) => list.forEach((item) => container.append(new className(item).getElement()));
 
 const closePopup = (popup) => popup.remove();
 
-const findOpenPopup = () => document.querySelector('section.film-details'); //ищет незакрытый попап
+const findOpenPopup = () => document.querySelector(SELECTOR_POPUP); //ищет незакрытый попап
 
-export const openPopup = (id, evt) => {
-  evt.preventDefault();
+export const openPopup = (films, id) => {
 
   if (findOpenPopup()) {
     closePopup(findOpenPopup()); //удаляет незакрытый попап
   }
 
-  const mockFilm = mockFilms.find((film) => film.id === +id);
+  const mockFilm = films.find((film) => film.id === +id);
   const filmPopup = new FilmPopup(mockFilm);
   const filmPopupElement = filmPopup.getElement();
 
-  const btnClose = filmPopupElement.querySelector('.film-details__close-btn');
+  const btnClose = filmPopupElement.querySelector(SELECTOR_CLOSE_POPUP);
   btnClose.addEventListener('click', () => closePopup(filmPopupElement));
 
   render(footer, filmPopupElement, RenderPosition.AFTER_END);
+
   renderListToContainer(filmPopup.getContainer(), Comment, mockFilm.comments);
 };

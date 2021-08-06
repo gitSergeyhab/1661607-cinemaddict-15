@@ -7,9 +7,9 @@ import BtnShowMore from './view/films/show-more-btn.js';
 import FilmCard from './view/films/film-card.js';
 import FooterStatistic from './view/films/footer-statistic.js';
 
-
 import {
-  getRandomInt
+  getRandomInt,
+  sortAndCut
 } from './utils/utils.js';
 import {
   render
@@ -37,7 +37,10 @@ import {
 
 // CONSTANTS
 
-const ADDITIONAL_BLOCK_LENGTH = 2;
+const FilmSectionName = {
+  TOP_RATED: 'Top rated',
+  POP_RATED: 'Most commented',
+};
 
 const Rating = {
   NOVICE: {
@@ -61,7 +64,8 @@ const UserDetailFields = {
 };
 
 
-export const mockFilms = new Array(getRandomInt(COUNTS.FILM.MIN, COUNTS.FILM.MAX)).fill().map((item, i) => createMockFilm(i));
+//  DATA
+const mockFilms = new Array(getRandomInt(COUNTS.FILM.MIN, COUNTS.FILM.MAX)).fill().map((item, i) => createMockFilm(i));
 
 
 //FUNCTIONS
@@ -72,17 +76,14 @@ const filterFilmsByDetailField = (films, field) => films.filter((film) => film.u
 const renderFilmsToContainer = (container, films = []) => {
   films.forEach((film) => {
     const filmCardElement = new FilmCard(film).getElement();
-    addListenersToFilmCard(filmCardElement); // навешивает обработчики открытия попапа
+    addListenersToFilmCard(mockFilms, filmCardElement); // навешивает обработчики открытия попапа
     container.append(filmCardElement);
   });
 };
 
-
 // функция для рендеринга списка фильмов в Main Block по частям:
-export const renderMainFilms = (container, films) => renderFilmsToContainer(container, films.slice(filmsShownIndexes.first, filmsShownIndexes.last));
+const renderMainFilms = (container, films) => renderFilmsToContainer(container, films.slice(filmsShownIndexes.first, filmsShownIndexes.last));
 
-
-const sortAndCut = (films, sortFunction, length = ADDITIONAL_BLOCK_LENGTH) => films.slice().sort(sortFunction).slice(0, length);
 
 const getRatingByWatched = (count) => {
   if (count >= Rating.MOVIE_BUFF.count) {
@@ -105,7 +106,7 @@ const topFilms = sortAndCut(mockFilms, (a, b) => (b.filmInfo.totalRating || 0) -
 
 const popFilms = sortAndCut(mockFilms, (a, b) => b.comments.length - a.comments.length);
 
-
+// списки фильмов по фильтрам
 const watchList = filterFilmsByDetailField(mockFilms, UserDetailFields.WATCH_LIST);
 
 const history = filterFilmsByDetailField(mockFilms, UserDetailFields.HISTORY);
@@ -140,11 +141,11 @@ const mainFilmsBlock = new MainFilmsBlock();
 
 render(filmSection.getElement(), mainFilmsBlock.getElement());
 
-const topFilmBlock = new ExtraFilmsBlock('Top rated');
+const topFilmBlock = new ExtraFilmsBlock(FilmSectionName.TOP_RATED);
 
 render(filmSection.getElement(), topFilmBlock.getElement());
 
-const popFilmBlock = new ExtraFilmsBlock('Most commented');
+const popFilmBlock = new ExtraFilmsBlock(FilmSectionName.POP_RATED);
 
 render(filmSection.getElement(), popFilmBlock.getElement());
 
@@ -169,4 +170,4 @@ const btnShowMoreElement = new BtnShowMore().getElement(); // ... кнопк
 
 render(mainFilmsBlock.getElement(), btnShowMoreElement, RenderPosition.AFTER_END);
 
-showMoreFilms(btnShowMoreElement, mainFilmsBlock.getContainer());
+showMoreFilms(mockFilms, btnShowMoreElement, renderMainFilms, mainFilmsBlock.getContainer());
