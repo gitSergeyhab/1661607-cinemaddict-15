@@ -28,10 +28,21 @@ import {
 
 const SELECTOR_POPUP = 'section.film-details';
 const SELECTOR_CLOSE_POPUP = '.film-details__close-btn';
-const SELECTOR_TITLE = '.film-card__title';
+const SELECTOR_TITLE_FILM_CARD = '.film-card__title';
 const SELECTOR_POSTER = '.film-card__poster';
 const SELECTOR_COMMENTS = '.film-card__comments';
+const SELECTOR_TITLE_FILM_BLOCK = '.films-list__title';
 const CLASS_HIDE_SCROLL = 'hide-overflow';
+const CLASS_HIDDEN = 'visually-hidden';
+
+const KEY_CODE_ESC = 27;
+
+const EmptyResultMessage = {
+  ALL: 'There are no movies in our database',
+  WATCH_LIST: 'There are no movies to watch now',
+  HISTORY: 'There are no watched movies now',
+  FAVORITE: 'There are no favorite movies now',
+};
 
 const FilmSectionName = {
   TOP_RATED: 'Top rated',
@@ -71,6 +82,7 @@ const statistic = footer.querySelector('.footer__statistics');
 
 //  DATA
 const mockFilms = new Array(getRandomInt(COUNTS.FILM.MIN, COUNTS.FILM.MAX)).fill().map((item, i) => createMockFilm(i));
+// const mockFilms = new Array(getRandomInt(0, 0)).fill().map((item, i) => createMockFilm(i));
 
 
 //FUNCTIONS
@@ -84,11 +96,11 @@ const closePopup = (popup) => {
 
 const findOpenPopup = () => document.querySelector(SELECTOR_POPUP); //ищет незакрытый попап
 
+const removePopup = () => findOpenPopup() ? closePopup(findOpenPopup()) : null; //удаляет незакрытый попап
+
 const openPopup = (id) => {
 
-  if (findOpenPopup()) {
-    closePopup(findOpenPopup()); //удаляет незакрытый попап
-  }
+  removePopup();
 
   const mockFilm = mockFilms.find((film) => film.id === +id);
   const filmPopup = new FilmPopup(mockFilm);
@@ -106,7 +118,7 @@ const openPopup = (id) => {
 const addListenersToFilmCard = (element) => {
   const id = element.dataset.filmId;
 
-  const title = element.querySelector(SELECTOR_TITLE);
+  const title = element.querySelector(SELECTOR_TITLE_FILM_CARD);
   const poster = element.querySelector(SELECTOR_POSTER);
   const commentsBlock = element.querySelector(SELECTOR_COMMENTS);
 
@@ -197,7 +209,41 @@ render(filmSection.getElement(), popFilmBlock.getElement());
 
 // //1.3.3.рендеринг фильмов в блоки
 
-renderMainFilms(mainFilmsBlock.getContainer(), mockFilms); // рендерит первые 5 фильмов в основной блок
+//1.3.3.1 Main block and BtnShowMore
+
+// отображения фильмов при нажатии на btnShowMore
+const addBtnShowMore = (data) => {
+  const btnShowMoreElement = new BtnShowMore().getElement(); // ... кнопка
+
+  render(mainFilmsBlock.getElement(), btnShowMoreElement, RenderPosition.AFTER_END);
+
+  btnShowMoreElement.addEventListener('click', () => {
+    filmsShownIndexes.first += filmsShownIndexes.plus;
+    filmsShownIndexes.last += filmsShownIndexes.plus;
+
+    renderMainFilms(mainFilmsBlock.getContainer(), data);
+
+    if (filmsShownIndexes.last >= mockFilms.length) {
+      btnShowMoreElement.style.display = 'none';
+    }
+  });
+};
+// ПЕРЕДЕЛАЮ, КОГДА НУЖНО БУДЕТ ВЫВОДИТЬ ФИЛЬМЫ ПО ФИЛЬТРАМ
+const showMainBlock = (data = mockFilms, text = EmptyResultMessage.ALL) => {
+  if (data.length) { // если есть, что рендерить ...
+    renderMainFilms(mainFilmsBlock.getContainer(), data); // ... рендерит первые 5 фильмов в основной блок ...
+    addBtnShowMore(data); // ... и показывает кнопку ...
+  } else { // ... иначе сообщение:
+    const headerFilmsBlock = mainFilmsBlock.getElement().querySelector(SELECTOR_TITLE_FILM_BLOCK);
+    headerFilmsBlock.classList.remove(CLASS_HIDDEN);
+    headerFilmsBlock.textContent = text;
+  }
+};
+
+showMainBlock();
+
+
+//1.3.3.2 TOP_RATED and MOST_COMMENTED blocks
 
 renderFilmsToContainer(topFilmBlock.getContainer(), topFilms);
 
@@ -209,19 +255,6 @@ renderFilmsToContainer(popFilmBlock.getContainer(), popFilms);
 render(statistic, new FooterStatistic(mockFilms.length).getElement());
 
 
-// отображения фильмов при нажатии на btnShowMore
+// обработчик для удаления попапа при ESC
 
-const btnShowMoreElement = new BtnShowMore().getElement(); // ... кнопка
-
-render(mainFilmsBlock.getElement(), btnShowMoreElement, RenderPosition.AFTER_END);
-
-btnShowMoreElement.addEventListener('click', () => {
-  filmsShownIndexes.first += filmsShownIndexes.plus;
-  filmsShownIndexes.last += filmsShownIndexes.plus;
-
-  renderMainFilms(mainFilmsBlock.getContainer(), mockFilms);
-
-  if (filmsShownIndexes.last >= mockFilms.length) {
-    btnShowMoreElement.style.display = 'none';
-  }
-});
+document.addEventListener('keydown', (evt) => evt.keyCode === KEY_CODE_ESC ? removePopup() : null);
