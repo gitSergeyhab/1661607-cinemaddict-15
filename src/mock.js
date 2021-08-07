@@ -4,9 +4,7 @@ import {
   getRandFromList,
   getRandomListNoRepeat
 } from './utils/utils.js';
-import {
-  getRandomDateStamp
-} from './utils/date-time-utils.js';
+import {getRandomDateStamp} from './utils/date-time-utils.js';
 
 
 //CONSTANTS

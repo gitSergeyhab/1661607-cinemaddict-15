@@ -1,7 +1,5 @@
 import dayjs from 'dayjs';
-import {
-  getRandomInt
-} from './utils.js';
+import {getRandomInt} from './utils.js';
 
 
 const getHoursAndMinutes = (minutes) => minutes ? `${Math.floor(minutes/60)}h ${minutes % 60}m` : '';

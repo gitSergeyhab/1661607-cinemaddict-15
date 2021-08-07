@@ -6,14 +6,14 @@ import ExtraFilmsBlock from './view/films/extra-films-block.js';
 import BtnShowMore from './view/films/show-more-btn.js';
 import FilmCard from './view/films/film-card.js';
 import FooterStatistic from './view/films/footer-statistic.js';
+import FilmPopup from './view/popup/film-popup.js';
+import Comment from './view/popup/comment.js';
 
+import {render} from './utils/dom-utils.js';
 import {
   getRandomInt,
   sortAndCut
 } from './utils/utils.js';
-import {
-  render
-} from './utils/dom-utils.js';
 import {
   COUNTS,
   createMockFilm
@@ -22,24 +22,20 @@ import {
   RenderPosition,
   filmsShownIndexes
 } from './constants.js';
-import {
-  addListenersToFilmCard
-} from './add-listeners-to-film-card.js';
-import {
-  showMoreFilms
-} from './show-more-films.js';
-import {
-  header,
-  main,
-  statistic
-} from './dom-elements.js';
 
 
 // CONSTANTS
 
+const SELECTOR_POPUP = 'section.film-details';
+const SELECTOR_CLOSE_POPUP = '.film-details__close-btn';
+const SELECTOR_TITLE = '.film-card__title';
+const SELECTOR_POSTER = '.film-card__poster';
+const SELECTOR_COMMENTS = '.film-card__comments';
+const CLASS_HIDE_SCROLL = 'hide-overflow';
+
 const FilmSectionName = {
   TOP_RATED: 'Top rated',
-  POP_RATED: 'Most commented',
+  MOST_COMMENTED: 'Most commented',
 };
 
 const Rating = {
@@ -64,11 +60,60 @@ const UserDetailFields = {
 };
 
 
+const header = document.querySelector('header.header');
+
+const main = document.querySelector('main.main');
+
+const footer = document.querySelector('footer.footer');
+
+const statistic = footer.querySelector('.footer__statistics');
+
+
 //  DATA
 const mockFilms = new Array(getRandomInt(COUNTS.FILM.MIN, COUNTS.FILM.MAX)).fill().map((item, i) => createMockFilm(i));
 
 
 //FUNCTIONS
+
+const renderListToContainer = (container, className, list = []) => list.forEach((item) => container.append(new className(item).getElement()));
+
+const closePopup = (popup) => {
+  popup.remove();
+  document.body.classList.remove(CLASS_HIDE_SCROLL);
+};
+
+const findOpenPopup = () => document.querySelector(SELECTOR_POPUP); //ищет незакрытый попап
+
+const openPopup = (id) => {
+
+  if (findOpenPopup()) {
+    closePopup(findOpenPopup()); //удаляет незакрытый попап
+  }
+
+  const mockFilm = mockFilms.find((film) => film.id === +id);
+  const filmPopup = new FilmPopup(mockFilm);
+  const filmPopupElement = filmPopup.getElement();
+
+  const btnClose = filmPopupElement.querySelector(SELECTOR_CLOSE_POPUP);
+  btnClose.addEventListener('click', () => closePopup(filmPopupElement));
+  document.body.classList.add(CLASS_HIDE_SCROLL);
+
+  render(footer, filmPopupElement, RenderPosition.AFTER_END);
+
+  renderListToContainer(filmPopup.getContainer(), Comment, mockFilm.comments);
+};
+
+const addListenersToFilmCard = (element) => {
+  const id = element.dataset.filmId;
+
+  const title = element.querySelector(SELECTOR_TITLE);
+  const poster = element.querySelector(SELECTOR_POSTER);
+  const commentsBlock = element.querySelector(SELECTOR_COMMENTS);
+
+  title.addEventListener('click', () => openPopup(id));
+  poster.addEventListener('click', () => openPopup(id));
+  commentsBlock.addEventListener('click', () => openPopup(id));
+};
 
 //фильерует фильмы по значениям в film.userDetails
 const filterFilmsByDetailField = (films, field) => films.filter((film) => film.userDetails[field]);
@@ -76,7 +121,7 @@ const filterFilmsByDetailField = (films, field) => films.filter((film) => film.u
 const renderFilmsToContainer = (container, films = []) => {
   films.forEach((film) => {
     const filmCardElement = new FilmCard(film).getElement();
-    addListenersToFilmCard(mockFilms, filmCardElement); // навешивает обработчики открытия попапа
+    addListenersToFilmCard(filmCardElement); // навешивает обработчики открытия попапа
     container.append(filmCardElement);
   });
 };
@@ -145,7 +190,7 @@ const topFilmBlock = new ExtraFilmsBlock(FilmSectionName.TOP_RATED);
 
 render(filmSection.getElement(), topFilmBlock.getElement());
 
-const popFilmBlock = new ExtraFilmsBlock(FilmSectionName.POP_RATED);
+const popFilmBlock = new ExtraFilmsBlock(FilmSectionName.MOST_COMMENTED);
 
 render(filmSection.getElement(), popFilmBlock.getElement());
 
@@ -166,8 +211,17 @@ render(statistic, new FooterStatistic(mockFilms.length).getElement());
 
 // отображения фильмов при нажатии на btnShowMore
 
-const btnShowMoreElement = new BtnShowMore().getElement(); // ... кнопк
+const btnShowMoreElement = new BtnShowMore().getElement(); // ... кнопка
 
 render(mainFilmsBlock.getElement(), btnShowMoreElement, RenderPosition.AFTER_END);
 
-showMoreFilms(mockFilms, btnShowMoreElement, renderMainFilms, mainFilmsBlock.getContainer());
+btnShowMoreElement.addEventListener('click', () => {
+  filmsShownIndexes.first += filmsShownIndexes.plus;
+  filmsShownIndexes.last += filmsShownIndexes.plus;
+
+  renderMainFilms(mainFilmsBlock.getContainer(), mockFilms);
+
+  if (filmsShownIndexes.last >= mockFilms.length) {
+    btnShowMoreElement.style.display = 'none';
+  }
+});

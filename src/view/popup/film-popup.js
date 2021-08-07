@@ -3,16 +3,13 @@ import {
   getDayMonthYear
 } from '../../utils/date-time-utils.js';
 import {
-  renderAll
-} from '../../utils/dom-utils.js';
-import {
   DEFAULT_POSTER,
   ActiveClass
 } from '../../constants.js';
 import {getListWithoutNull} from '../../utils/utils.js';
-import {
-  createElement
-} from '../../utils/dom-utils.js';
+import {createElement} from '../../utils/dom-utils.js';
+import {renderAll} from '../../utils/dom-utils.js';
+
 
 const COMMENT_CONTAINER_SELECTOR = '.film-details__comments-list';
 
@@ -26,26 +23,11 @@ const createFilmPopup = ({
   id,
   comments,
   filmInfo: {
-    title,
-    alternativeTitle,
-    ageRating,
-    director,
-    writers,
-    actors,
-    totalRating,
-    poster,
-    release: {
-      date,
-      releaseCountry,
-    },
-    runtime,
-    genre,
-    description,
+    title, alternativeTitle, ageRating, director, writers, actors, totalRating, poster, runtime, genre, description,
+    release: {date, releaseCountry},
   },
   userDetails: {
-    watchList,
-    alreadyWatched,
-    favorite,
+    watchList, alreadyWatched, favorite,
   },
 }) => `
 <section class="film-details data-film-id="${id}">

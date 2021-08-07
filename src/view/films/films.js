@@ -1,9 +1,5 @@
-import {
-  createElement
-} from '../../utils/dom-utils.js';
+import {createElement} from '../../utils/dom-utils.js';
 
-
-const createFilmsSections = () => '<section class="films"></section>';
 
 export default class FilmSection {
   constructor() {
@@ -11,8 +7,7 @@ export default class FilmSection {
   }
 
   getTemplate() {
-    // return '<section class="films"></section>'; // ??? а ТАК нельзя ???
-    return createFilmsSections();
+    return '<section class="films"></section>';
   }
 
   getElement() {

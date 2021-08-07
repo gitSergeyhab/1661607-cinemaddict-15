@@ -1,8 +1,4 @@
-import {
-  createElement
-} from '../../utils/dom-utils.js';
-
-const createShowMoreBtn = () => '<button class="films-list__show-more">Show more</button>';
+import {createElement} from '../../utils/dom-utils.js';
 
 
 export default class BtnShowMore {
@@ -11,7 +7,7 @@ export default class BtnShowMore {
   }
 
   getTemplate() {
-    return createShowMoreBtn();
+    return '<button class="films-list__show-more">Show more</button>';
   }
 
   getElement() {

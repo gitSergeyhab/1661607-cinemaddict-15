@@ -1,10 +1,6 @@
-import {
-  createElement
-} from '../../utils/dom-utils.js';
+import {createElement} from '../../utils/dom-utils.js';
+import {FILM_CONTAINER_SELECTOR} from '../../constants.js';
 
-import {
-  FILM_CONTAINER_SELECTOR
-} from '../../constants.js';
 
 const createMainFilmsBlock = () => `
   <section class="films-list">

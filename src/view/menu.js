@@ -1,6 +1,4 @@
-import {
-  createElement
-} from '../utils/dom-utils.js';
+import {createElement} from '../utils/dom-utils.js';
 
 const createMenu = (watchListLength, historyLength, favoritestLength) => `
   <nav class="main-navigation">

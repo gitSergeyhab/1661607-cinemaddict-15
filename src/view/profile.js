@@ -1,6 +1,5 @@
-import {
-  createElement
-} from '../utils/dom-utils.js';
+import {createElement} from '../utils/dom-utils.js';
+
 
 const createProfileTemplate = (rating) => `
   <section class="header__profile profile">

@@ -6,9 +6,7 @@ import {
   DEFAULT_POSTER,
   ActiveClass
 } from '../../constants.js';
-import {
-  createElement
-} from '../../utils/dom-utils.js';
+import {createElement} from '../../utils/dom-utils.js';
 
 
 const MAX_DESCRIPTION_LENGTH = 140;
@@ -30,22 +28,8 @@ const cutOffDescription = (description) => {
 const createFilmCard = ({
   id,
   comments,
-  filmInfo: {
-    title,
-    totalRating,
-    poster,
-    release: {
-      date,
-    },
-    runtime,
-    genre,
-    description,
-  },
-  userDetails: {
-    watchList,
-    alreadyWatched,
-    favorite,
-  },
+  filmInfo: {title, totalRating, poster, release: {date}, runtime, genre, description},
+  userDetails: {watchList, alreadyWatched, favorite},
 }) => `
 <article class="film-card" data-film-id=${id}>
   <h3 class="film-card__title">${title || ''}</h3>

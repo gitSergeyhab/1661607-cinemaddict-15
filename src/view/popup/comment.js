@@ -1,17 +1,7 @@
-import {
-  getFullDate
-} from '../../utils/date-time-utils.js';
-import {
-  createElement
-} from '../../utils/dom-utils.js';
+import {getFullDate} from '../../utils/date-time-utils.js';
+import {createElement} from '../../utils/dom-utils.js';
 
-const createComment = ({
-  id,
-  author,
-  comment,
-  date,
-  emotion,
-}) => `
+const createComment = ({id,author,comment,date,emotion}) => `
   <li class="film-details__comment" data-comment-id=${id}>
 
     <span class="film-details__comment-emoji">
@@ -51,4 +41,3 @@ export default class Comment {
     this._element = null;
   }
 }
-

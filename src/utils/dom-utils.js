@@ -1,6 +1,4 @@
-import {
-  RenderPosition
-} from '../constants.js';
+import {RenderPosition} from '../constants.js';
 
 
 const renderAll = (data = [], templateFunction = () => '') => data.map((item) => templateFunction(item || '')).join('\n').trim();

@@ -1,8 +1,5 @@
-import {
-  createElement
-} from '../../utils/dom-utils.js';
+import {createElement} from '../../utils/dom-utils.js';
 
-const createFooterStatistic = (count) => `<p>${count} movies inside</p>`;
 
 export default class FooterStatistic {
   constructor(count) {
@@ -11,7 +8,7 @@ export default class FooterStatistic {
   }
 
   getTemplate() {
-    return createFooterStatistic(this._count);
+    return `<p>${this._count} movies inside</p>`;
   }
 
   getElement() {
