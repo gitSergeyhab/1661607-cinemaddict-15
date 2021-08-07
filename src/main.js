@@ -35,9 +35,14 @@ const SELECTOR_TITLE_FILM_BLOCK = '.films-list__title';
 const CLASS_HIDE_SCROLL = 'hide-overflow';
 const CLASS_HIDDEN = 'visually-hidden';
 
-const TEXT_EMPTY_DATABASE = 'There are no movies in our database';
-
 const KEY_CODE_ESC = 27;
+
+const EmptyResultMessage = {
+  ALL: 'There are no movies in our database',
+  WATCH_LIST: 'There are no movies to watch now',
+  HISTORY: 'There are no watched movies now',
+  FAVORITE: 'There are no favorite movies now',
+};
 
 const FilmSectionName = {
   TOP_RATED: 'Top rated',
@@ -77,6 +82,7 @@ const statistic = footer.querySelector('.footer__statistics');
 
 //  DATA
 const mockFilms = new Array(getRandomInt(COUNTS.FILM.MIN, COUNTS.FILM.MAX)).fill().map((item, i) => createMockFilm(i));
+// const mockFilms = new Array(getRandomInt(0, 0)).fill().map((item, i) => createMockFilm(i));
 
 
 //FUNCTIONS
@@ -206,7 +212,7 @@ render(filmSection.getElement(), popFilmBlock.getElement());
 //1.3.3.1 Main block and BtnShowMore
 
 // отображения фильмов при нажатии на btnShowMore
-const addBtnShowMore = () => {
+const addBtnShowMore = (data) => {
   const btnShowMoreElement = new BtnShowMore().getElement(); // ... кнопка
 
   render(mainFilmsBlock.getElement(), btnShowMoreElement, RenderPosition.AFTER_END);
@@ -215,7 +221,7 @@ const addBtnShowMore = () => {
     filmsShownIndexes.first += filmsShownIndexes.plus;
     filmsShownIndexes.last += filmsShownIndexes.plus;
 
-    renderMainFilms(mainFilmsBlock.getContainer(), mockFilms);
+    renderMainFilms(mainFilmsBlock.getContainer(), data);
 
     if (filmsShownIndexes.last >= mockFilms.length) {
       btnShowMoreElement.style.display = 'none';
@@ -223,14 +229,19 @@ const addBtnShowMore = () => {
   });
 };
 
-if (mockFilms.length) { // если есть, что рендерить ...
-  renderMainFilms(mainFilmsBlock.getContainer(), mockFilms); // ... рендерит первые 5 фильмов в основной блок ...
-  addBtnShowMore(); // ... и показывает кнопку ...
-} else { // ... иначе сообщение:
-  const headerFilmsBlock = mainFilmsBlock.getElement().querySelector(SELECTOR_TITLE_FILM_BLOCK);
-  headerFilmsBlock.classList.remove(CLASS_HIDDEN);
-  headerFilmsBlock.textContent = TEXT_EMPTY_DATABASE;
-}
+const showMainBlock = (data = mockFilms, filter = 'ALL') => {
+  if (data.length) { // если есть, что рендерить ...
+    renderMainFilms(mainFilmsBlock.getContainer(), data); // ... рендерит первые 5 фильмов в основной блок ...
+    addBtnShowMore(data); // ... и показывает кнопку ...
+  } else { // ... иначе сообщение:
+    const headerFilmsBlock = mainFilmsBlock.getElement().querySelector(SELECTOR_TITLE_FILM_BLOCK);
+    headerFilmsBlock.classList.remove(CLASS_HIDDEN);
+    headerFilmsBlock.textContent = EmptyResultMessage[filter];
+  }
+};
+
+showMainBlock();
+
 
 //1.3.3.2 TOP_RATED and MOST_COMMENTED blocks
 
