@@ -228,15 +228,15 @@ const addBtnShowMore = (data) => {
     }
   });
 };
-
-const showMainBlock = (data = mockFilms, filter = 'ALL') => {
+// ПЕРЕДЕЛАЮ, КОГДА НУЖНО БУДЕТ ВЫВОДИТЬ ФИЛЬМЫ ПО ФИЛЬТРАМ
+const showMainBlock = (data = mockFilms, text = EmptyResultMessage.ALL) => {
   if (data.length) { // если есть, что рендерить ...
     renderMainFilms(mainFilmsBlock.getContainer(), data); // ... рендерит первые 5 фильмов в основной блок ...
     addBtnShowMore(data); // ... и показывает кнопку ...
   } else { // ... иначе сообщение:
     const headerFilmsBlock = mainFilmsBlock.getElement().querySelector(SELECTOR_TITLE_FILM_BLOCK);
     headerFilmsBlock.classList.remove(CLASS_HIDDEN);
-    headerFilmsBlock.textContent = EmptyResultMessage[filter];
+    headerFilmsBlock.textContent = text;
   }
 };
 
