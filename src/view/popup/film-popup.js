@@ -3,12 +3,15 @@ import {
   getDayMonthYear
 } from '../../utils/date-time-utils.js';
 import {
-  renderAll
-} from '../../utils/dom-utils.js';
-import {
   DEFAULT_POSTER,
   ActiveClass
 } from '../../constants.js';
+import {getListWithoutNull} from '../../utils/utils.js';
+import {createElement} from '../../utils/dom-utils.js';
+import {renderAll} from '../../utils/dom-utils.js';
+
+
+const COMMENT_CONTAINER_SELECTOR = '.film-details__comments-list';
 
 
 const makeButtonActive = (value) => value ? ActiveClass.POPUP : '';
@@ -16,30 +19,15 @@ const makeButtonActive = (value) => value ? ActiveClass.POPUP : '';
 const getGenre = (genre) => `<span class="film-details__genre">${genre}</span>`;
 
 
-export const createFilmPopup = ({
+const createFilmPopup = ({
   id,
   comments,
   filmInfo: {
-    title,
-    alternativeTitle,
-    ageRating,
-    director,
-    writers,
-    actors,
-    totalRating,
-    poster,
-    release: {
-      date,
-      releaseCountry,
-    },
-    runtime,
-    genre,
-    description,
+    title, alternativeTitle, ageRating, director, writers, actors, totalRating, poster, runtime, genre, description,
+    release: {date, releaseCountry},
   },
   userDetails: {
-    watchList,
-    alreadyWatched,
-    favorite,
+    watchList, alreadyWatched, favorite,
   },
 }) => `
 <section class="film-details data-film-id="${id}">
@@ -76,11 +64,11 @@ export const createFilmPopup = ({
 
               <tr class="film-details__row">
                 <td class="film-details__term">Writers</td>
-                <td class="film-details__cell">${writers ? writers.join(', ') : ''}</td>
+                <td class="film-details__cell">${getListWithoutNull(writers)}</td>
               </tr>
               <tr class="film-details__row">
                 <td class="film-details__term">Actors</td>
-                <td class="film-details__cell">${actors ? actors.join(', ') : ''}</td>
+                <td class="film-details__cell">${getListWithoutNull(actors)}</td>
               </tr>
 
               <tr class="film-details__row">
@@ -153,3 +141,33 @@ export const createFilmPopup = ({
     </div>
   </form>
 </section>`;
+
+
+export default class FilmPopup {
+  constructor(data, containerSelector = COMMENT_CONTAINER_SELECTOR) {
+    this._containerSelector = containerSelector;
+    this._data = data;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createFilmPopup(this._data);
+  }
+
+  getElement() {
+    if(!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  getContainer() {
+    if(this._element) {
+      return this._element.querySelector(this._containerSelector);
+    }
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

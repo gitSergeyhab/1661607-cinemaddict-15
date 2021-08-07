@@ -6,6 +6,7 @@ import {
   DEFAULT_POSTER,
   ActiveClass
 } from '../../constants.js';
+import {createElement} from '../../utils/dom-utils.js';
 
 
 const MAX_DESCRIPTION_LENGTH = 140;
@@ -24,25 +25,11 @@ const cutOffDescription = (description) => {
 };
 
 
-export const createFilmCard = ({
+const createFilmCard = ({
   id,
   comments,
-  filmInfo: {
-    title,
-    totalRating,
-    poster,
-    release: {
-      date,
-    },
-    runtime,
-    genre,
-    description,
-  },
-  userDetails: {
-    watchList,
-    alreadyWatched,
-    favorite,
-  },
+  filmInfo: {title, totalRating, poster, release: {date}, runtime, genre, description},
+  userDetails: {watchList, alreadyWatched, favorite},
 }) => `
 <article class="film-card" data-film-id=${id}>
   <h3 class="film-card__title">${title || ''}</h3>
@@ -64,3 +51,25 @@ export const createFilmCard = ({
     <button class="film-card__controls-item film-card__controls-item--favorite ${makeItemActive(favorite)}" type="button">Mark as favorite</button>
   </div>
 </article>`;
+
+export default class FilmCard {
+  constructor(data) {
+    this._data = data;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createFilmCard(this._data);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate(this._data));
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

@@ -1,3 +1,5 @@
+const ADDITIONAL_BLOCK_LENGTH = 2;
+
 const getRandomInt = (min, max) => {
   [min, max] = [Math.min(min, max), Math.max(min, max)];
   return Math.round(Math.random() * (max - min) + min);
@@ -17,13 +19,15 @@ const getRandomListNoRepeat = (num, list) => {
 
 const getRandomBoolean = () => Math.random() > 0.5;
 
-const getRandomListWithoutNull = (arr, min, max) => getRandomListNoRepeat(getRandomInt(min, max), arr.filter(Boolean));
+const getListWithoutNull = (list) => list ? list.filter(Boolean).join(', ') : '';
 
+const sortAndCut = (list, sortFunction, length = ADDITIONAL_BLOCK_LENGTH) => list.slice().sort(sortFunction).slice(0, length);
 
 export {
   getRandomInt,
   getRandFromList,
+  sortAndCut,
   getRandomListNoRepeat,
   getRandomBoolean,
-  getRandomListWithoutNull
+  getListWithoutNull
 };

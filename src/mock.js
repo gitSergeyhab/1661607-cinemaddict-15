@@ -2,12 +2,9 @@ import {
   getRandomBoolean,
   getRandomInt,
   getRandFromList,
-  getRandomListNoRepeat,
-  getRandomListWithoutNull
+  getRandomListNoRepeat
 } from './utils/utils.js';
-import {
-  getRandomDateStamp
-} from './utils/date-time-utils.js';
+import {getRandomDateStamp} from './utils/date-time-utils.js';
 
 
 //CONSTANTS
@@ -99,8 +96,8 @@ export const createMockFilm = (id) => ({
     poster: getRandFromList(POSTERS),
     ageRating: getRandFromList(AGE_RATINGS),
     director: getRandFromList(NAMES),
-    writers: getRandomListWithoutNull(NAMES, COUNTS.NAMES.MIN, COUNTS.NAMES.MAX),
-    actors: getRandomListWithoutNull(NAMES, COUNTS.NAMES.MIN, COUNTS.NAMES.MAX),
+    writers: getRandomListNoRepeat(getRandomInt(COUNTS.NAMES.MIN, COUNTS.NAMES.MAX), NAMES),
+    actors: getRandomListNoRepeat(getRandomInt(COUNTS.NAMES.MIN, COUNTS.NAMES.MAX), NAMES),
     release: {
       date: getRandomDateStamp(),
       releaseCountry: getRandFromList(COUNTRIES),
