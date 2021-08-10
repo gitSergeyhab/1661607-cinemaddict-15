@@ -28,10 +28,6 @@ import {
 // CONSTANTS
 
 const SELECTOR_POPUP = 'section.film-details';
-const SELECTOR_CLOSE_POPUP = '.film-details__close-btn';
-const SELECTOR_TITLE_FILM_CARD = '.film-card__title';
-const SELECTOR_POSTER = '.film-card__poster';
-const SELECTOR_COMMENTS = '.film-card__comments';
 const SELECTOR_TITLE_FILM_BLOCK = '.films-list__title';
 const CLASS_HIDE_SCROLL = 'hide-overflow';
 const CLASS_HIDDEN = 'visually-hidden';
@@ -83,7 +79,6 @@ const statistic = footer.querySelector('.footer__statistics');
 
 //  DATA
 const mockFilms = new Array(getRandomInt(COUNTS.FILM.MIN, COUNTS.FILM.MAX)).fill().map((item, i) => createMockFilm(i));
-// const mockFilms = new Array(getRandomInt(0, 0)).fill().map((item, i) => createMockFilm(i));
 
 
 //FUNCTIONS
@@ -94,7 +89,8 @@ const renderListToContainer = (container, className, list = []) => {
 };
 
 const closePopup = (popup) => {
-  popup.remove();
+  popup.getElement().remove();
+  popup.removeElement();
   document.body.classList.remove(CLASS_HIDE_SCROLL);
 };
 
@@ -103,32 +99,15 @@ const findOpenPopup = () => document.querySelector(SELECTOR_POPUP); //ищет �
 const removePopup = () => findOpenPopup() ? closePopup(findOpenPopup()) : null; //удаляет незакрытый попап
 
 const openPopup = (id) => {
-  console.log(id)
   removePopup();
-
-  const mockFilm = mockFilms.find((film) => film.id === +id);
+  const mockFilm = mockFilms.find((film) => film.id === +id); // находит тыкнутый
   const filmPopup = new FilmPopup(mockFilm);
-  const filmPopupElement = filmPopup.getElement();
 
-  const btnClose = filmPopupElement.querySelector(SELECTOR_CLOSE_POPUP);
-  btnClose.addEventListener('click', () => closePopup(filmPopupElement));
+  filmPopup.setClickHandler(() => closePopup(filmPopup)); // обработчик закрытия попапа на попап(кнопку)
+
   document.body.classList.add(CLASS_HIDE_SCROLL);
-
   render(footer, filmPopup, RenderPosition.AFTER_END);
-
   renderListToContainer(filmPopup, Comment, mockFilm.comments);
-};
-
-const addListenersToFilmCard = (element) => {
-  const id = element.dataset.filmId;
-
-  const title = element.querySelector(SELECTOR_TITLE_FILM_CARD);
-  const poster = element.querySelector(SELECTOR_POSTER);
-  const commentsBlock = element.querySelector(SELECTOR_COMMENTS);
-
-  title.addEventListener('click', () => openPopup(id));
-  poster.addEventListener('click', () => openPopup(id));
-  commentsBlock.addEventListener('click', () => openPopup(id));
 };
 
 //фильерует фильмы по значениям в film.userDetails
@@ -138,8 +117,9 @@ const renderFilmsToContainer = (container, films = []) => {
   container = (container instanceof Abstract) ? container.getContainer() : container;
   films.forEach((film) => {
     const filmCard = new FilmCard(film);
-    filmCard.setClickHandler(openPopup);
-    // addListenersToFilmCard(filmCard.getElement()); // навешивает обработчики открытия попапа
+
+    filmCard.setClickHandler(openPopup); // обработчик открытия попапа на карточку
+
     container.append(filmCard.getElement());
   });
 };
@@ -224,7 +204,7 @@ const addBtnShowMore = (data) => {
 
   render(mainFilmsBlock, btnShowMore, RenderPosition.AFTER_END);
 
-  btnShowMore.setClickHandler(() => {
+  btnShowMore.setClickHandler(() => { // обработчик допавления фильмов на кнопку
     filmsShownIndexes.first += filmsShownIndexes.plus;
     filmsShownIndexes.last += filmsShownIndexes.plus;
 

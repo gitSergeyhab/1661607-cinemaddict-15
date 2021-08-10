@@ -70,8 +70,8 @@ export default class FilmCard extends Abstract {
   }
 
   _clickHandler(evt) {
-    console.log(evt.target)
     evt.preventDefault();
+    // не знаю, считать это логикой приложения или нет, но по-другому  -  не  смог
     if (this._listTargetClases.some((classTarget) => evt.target.classList.contains(classTarget))) {
       this._callback.click();
     }

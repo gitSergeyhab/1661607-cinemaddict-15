@@ -11,7 +11,8 @@ import {getListWithoutNull} from '../../utils/utils.js';
 import {renderAll} from '../../utils/dom-utils.js';
 
 
-const COMMENT_CONTAINER_SELECTOR = '.film-details__comments-list';
+const SELECTOR_COMMENT_CONTAINER = '.film-details__comments-list';
+const CLASS_CLOSE_POPUP = 'film-details__close-btn';
 
 
 const makeButtonActive = (value) => value ? ActiveClass.POPUP : '';
@@ -144,12 +145,27 @@ const createFilmPopup = ({
 
 
 export default class FilmPopup extends AbstractWithContainer {
-  constructor(data, containerSelector = COMMENT_CONTAINER_SELECTOR) {
+  constructor(data, containerSelector = SELECTOR_COMMENT_CONTAINER) {
     super(containerSelector);
     this._data = data;
+
+    this._classCloseBtn = CLASS_CLOSE_POPUP;
+    this._clickHandler = this._clickHandler.bind(this);
   }
 
   getTemplate() {
     return createFilmPopup(this._data);
+  }
+
+  _clickHandler(evt) {
+    evt.preventDefault();
+    if(evt.target.classList.contains(this._classCloseBtn)) {
+      this._callback.click();
+    }
+  }
+
+  setClickHandler(cb) {
+    this._callback.click = cb;
+    this.getElement().addEventListener('click', this._clickHandler);
   }
 }
