@@ -218,18 +218,19 @@ render(filmSection, popFilmBlock);
 
 // отображения фильмов при нажатии на btnShowMore
 const addBtnShowMore = (data) => {
-  const btnShowMoreElement = new BtnShowMore().getElement(); // ... кнопка
+  // const btnShowMoreElement = new BtnShowMore().getElement(); // ... кнопка
+  const btnShowMore = new BtnShowMore(); // ... кнопка
 
-  render(mainFilmsBlock, btnShowMoreElement, RenderPosition.AFTER_END);
+  render(mainFilmsBlock, btnShowMore, RenderPosition.AFTER_END);
 
-  btnShowMoreElement.addEventListener('click', () => {
+  btnShowMore.setClickHandler(() => {
     filmsShownIndexes.first += filmsShownIndexes.plus;
     filmsShownIndexes.last += filmsShownIndexes.plus;
 
     renderMainFilms(mainFilmsBlock, data);
 
     if (filmsShownIndexes.last >= mockFilms.length) {
-      btnShowMoreElement.style.display = 'none';
+      btnShowMore.getElement().style.display = 'none';
     }
   });
 };
