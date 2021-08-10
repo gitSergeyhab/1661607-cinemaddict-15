@@ -1,3 +1,4 @@
+import Abstract from './view/abstract.js';
 import Profile from './view/profile.js';
 import Menu from './view/menu.js';
 import FilmSection from './view/films/films.js';
@@ -87,7 +88,10 @@ const mockFilms = new Array(getRandomInt(COUNTS.FILM.MIN, COUNTS.FILM.MAX)).fill
 
 //FUNCTIONS
 
-const renderListToContainer = (container, className, list = []) => list.forEach((item) => container.append(new className(item).getElement()));
+const renderListToContainer = (container, className, list = []) => {
+  container = (container instanceof Abstract) ? container.getContainer() : container;
+  list.forEach((item) => container.append(new className(item).getElement()));
+};
 
 const closePopup = (popup) => {
   popup.remove();
@@ -110,9 +114,9 @@ const openPopup = (id) => {
   btnClose.addEventListener('click', () => closePopup(filmPopupElement));
   document.body.classList.add(CLASS_HIDE_SCROLL);
 
-  render(footer, filmPopupElement, RenderPosition.AFTER_END);
+  render(footer, filmPopup, RenderPosition.AFTER_END);
 
-  renderListToContainer(filmPopup.getContainer(), Comment, mockFilm.comments);
+  renderListToContainer(filmPopup, Comment, mockFilm.comments);
 };
 
 const addListenersToFilmCard = (element) => {
@@ -131,6 +135,7 @@ const addListenersToFilmCard = (element) => {
 const filterFilmsByDetailField = (films, field) => films.filter((film) => film.userDetails[field]);
 
 const renderFilmsToContainer = (container, films = []) => {
+  container = (container instanceof Abstract) ? container.getContainer() : container;
   films.forEach((film) => {
     const filmCardElement = new FilmCard(film).getElement();
     addListenersToFilmCard(filmCardElement); // навешивает обработчики открытия попапа
@@ -175,12 +180,12 @@ const favorites = filterFilmsByDetailField(mockFilms, UserDetailFields.FAVORITE)
 
 // 1.1.header
 
-render(header, new Profile(getRatingByWatched(history.length)).getElement());
+render(header, new Profile(getRatingByWatched(history.length)));
 
 
 //1.2.menu
 
-render(main, new Menu(watchList.length, history.length, favorites.length).getElement());
+render(main, new Menu(watchList.length, history.length, favorites.length));
 
 
 // 1.3.film block
@@ -189,22 +194,22 @@ render(main, new Menu(watchList.length, history.length, favorites.length).getEle
 
 const filmSection = new FilmSection();
 
-render(main, filmSection.getElement());
+render(main, filmSection);
 
 
 // 1.3.2.рендеринг Main, Top rated, Most commented Film Blocks
 
 const mainFilmsBlock = new MainFilmsBlock();
 
-render(filmSection.getElement(), mainFilmsBlock.getElement());
+render(filmSection, mainFilmsBlock);
 
 const topFilmBlock = new ExtraFilmsBlock(FilmSectionName.TOP_RATED);
 
-render(filmSection.getElement(), topFilmBlock.getElement());
+render(filmSection, topFilmBlock);
 
 const popFilmBlock = new ExtraFilmsBlock(FilmSectionName.MOST_COMMENTED);
 
-render(filmSection.getElement(), popFilmBlock.getElement());
+render(filmSection, popFilmBlock);
 
 
 // //1.3.3.рендеринг фильмов в блоки
@@ -215,13 +220,13 @@ render(filmSection.getElement(), popFilmBlock.getElement());
 const addBtnShowMore = (data) => {
   const btnShowMoreElement = new BtnShowMore().getElement(); // ... кнопка
 
-  render(mainFilmsBlock.getElement(), btnShowMoreElement, RenderPosition.AFTER_END);
+  render(mainFilmsBlock, btnShowMoreElement, RenderPosition.AFTER_END);
 
   btnShowMoreElement.addEventListener('click', () => {
     filmsShownIndexes.first += filmsShownIndexes.plus;
     filmsShownIndexes.last += filmsShownIndexes.plus;
 
-    renderMainFilms(mainFilmsBlock.getContainer(), data);
+    renderMainFilms(mainFilmsBlock, data);
 
     if (filmsShownIndexes.last >= mockFilms.length) {
       btnShowMoreElement.style.display = 'none';
@@ -231,7 +236,7 @@ const addBtnShowMore = (data) => {
 // ПЕРЕДЕЛАЮ, КОГДА НУЖНО БУДЕТ ВЫВОДИТЬ ФИЛЬМЫ ПО ФИЛЬТРАМ
 const showMainBlock = (data = mockFilms, text = EmptyResultMessage.ALL) => {
   if (data.length) { // если есть, что рендерить ...
-    renderMainFilms(mainFilmsBlock.getContainer(), data); // ... рендерит первые 5 фильмов в основной блок ...
+    renderMainFilms(mainFilmsBlock, data); // ... рендерит первые 5 фильмов в основной блок ...
     addBtnShowMore(data); // ... и показывает кнопку ...
   } else { // ... иначе сообщение:
     const headerFilmsBlock = mainFilmsBlock.getElement().querySelector(SELECTOR_TITLE_FILM_BLOCK);
@@ -245,14 +250,14 @@ showMainBlock();
 
 //1.3.3.2 TOP_RATED and MOST_COMMENTED blocks
 
-renderFilmsToContainer(topFilmBlock.getContainer(), topFilms);
+renderFilmsToContainer(topFilmBlock, topFilms);
 
-renderFilmsToContainer(popFilmBlock.getContainer(), popFilms);
+renderFilmsToContainer(popFilmBlock, popFilms);
 
 
 //1.4.footer statistic
 
-render(statistic, new FooterStatistic(mockFilms.length).getElement());
+render(statistic, new FooterStatistic(mockFilms.length));
 
 
 // обработчик для удаления попапа при ESC
