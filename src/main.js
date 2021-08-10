@@ -103,7 +103,7 @@ const findOpenPopup = () => document.querySelector(SELECTOR_POPUP); //ищет �
 const removePopup = () => findOpenPopup() ? closePopup(findOpenPopup()) : null; //удаляет незакрытый попап
 
 const openPopup = (id) => {
-
+  console.log(id)
   removePopup();
 
   const mockFilm = mockFilms.find((film) => film.id === +id);
@@ -137,9 +137,10 @@ const filterFilmsByDetailField = (films, field) => films.filter((film) => film.u
 const renderFilmsToContainer = (container, films = []) => {
   container = (container instanceof Abstract) ? container.getContainer() : container;
   films.forEach((film) => {
-    const filmCardElement = new FilmCard(film).getElement();
-    addListenersToFilmCard(filmCardElement); // навешивает обработчики открытия попапа
-    container.append(filmCardElement);
+    const filmCard = new FilmCard(film);
+    filmCard.setClickHandler(openPopup);
+    // addListenersToFilmCard(filmCard.getElement()); // навешивает обработчики открытия попапа
+    container.append(filmCard.getElement());
   });
 };
 
@@ -234,6 +235,7 @@ const addBtnShowMore = (data) => {
     }
   });
 };
+
 // ПЕРЕДЕЛАЮ, КОГДА НУЖНО БУДЕТ ВЫВОДИТЬ ФИЛЬМЫ ПО ФИЛЬТРАМ
 const showMainBlock = (data = mockFilms, text = EmptyResultMessage.ALL) => {
   if (data.length) { // если есть, что рендерить ...

@@ -10,6 +10,9 @@ import Abstract from '../abstract.js';
 
 
 const MAX_DESCRIPTION_LENGTH = 140;
+const CLASS_TITLE_FILM_CARD = 'film-card__title';
+const CLASS_POSTER = 'film-card__poster';
+const CLASS_COMMENTS = 'film-card__comments';
 
 
 const makeItemActive = (value) => value ? ActiveClass.CARD : '';
@@ -56,9 +59,30 @@ export default class FilmCard extends Abstract {
   constructor(data) {
     super();
     this._data = data;
+    this._clickHandler = this._clickHandler.bind(this);
+
+    this._id = null;
+    this._listTargetClases = [CLASS_TITLE_FILM_CARD, CLASS_POSTER, CLASS_COMMENTS];
   }
 
   getTemplate() {
     return createFilmCard(this._data);
+  }
+
+  _clickHandler(evt) {
+    console.log(evt.target)
+    evt.preventDefault();
+    if (this._listTargetClases.some((classTarget) => evt.target.classList.contains(classTarget))) {
+      this._callback.click();
+    }
+  }
+
+  _getId() {
+    return this.getElement().dataset.filmId;
+  }
+
+  setClickHandler(cb) {
+    this._callback.click = () => cb(this._getId());
+    this.getElement().addEventListener('click', this._clickHandler);
   }
 }
