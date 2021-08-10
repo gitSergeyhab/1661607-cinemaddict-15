@@ -6,7 +6,7 @@ import {
   DEFAULT_POSTER,
   ActiveClass
 } from '../../constants.js';
-import {createElement} from '../../utils/dom-utils.js';
+import Abstract from '../abstract.js';
 
 
 const MAX_DESCRIPTION_LENGTH = 140;
@@ -52,24 +52,13 @@ const createFilmCard = ({
   </div>
 </article>`;
 
-export default class FilmCard {
+export default class FilmCard extends Abstract {
   constructor(data) {
+    super();
     this._data = data;
-    this._element = null;
   }
 
   getTemplate() {
     return createFilmCard(this._data);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate(this._data));
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

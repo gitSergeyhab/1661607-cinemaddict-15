@@ -1,3 +1,4 @@
+import AbstractWithContainer from '../abstract-with-container.js';
 import {
   getHoursAndMinutes,
   getDayMonthYear
@@ -7,7 +8,6 @@ import {
   ActiveClass
 } from '../../constants.js';
 import {getListWithoutNull} from '../../utils/utils.js';
-import {createElement} from '../../utils/dom-utils.js';
 import {renderAll} from '../../utils/dom-utils.js';
 
 
@@ -143,31 +143,13 @@ const createFilmPopup = ({
 </section>`;
 
 
-export default class FilmPopup {
+export default class FilmPopup extends AbstractWithContainer {
   constructor(data, containerSelector = COMMENT_CONTAINER_SELECTOR) {
-    this._containerSelector = containerSelector;
+    super(containerSelector);
     this._data = data;
-    this._element = null;
   }
 
   getTemplate() {
     return createFilmPopup(this._data);
-  }
-
-  getElement() {
-    if(!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  getContainer() {
-    if(this._element) {
-      return this._element.querySelector(this._containerSelector);
-    }
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

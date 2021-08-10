@@ -1,5 +1,4 @@
-import {createElement} from '../../utils/dom-utils.js';
-
+import AbstractWithContainer from '../abstract-with-container.js';
 import {FILM_CONTAINER_SELECTOR} from '../../constants.js';
 
 const createExtraFilmsBlock = (name) => `
@@ -10,31 +9,13 @@ const createExtraFilmsBlock = (name) => `
   </section>`;
 
 
-export default class ExtraFilmsBlock {
+export default class ExtraFilmsBlock extends AbstractWithContainer {
   constructor(name, containerSelector = FILM_CONTAINER_SELECTOR) {
-    this._containerSelector = containerSelector;
+    super(containerSelector);
     this._name = name;
-    this._element = null;
   }
 
   getTemplate() {
     return createExtraFilmsBlock(this._name);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  getContainer() {
-    if (this._element) {
-      return this._element.querySelector(this._containerSelector);
-    }
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

@@ -1,5 +1,5 @@
 import {getFullDate} from '../../utils/date-time-utils.js';
-import {createElement} from '../../utils/dom-utils.js';
+import Abstract from '../abstract.js';
 
 const createComment = ({id,author,comment,date,emotion}) => `
   <li class="film-details__comment" data-comment-id=${id}>
@@ -20,24 +20,13 @@ const createComment = ({id,author,comment,date,emotion}) => `
   </li>`;
 
 
-export default class Comment {
+export default class Comment extends Abstract{
   constructor(data) {
+    super();
     this._data = data;
-    this._element = null;
   }
 
   getTemplate() {
     return createComment(this._data);
-  }
-
-  getElement() {
-    if(!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
