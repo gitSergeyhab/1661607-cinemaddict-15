@@ -89,8 +89,12 @@ const renderListToContainer = (container, className, list = []) => {
 };
 
 const closePopup = (popup) => {
-  popup.getElement().remove();
-  popup.removeElement();
+  if (popup instanceof Abstract) {
+    popup.getElement().remove();
+    popup.removeElement();
+  } else {
+    popup.remove();
+  }
   document.body.classList.remove(CLASS_HIDE_SCROLL);
 };
 
