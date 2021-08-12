@@ -1,3 +1,4 @@
+import Abstract from '../abstract.js';
 import {
   getHoursAndMinutes,
   getDayMonthYear
@@ -7,11 +8,10 @@ import {
   ActiveClass
 } from '../../constants.js';
 import {getListWithoutNull} from '../../utils/utils.js';
-import {createElement} from '../../utils/dom-utils.js';
 import {renderAll} from '../../utils/dom-utils.js';
 
 
-const COMMENT_CONTAINER_SELECTOR = '.film-details__comments-list';
+const CLASS_CLOSE_POPUP = 'film-details__close-btn';
 
 
 const makeButtonActive = (value) => value ? ActiveClass.POPUP : '';
@@ -143,31 +143,27 @@ const createFilmPopup = ({
 </section>`;
 
 
-export default class FilmPopup {
-  constructor(data, containerSelector = COMMENT_CONTAINER_SELECTOR) {
-    this._containerSelector = containerSelector;
+export default class FilmPopup extends Abstract {
+  constructor(data) {
+    super();
     this._data = data;
-    this._element = null;
+    this._classCloseBtn = CLASS_CLOSE_POPUP;
+    this._clickHandler = this._clickHandler.bind(this);
   }
 
   getTemplate() {
     return createFilmPopup(this._data);
   }
 
-  getElement() {
-    if(!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  getContainer() {
-    if(this._element) {
-      return this._element.querySelector(this._containerSelector);
+  _clickHandler(evt) {
+    evt.preventDefault();
+    if(evt.target.classList.contains(this._classCloseBtn)) {
+      this._callback.click();
     }
   }
 
-  removeElement() {
-    this._element = null;
+  setClickHandler(cb) {
+    this._callback.click = cb;
+    this.getElement().addEventListener('click', this._clickHandler);
   }
 }

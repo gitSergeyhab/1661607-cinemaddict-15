@@ -1,4 +1,4 @@
-import {createElement} from '../utils/dom-utils.js';
+import Abstract from './abstract.js';
 
 const createMenu = (watchListLength, historyLength, favoritestLength) => `
   <nav class="main-navigation">
@@ -18,26 +18,16 @@ const createMenu = (watchListLength, historyLength, favoritestLength) => `
     <li><a href="#" class="sort__button">Sort by rating</a></li>
   </ul>`;
 
-export default class Menu {
+export default class Menu extends Abstract{
   constructor(watchListLength, historyLength, favoritestLength) {
+    super();
     this._watchListLength = watchListLength;
     this._historyLength = historyLength;
     this._favoritestLength = favoritestLength;
-    this._element = null;
   }
 
   getTemplate() {
     return createMenu(this._watchListLength, this._historyLength, this._favoritestLength);
   }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
-  }
 }
+

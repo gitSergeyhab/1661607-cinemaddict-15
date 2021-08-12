@@ -1,3 +1,4 @@
+import Abstract from './view/abstract.js';
 import Profile from './view/profile.js';
 import Menu from './view/menu.js';
 import FilmSection from './view/films/films.js';
@@ -25,12 +26,9 @@ import {
 
 
 // CONSTANTS
-
+const SELECTOR_FILM_CONTAINER = '.films-list__container';
+const SELECTOR_COMMENT_CONTAINER = '.film-details__comments-list';
 const SELECTOR_POPUP = 'section.film-details';
-const SELECTOR_CLOSE_POPUP = '.film-details__close-btn';
-const SELECTOR_TITLE_FILM_CARD = '.film-card__title';
-const SELECTOR_POSTER = '.film-card__poster';
-const SELECTOR_COMMENTS = '.film-card__comments';
 const SELECTOR_TITLE_FILM_BLOCK = '.films-list__title';
 const CLASS_HIDE_SCROLL = 'hide-overflow';
 const CLASS_HIDDEN = 'visually-hidden';
@@ -82,7 +80,6 @@ const statistic = footer.querySelector('.footer__statistics');
 
 //  DATA
 const mockFilms = new Array(getRandomInt(COUNTS.FILM.MIN, COUNTS.FILM.MAX)).fill().map((item, i) => createMockFilm(i));
-// const mockFilms = new Array(getRandomInt(0, 0)).fill().map((item, i) => createMockFilm(i));
 
 
 //FUNCTIONS
@@ -90,7 +87,12 @@ const mockFilms = new Array(getRandomInt(COUNTS.FILM.MIN, COUNTS.FILM.MAX)).fill
 const renderListToContainer = (container, className, list = []) => list.forEach((item) => container.append(new className(item).getElement()));
 
 const closePopup = (popup) => {
-  popup.remove();
+  if (popup instanceof Abstract) {
+    popup.getElement().remove();
+    popup.removeElement();
+  } else {
+    popup.remove();
+  }
   document.body.classList.remove(CLASS_HIDE_SCROLL);
 };
 
@@ -99,32 +101,16 @@ const findOpenPopup = () => document.querySelector(SELECTOR_POPUP); //ищет �
 const removePopup = () => findOpenPopup() ? closePopup(findOpenPopup()) : null; //удаляет незакрытый попап
 
 const openPopup = (id) => {
-
   removePopup();
-
-  const mockFilm = mockFilms.find((film) => film.id === +id);
+  const mockFilm = mockFilms.find((film) => film.id === +id); // находит тыкнутый
   const filmPopup = new FilmPopup(mockFilm);
-  const filmPopupElement = filmPopup.getElement();
 
-  const btnClose = filmPopupElement.querySelector(SELECTOR_CLOSE_POPUP);
-  btnClose.addEventListener('click', () => closePopup(filmPopupElement));
+  filmPopup.setClickHandler(() => closePopup(filmPopup)); // обработчик закрытия попапа на попап(кнопку)
+
   document.body.classList.add(CLASS_HIDE_SCROLL);
-
-  render(footer, filmPopupElement, RenderPosition.AFTER_END);
-
-  renderListToContainer(filmPopup.getContainer(), Comment, mockFilm.comments);
-};
-
-const addListenersToFilmCard = (element) => {
-  const id = element.dataset.filmId;
-
-  const title = element.querySelector(SELECTOR_TITLE_FILM_CARD);
-  const poster = element.querySelector(SELECTOR_POSTER);
-  const commentsBlock = element.querySelector(SELECTOR_COMMENTS);
-
-  title.addEventListener('click', () => openPopup(id));
-  poster.addEventListener('click', () => openPopup(id));
-  commentsBlock.addEventListener('click', () => openPopup(id));
+  render(footer, filmPopup, RenderPosition.AFTER_END);
+  const commentContainer = filmPopup.getElement().querySelector(SELECTOR_COMMENT_CONTAINER);
+  renderListToContainer(commentContainer, Comment, mockFilm.comments);
 };
 
 //фильерует фильмы по значениям в film.userDetails
@@ -132,9 +118,10 @@ const filterFilmsByDetailField = (films, field) => films.filter((film) => film.u
 
 const renderFilmsToContainer = (container, films = []) => {
   films.forEach((film) => {
-    const filmCardElement = new FilmCard(film).getElement();
-    addListenersToFilmCard(filmCardElement); // навешивает обработчики открытия попапа
-    container.append(filmCardElement);
+    const filmCard = new FilmCard(film);
+
+    filmCard.setClickHandler(openPopup); // обработчик открытия попапа на карточку
+    container.getElement().querySelector(SELECTOR_FILM_CONTAINER).append(filmCard.getElement());
   });
 };
 
@@ -175,12 +162,12 @@ const favorites = filterFilmsByDetailField(mockFilms, UserDetailFields.FAVORITE)
 
 // 1.1.header
 
-render(header, new Profile(getRatingByWatched(history.length)).getElement());
+render(header, new Profile(getRatingByWatched(history.length)));
 
 
 //1.2.menu
 
-render(main, new Menu(watchList.length, history.length, favorites.length).getElement());
+render(main, new Menu(watchList.length, history.length, favorites.length));
 
 
 // 1.3.film block
@@ -189,22 +176,22 @@ render(main, new Menu(watchList.length, history.length, favorites.length).getEle
 
 const filmSection = new FilmSection();
 
-render(main, filmSection.getElement());
+render(main, filmSection);
 
 
 // 1.3.2.рендеринг Main, Top rated, Most commented Film Blocks
 
 const mainFilmsBlock = new MainFilmsBlock();
 
-render(filmSection.getElement(), mainFilmsBlock.getElement());
+render(filmSection, mainFilmsBlock);
 
 const topFilmBlock = new ExtraFilmsBlock(FilmSectionName.TOP_RATED);
 
-render(filmSection.getElement(), topFilmBlock.getElement());
+render(filmSection, topFilmBlock);
 
 const popFilmBlock = new ExtraFilmsBlock(FilmSectionName.MOST_COMMENTED);
 
-render(filmSection.getElement(), popFilmBlock.getElement());
+render(filmSection, popFilmBlock);
 
 
 // //1.3.3.рендеринг фильмов в блоки
@@ -212,26 +199,28 @@ render(filmSection.getElement(), popFilmBlock.getElement());
 //1.3.3.1 Main block and BtnShowMore
 
 // отображения фильмов при нажатии на btnShowMore
+
 const addBtnShowMore = (data) => {
-  const btnShowMoreElement = new BtnShowMore().getElement(); // ... кнопка
+  const btnShowMore = new BtnShowMore(); // ... кнопка
 
-  render(mainFilmsBlock.getElement(), btnShowMoreElement, RenderPosition.AFTER_END);
+  render(mainFilmsBlock, btnShowMore, RenderPosition.AFTER_END);
 
-  btnShowMoreElement.addEventListener('click', () => {
+  btnShowMore.setClickHandler(() => { // обработчик допавления фильмов на кнопку
     filmsShownIndexes.first += filmsShownIndexes.plus;
     filmsShownIndexes.last += filmsShownIndexes.plus;
 
-    renderMainFilms(mainFilmsBlock.getContainer(), data);
+    renderMainFilms(mainFilmsBlock, data);
 
     if (filmsShownIndexes.last >= mockFilms.length) {
-      btnShowMoreElement.style.display = 'none';
+      btnShowMore.getElement().style.display = 'none';
     }
   });
 };
+
 // ПЕРЕДЕЛАЮ, КОГДА НУЖНО БУДЕТ ВЫВОДИТЬ ФИЛЬМЫ ПО ФИЛЬТРАМ
 const showMainBlock = (data = mockFilms, text = EmptyResultMessage.ALL) => {
   if (data.length) { // если есть, что рендерить ...
-    renderMainFilms(mainFilmsBlock.getContainer(), data); // ... рендерит первые 5 фильмов в основной блок ...
+    renderMainFilms(mainFilmsBlock, data); // ... рендерит первые 5 фильмов в основной блок ...
     addBtnShowMore(data); // ... и показывает кнопку ...
   } else { // ... иначе сообщение:
     const headerFilmsBlock = mainFilmsBlock.getElement().querySelector(SELECTOR_TITLE_FILM_BLOCK);
@@ -245,14 +234,14 @@ showMainBlock();
 
 //1.3.3.2 TOP_RATED and MOST_COMMENTED blocks
 
-renderFilmsToContainer(topFilmBlock.getContainer(), topFilms);
+renderFilmsToContainer(topFilmBlock, topFilms);
 
-renderFilmsToContainer(popFilmBlock.getContainer(), popFilms);
+renderFilmsToContainer(popFilmBlock, popFilms);
 
 
 //1.4.footer statistic
 
-render(statistic, new FooterStatistic(mockFilms.length).getElement());
+render(statistic, new FooterStatistic(mockFilms.length));
 
 
 // обработчик для удаления попапа при ESC
