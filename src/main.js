@@ -200,8 +200,6 @@ render(filmSection, popFilmBlock);
 
 // отображения фильмов при нажатии на btnShowMore
 
-// const mainFilmContainer = mainFilmsBlock.getElement().querySelector(SELECTOR_FILM_CONTAINER);
-
 const addBtnShowMore = (data) => {
   const btnShowMore = new BtnShowMore(); // ... кнопка
 
