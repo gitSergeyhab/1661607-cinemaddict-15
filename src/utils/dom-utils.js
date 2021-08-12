@@ -6,7 +6,6 @@ const renderAll = (data = [], templateFunction = () => '') => data.map((item) =>
 
 
 const render = (container, element, place = RenderPosition.BEFORE_END) => {
-  //я помню, переоопределять переременную - смертный грех, но в демо-проекте почему-то переопределяют
   container = (container instanceof Abstract) ? container.getElement() : container;
   element = (element instanceof Abstract) ? element.getElement() : element;
 

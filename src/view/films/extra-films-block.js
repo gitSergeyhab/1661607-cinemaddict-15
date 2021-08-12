@@ -1,5 +1,4 @@
-import AbstractWithContainer from '../abstract-with-container.js';
-import {FILM_CONTAINER_SELECTOR} from '../../constants.js';
+import Abstract from '../abstract.js';
 
 const createExtraFilmsBlock = (name) => `
   <section class="films-list films-list--extra">
@@ -9,9 +8,9 @@ const createExtraFilmsBlock = (name) => `
   </section>`;
 
 
-export default class ExtraFilmsBlock extends AbstractWithContainer {
-  constructor(name, containerSelector = FILM_CONTAINER_SELECTOR) {
-    super(containerSelector);
+export default class ExtraFilmsBlock extends Abstract {
+  constructor(name) {
+    super();
     this._name = name;
   }
 

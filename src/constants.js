@@ -12,8 +12,6 @@ const RenderPosition = {
   AFTER_END: 'afterend',
 };
 
-const FILM_CONTAINER_SELECTOR = '.films-list__container';
-
 const filmsShownIndexes = {
   first: 0, // индекс 1-го вновь отрисовываемого фильма
   last: 5, // индекс фильма до которого нужно отрисовывать
@@ -24,6 +22,5 @@ export {
   ActiveClass,
   DEFAULT_POSTER,
   RenderPosition,
-  FILM_CONTAINER_SELECTOR,
   filmsShownIndexes
 };

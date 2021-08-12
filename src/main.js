@@ -26,7 +26,8 @@ import {
 
 
 // CONSTANTS
-
+const SELECTOR_FILM_CONTAINER = '.films-list__container';
+const SELECTOR_COMMENT_CONTAINER = '.film-details__comments-list';
 const SELECTOR_POPUP = 'section.film-details';
 const SELECTOR_TITLE_FILM_BLOCK = '.films-list__title';
 const CLASS_HIDE_SCROLL = 'hide-overflow';
@@ -83,10 +84,7 @@ const mockFilms = new Array(getRandomInt(COUNTS.FILM.MIN, COUNTS.FILM.MAX)).fill
 
 //FUNCTIONS
 
-const renderListToContainer = (container, className, list = []) => {
-  container = (container instanceof Abstract) ? container.getContainer() : container;
-  list.forEach((item) => container.append(new className(item).getElement()));
-};
+const renderListToContainer = (container, className, list = []) => list.forEach((item) => container.append(new className(item).getElement()));
 
 const closePopup = (popup) => {
   if (popup instanceof Abstract) {
@@ -111,20 +109,19 @@ const openPopup = (id) => {
 
   document.body.classList.add(CLASS_HIDE_SCROLL);
   render(footer, filmPopup, RenderPosition.AFTER_END);
-  renderListToContainer(filmPopup, Comment, mockFilm.comments);
+  const commentContainer = filmPopup.getElement().querySelector(SELECTOR_COMMENT_CONTAINER);
+  renderListToContainer(commentContainer, Comment, mockFilm.comments);
 };
 
 //фильерует фильмы по значениям в film.userDetails
 const filterFilmsByDetailField = (films, field) => films.filter((film) => film.userDetails[field]);
 
 const renderFilmsToContainer = (container, films = []) => {
-  container = (container instanceof Abstract) ? container.getContainer() : container;
   films.forEach((film) => {
     const filmCard = new FilmCard(film);
 
     filmCard.setClickHandler(openPopup); // обработчик открытия попапа на карточку
-
-    container.append(filmCard.getElement());
+    container.getElement().querySelector(SELECTOR_FILM_CONTAINER).append(filmCard.getElement());
   });
 };
 
@@ -202,8 +199,10 @@ render(filmSection, popFilmBlock);
 //1.3.3.1 Main block and BtnShowMore
 
 // отображения фильмов при нажатии на btnShowMore
+
+// const mainFilmContainer = mainFilmsBlock.getElement().querySelector(SELECTOR_FILM_CONTAINER);
+
 const addBtnShowMore = (data) => {
-  // const btnShowMoreElement = new BtnShowMore().getElement(); // ... кнопка
   const btnShowMore = new BtnShowMore(); // ... кнопка
 
   render(mainFilmsBlock, btnShowMore, RenderPosition.AFTER_END);

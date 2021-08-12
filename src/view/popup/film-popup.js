@@ -1,4 +1,4 @@
-import AbstractWithContainer from '../abstract-with-container.js';
+import Abstract from '../abstract.js';
 import {
   getHoursAndMinutes,
   getDayMonthYear
@@ -11,7 +11,6 @@ import {getListWithoutNull} from '../../utils/utils.js';
 import {renderAll} from '../../utils/dom-utils.js';
 
 
-const SELECTOR_COMMENT_CONTAINER = '.film-details__comments-list';
 const CLASS_CLOSE_POPUP = 'film-details__close-btn';
 
 
@@ -144,11 +143,10 @@ const createFilmPopup = ({
 </section>`;
 
 
-export default class FilmPopup extends AbstractWithContainer {
-  constructor(data, containerSelector = SELECTOR_COMMENT_CONTAINER) {
-    super(containerSelector);
+export default class FilmPopup extends Abstract {
+  constructor(data) {
+    super();
     this._data = data;
-
     this._classCloseBtn = CLASS_CLOSE_POPUP;
     this._clickHandler = this._clickHandler.bind(this);
   }

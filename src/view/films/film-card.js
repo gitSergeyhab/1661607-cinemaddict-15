@@ -10,10 +10,6 @@ import Abstract from '../abstract.js';
 
 
 const MAX_DESCRIPTION_LENGTH = 140;
-const CLASS_TITLE_FILM_CARD = 'film-card__title';
-const CLASS_POSTER = 'film-card__poster';
-const CLASS_COMMENTS = 'film-card__comments';
-
 
 const makeItemActive = (value) => value ? ActiveClass.CARD : '';
 
@@ -60,9 +56,7 @@ export default class FilmCard extends Abstract {
     super();
     this._data = data;
     this._clickHandler = this._clickHandler.bind(this);
-
     this._id = null;
-    this._listTargetClasses = [CLASS_TITLE_FILM_CARD, CLASS_POSTER, CLASS_COMMENTS];
   }
 
   getTemplate() {
@@ -71,10 +65,7 @@ export default class FilmCard extends Abstract {
 
   _clickHandler(evt) {
     evt.preventDefault();
-    // так или ...
-    if (this._listTargetClasses.some((classTarget) => evt.target.classList.contains(classTarget))) {
-      this._callback.click();
-    }
+    this._callback.click();
   }
 
   _getId() {
@@ -83,10 +74,8 @@ export default class FilmCard extends Abstract {
 
   setClickHandler(cb) {
     this._callback.click = () => cb(this._getId());
-    this.getElement().addEventListener('click', this._clickHandler);
-    // ... или лучше просто так?
-    // this.getElement().querySelector('.film-card__title').addEventListener('click', this._clickHandler);
-    // this.getElement().querySelector('.film-card__poster').addEventListener('click', this._clickHandler);
-    // this.getElement().querySelector('.film-card__comments').addEventListener('click', this._clickHandler);
+    this.getElement().querySelector('.film-card__title').addEventListener('click', this._clickHandler);
+    this.getElement().querySelector('.film-card__poster').addEventListener('click', this._clickHandler);
+    this.getElement().querySelector('.film-card__comments').addEventListener('click', this._clickHandler);
   }
 }
