@@ -144,20 +144,19 @@ const createFilmPopup = ({
 
 
 export default class FilmPopup extends Abstract {
-  constructor(data) {
+  constructor(film) {
     super();
-    this._data = data;
-    this._classCloseBtn = CLASS_CLOSE_POPUP;
+    this._film = film;
     this._clickHandler = this._clickHandler.bind(this);
   }
 
   getTemplate() {
-    return createFilmPopup(this._data);
+    return createFilmPopup(this._film);
   }
 
   _clickHandler(evt) {
     evt.preventDefault();
-    if(evt.target.classList.contains(this._classCloseBtn)) {
+    if(evt.target.classList.contains(CLASS_CLOSE_POPUP)) {
       this._callback.click();
     }
   }
