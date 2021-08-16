@@ -1,4 +1,4 @@
-import Abstract from './view/abstract.js';
+// import Abstract from './view/abstract.js';
 import Profile from './view/profile.js';
 import Menu from './view/menu.js';
 import FilmSection from './view/films/films.js';
@@ -16,11 +16,6 @@ import {
   COUNTS,
   createMockFilm
 } from './mock.js';
-
-
-const SELECTOR_POPUP = 'section.film-details';
-const CLASS_HIDE_SCROLL = 'hide-overflow';
-const KEY_CODE_ESC = 27;
 
 const FilmSectionName = {
   TOP_RATED: 'Top rated',
@@ -57,23 +52,11 @@ const statistic = footer.querySelector('.footer__statistics');
 
 //  DATA
 const mockFilms = new Array(getRandomInt(COUNTS.FILM.MIN, COUNTS.FILM.MAX)).fill().map((item, i) => createMockFilm(i));
+// const mockFilms = new Array(getRandomInt(3, 6)).fill().map((item, i) => createMockFilm(i));
+
 
 
 //FUNCTIONS
-
-const closePopup = (popup) => {
-  if (popup instanceof Abstract) {
-    popup.getElement().remove();
-    popup.removeElement();
-  } else {
-    popup.remove();
-  }
-  document.body.classList.remove(CLASS_HIDE_SCROLL);
-};
-
-const findOpenPopup = () => document.querySelector(SELECTOR_POPUP); //ищет незакрытый попап
-
-const removePopup = () => findOpenPopup() ? closePopup(findOpenPopup()) : null; //удаляет незакрытый попап
 
 //фильерует фильмы по значениям в film.userDetails
 const filterFilmsByDetailField = (films, field) => films.filter((film) => film.userDetails[field]);
@@ -123,24 +106,19 @@ render(main, new Menu(watchList.length, history.length, favorites.length));
 const filmSection = new FilmSection();
 render(main, filmSection);
 
-const mainFilmListPresenter = new FilmListPresenter(filmSection.getElement(), footer);
+const mainFilmListPresenter = new FilmListPresenter(filmSection, footer);
 mainFilmListPresenter.init(mockFilms);
 
 
 // 1.3.2.рендеринг Top rated, Most commented Film Blocks
 
-const topFilmListPresenter = new ExtraFilmListPresenter(filmSection.getElement(), footer, FilmSectionName.TOP_RATED);
+const topFilmListPresenter = new ExtraFilmListPresenter(filmSection, footer, FilmSectionName.TOP_RATED);
 topFilmListPresenter.init(topFilms);
 
-const popFilmListPresenter = new ExtraFilmListPresenter(filmSection.getElement(), footer, FilmSectionName.MOST_COMMENTED);
+const popFilmListPresenter = new ExtraFilmListPresenter(filmSection, footer, FilmSectionName.MOST_COMMENTED);
 popFilmListPresenter.init(popFilms);
 
 
 //1.4.footer statistic
 
 render(statistic, new FooterStatistic(mockFilms.length));
-
-
-// обработчик для удаления попапа при ESC
-
-document.addEventListener('keydown', (evt) => evt.keyCode === KEY_CODE_ESC ? removePopup() : null);

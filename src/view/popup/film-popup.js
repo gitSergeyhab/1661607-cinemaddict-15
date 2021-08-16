@@ -148,6 +148,7 @@ export default class FilmPopup extends Abstract {
     super();
     this._film = film;
     this._clickHandler = this._clickHandler.bind(this);
+    this._watchListClickHandler = this._watchListClickHandler.bind(this);
   }
 
   getTemplate() {
@@ -161,8 +162,19 @@ export default class FilmPopup extends Abstract {
     }
   }
 
+  _watchListClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.watchListClick();
+  }
+
   setClickHandler(cb) {
     this._callback.click = cb;
     this.getElement().addEventListener('click', this._clickHandler);
+  }
+
+  setWatchListClickHandler(cb) {
+    this._callback.watchListClick = cb;
+    this.getElement().querySelector('.film-details__control-button--watchlist').addEventListener('click', this._watchListClickHandler);
+
   }
 }
