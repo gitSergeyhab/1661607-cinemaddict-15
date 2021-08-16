@@ -23,11 +23,18 @@ const getListWithoutNull = (list) => list ? list.filter(Boolean).join(', ') : ''
 
 const sortAndCut = (list, sortFunction, length = ADDITIONAL_BLOCK_LENGTH) => list.slice().sort(sortFunction).slice(0, length);
 
+
+const updateItem = (items, update) => {
+  const index = items.findIndex((item) => item.id === update.id);
+  return index === -1 ? items : [...items.slice(0, index), update, ...items.slice(index + 1)];
+};
+
 export {
   getRandomInt,
   getRandFromList,
   sortAndCut,
   getRandomListNoRepeat,
   getRandomBoolean,
-  getListWithoutNull
+  getListWithoutNull,
+  updateItem
 };

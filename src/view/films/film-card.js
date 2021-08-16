@@ -52,30 +52,61 @@ const createFilmCard = ({
 </article>`;
 
 export default class FilmCard extends Abstract {
-  constructor(data) {
+  constructor(film) {
     super();
-    this._data = data;
-    this._clickHandler = this._clickHandler.bind(this);
+    this._film = film;
     this._id = null;
+
+    this._clickOpenPopupHandler = this._clickOpenPopupHandler.bind(this);
+    this._watchListClickHandler = this._watchListClickHandler.bind(this);
+    this._historyClickHandler = this._historyClickHandler.bind(this);
+    this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
   }
 
   getTemplate() {
-    return createFilmCard(this._data);
+    return createFilmCard(this._film);
   }
 
-  _clickHandler(evt) {
+  _watchListClickHandler(evt) {
     evt.preventDefault();
-    this._callback.click();
+    this._callback.watchListClick();
   }
 
-  _getId() {
-    return this.getElement().dataset.filmId;
+  _historyClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.historyClick();
   }
 
-  setClickHandler(cb) {
-    this._callback.click = () => cb(this._getId());
-    this.getElement().querySelector('.film-card__title').addEventListener('click', this._clickHandler);
-    this.getElement().querySelector('.film-card__poster').addEventListener('click', this._clickHandler);
-    this.getElement().querySelector('.film-card__comments').addEventListener('click', this._clickHandler);
+  _favoriteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.favoriteClick();
+  }
+
+  _clickOpenPopupHandler(evt) {
+    evt.preventDefault();
+    this._callback.clickOpenPopup();
+  }
+
+
+  setOpenPopupClickHandler(cb) {
+    this._callback.clickOpenPopup = cb;
+    this.getElement().querySelector('.film-card__title').addEventListener('click', this._clickOpenPopupHandler);
+    this.getElement().querySelector('.film-card__poster').addEventListener('click', this._clickOpenPopupHandler);
+    this.getElement().querySelector('.film-card__comments').addEventListener('click', this._clickOpenPopupHandler);
+  }
+
+  setWatchListClickHandler(cb) {
+    this._callback.watchListClick = cb;
+    this.getElement().querySelector('.film-card__controls-item--add-to-watchlist').addEventListener('click', this._watchListClickHandler);
+  }
+
+  setHistoryClickHandler(cb) {
+    this._callback.historyClick = cb;
+    this.getElement().querySelector('.film-card__controls-item--mark-as-watched').addEventListener('click', this._historyClickHandler);
+  }
+
+  setFavoriteClickHandler(cb) {
+    this._callback.favoriteClick = cb;
+    this.getElement().querySelector('.film-card__controls-item--favorite').addEventListener('click', this._favoriteClickHandler);
   }
 }
