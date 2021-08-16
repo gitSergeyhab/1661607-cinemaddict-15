@@ -18,9 +18,18 @@ const filmsShownIndexes = {
   plus: 5, // на сколько нужно увеличить предыдущие значения
 };
 
+// черт его знает, как это вообще можно назвать:
+const NoFilmMessageKey = {
+  ALL: 'ALL',
+  WATCH_LIST: 'WATCH_LIST',
+  HISTORY: 'HISTORY',
+  FAVORITE: 'FAVORITE',
+};
+
 export {
   ActiveClass,
   DEFAULT_POSTER,
   RenderPosition,
-  filmsShownIndexes
+  filmsShownIndexes,
+  NoFilmMessageKey
 };
