@@ -7,7 +7,6 @@ import FilmPresenter from './film.js';
 
 import {render} from '../utils/dom-utils.js';
 import {updateItem} from '../utils/utils.js';
-
 import {RenderPosition} from '../constants.js';
 
 
@@ -32,15 +31,12 @@ export default class FilmList {
 
     this._handleLoadMoreButtonClick = this._handleLoadMoreButtonClick.bind(this);
     this._handleFilmChange = this._handleFilmChange.bind(this);
-
-    // this._clearFilmList = this._clearFilmList.bind(this)
   }
 
   init(films){
     this._films = films.slice();
     render(this._container, this._filmBlockComponent);
     this._renderFilmList();
-    // document.addEventListener('keydown', this._clearFilmList)
   }
 
   _renderSort() {
