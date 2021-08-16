@@ -1,12 +1,10 @@
 import FilmCard from '../view/films/film-card.js';
-import FilmPopup from '../view/popup/film-popup.js';
-import Comment from '../view/popup/comment.js';
+import FullPopup from './full-popup.js';
 
 import {render, remove, replace} from '../utils/dom-utils.js';
 import {RenderPosition} from '../constants.js';
 
 
-const SELECTOR_COMMENT_CONTAINER = '.film-details__comments-list';
 const SELECTOR_POPUP = 'section.film-details';
 const CLASS_HIDE_SCROLL = 'hide-overflow';
 const KEY_CODE_ESC = 27;
@@ -39,7 +37,7 @@ export default class Film {
     const prevFilmPopupComponent = this._filmPopupComponent;
 
     this._filmCardComponent = new FilmCard(film);
-    this._filmPopupComponent = new FilmPopup(film);
+    this._filmPopupComponent = new FullPopup(film).getPopupWithComments();
 
     // навесить обработчики
     this._filmCardComponent.setOpenPopupClickHandler(this._handlerFilmCardClick); // обработчик открытия попапа на карточку
@@ -53,11 +51,12 @@ export default class Film {
     this._filmPopupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
 
 
-    if (prevFilmCardComponent === null || prevFilmPopupComponent === null) {
+    if (prevFilmCardComponent === null || prevFilmPopupComponent === null) {//если создается
       render(this._filmsContainer, this._filmCardComponent);
       return 0;
     }
 
+    //если изменяется
     if (this._filmsContainer.contains(prevFilmCardComponent.getElement())) {
       replace(this._filmCardComponent, prevFilmCardComponent);
     }
@@ -89,17 +88,6 @@ export default class Film {
     document.addEventListener('keydown', this._handlerEscKeyDown);
     document.body.classList.add(CLASS_HIDE_SCROLL);
     render(this._footer, this._filmPopupComponent, RenderPosition.AFTER_END);
-    const commentContainer = this._filmPopupComponent.getElement().querySelector(SELECTOR_COMMENT_CONTAINER);
-    this._renderComments(commentContainer, this._film.comments);
-  }
-
-  _renderComment(container, comment) {
-    const commentItem = new Comment(comment);
-    render(container, commentItem);
-  }
-
-  _renderComments(container, comments) {
-    comments.forEach((comment) => this._renderComment(container, comment));
   }
 
 
