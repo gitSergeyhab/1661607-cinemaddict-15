@@ -1,4 +1,3 @@
-// import Abstract from './view/abstract.js';
 import Profile from './view/profile.js';
 import Menu from './view/menu.js';
 import FilmSection from './view/films/films.js';
@@ -52,12 +51,8 @@ const statistic = footer.querySelector('.footer__statistics');
 
 //  DATA
 const mockFilms = new Array(getRandomInt(COUNTS.FILM.MIN, COUNTS.FILM.MAX)).fill().map((item, i) => createMockFilm(i));
-// const mockFilms = new Array(getRandomInt(3, 6)).fill().map((item, i) => createMockFilm(i));
-
-
 
 //FUNCTIONS
-
 //фильерует фильмы по значениям в film.userDetails
 const filterFilmsByDetailField = (films, field) => films.filter((film) => film.userDetails[field]);
 
@@ -76,7 +71,6 @@ const getRatingByWatched = (count) => {
 
 
 //. START
-
 // отсортированные и отрезаные куски фильмов для блока Top rated и Most commented
 const topFilms = sortAndCut(mockFilms, (a, b) => (b.filmInfo.totalRating || 0) - (a.filmInfo.totalRating || 0));
 const popFilms = sortAndCut(mockFilms, (a, b) => b.comments.length - a.comments.length);
@@ -88,30 +82,23 @@ const favorites = filterFilmsByDetailField(mockFilms, UserDetailFields.FAVORITE)
 
 
 //1.РЕНДЕРИНГ
-
 // 1.1.header
-
 render(header, new Profile(getRatingByWatched(history.length)));
 
 
 //1.2.menu and sort
-
 render(main, new Menu(watchList.length, history.length, favorites.length));
 
 
 // 1.3.film block
-
 // 1.3.1.рендеринг секции для блоков фильмов
-
 const filmSection = new FilmSection();
 render(main, filmSection);
 
 const mainFilmListPresenter = new FilmListPresenter(filmSection, footer);
 mainFilmListPresenter.init(mockFilms);
 
-
 // 1.3.2.рендеринг Top rated, Most commented Film Blocks
-
 const topFilmListPresenter = new ExtraFilmListPresenter(filmSection, footer, FilmSectionName.TOP_RATED);
 topFilmListPresenter.init(topFilms);
 
@@ -120,5 +107,4 @@ popFilmListPresenter.init(popFilms);
 
 
 //1.4.footer statistic
-
 render(statistic, new FooterStatistic(mockFilms.length));
