@@ -11,9 +11,6 @@ import {getListWithoutNull} from '../../utils/utils.js';
 import {renderAll} from '../../utils/dom-utils.js';
 
 
-const CLASS_CLOSE_POPUP = 'film-details__close-btn';
-
-
 const makeButtonActive = (value) => value ? ActiveClass.POPUP : '';
 
 const getGenre = (genre) => `<span class="film-details__genre">${genre}</span>`;
@@ -147,19 +144,21 @@ export default class FilmPopup extends Abstract {
   constructor(film) {
     super();
     this._film = film;
-    this._clickHandler = this._clickHandler.bind(this);
+
+    this._closePopupClickHandler = this._closePopupClickHandler.bind(this);
     this._watchListClickHandler = this._watchListClickHandler.bind(this);
+    this._historyClickHandler = this._historyClickHandler.bind(this);
+    this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
   }
 
   getTemplate() {
     return createFilmPopup(this._film);
   }
 
-  _clickHandler(evt) {
+
+  _closePopupClickHandler(evt) {
     evt.preventDefault();
-    if(evt.target.classList.contains(CLASS_CLOSE_POPUP)) {
-      this._callback.click();
-    }
+    this._callback.closePopupClick();
   }
 
   _watchListClickHandler(evt) {
@@ -167,14 +166,34 @@ export default class FilmPopup extends Abstract {
     this._callback.watchListClick();
   }
 
-  setClickHandler(cb) {
-    this._callback.click = cb;
-    this.getElement().addEventListener('click', this._clickHandler);
+  _historyClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.historyClick();
+  }
+
+  _favoriteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.favoriteClick();
+  }
+
+
+  setClosePopupClickHandler(cb) {
+    this._callback.closePopupClick = cb;
+    this.getElement().querySelector('.film-details__close-btn').addEventListener('click', this._closePopupClickHandler);
   }
 
   setWatchListClickHandler(cb) {
     this._callback.watchListClick = cb;
     this.getElement().querySelector('.film-details__control-button--watchlist').addEventListener('click', this._watchListClickHandler);
+  }
 
+  setHistoryClickHandler(cb) {
+    this._callback.historyClick = cb;
+    this.getElement().querySelector('.film-details__control-button--watched').addEventListener('click', this._historyClickHandler);
+  }
+
+  setFavoriteClickHandler(cb) {
+    this._callback.favoriteClick = cb;
+    this.getElement().querySelector('.film-details__control-button--favorite').addEventListener('click', this._favoriteClickHandler);
   }
 }

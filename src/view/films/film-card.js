@@ -57,12 +57,10 @@ export default class FilmCard extends Abstract {
     this._film = film;
     this._id = null;
 
-    this._clickHandler = this._clickHandler.bind(this);
+    this._clickOpenPopupHandler = this._clickOpenPopupHandler.bind(this);
     this._watchListClickHandler = this._watchListClickHandler.bind(this);
     this._historyClickHandler = this._historyClickHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
-
-
   }
 
   getTemplate() {
@@ -84,20 +82,17 @@ export default class FilmCard extends Abstract {
     this._callback.favoriteClick();
   }
 
-  _clickHandler(evt) {
+  _clickOpenPopupHandler(evt) {
     evt.preventDefault();
-    this._callback.click();
+    this._callback.clickOpenPopup();
   }
 
-  _getId() {
-    return this.getElement().dataset.filmId;
-  }
 
-  setClickHandler(cb) {
-    this._callback.click = () => cb(this._getId());
-    this.getElement().querySelector('.film-card__title').addEventListener('click', this._clickHandler);
-    this.getElement().querySelector('.film-card__poster').addEventListener('click', this._clickHandler);
-    this.getElement().querySelector('.film-card__comments').addEventListener('click', this._clickHandler);
+  setOpenPopupClickHandler(cb) {
+    this._callback.clickOpenPopup = cb;
+    this.getElement().querySelector('.film-card__title').addEventListener('click', this._clickOpenPopupHandler);
+    this.getElement().querySelector('.film-card__poster').addEventListener('click', this._clickOpenPopupHandler);
+    this.getElement().querySelector('.film-card__comments').addEventListener('click', this._clickOpenPopupHandler);
   }
 
   setWatchListClickHandler(cb) {

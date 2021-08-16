@@ -32,12 +32,15 @@ export default class FilmList {
 
     this._handleLoadMoreButtonClick = this._handleLoadMoreButtonClick.bind(this);
     this._handleFilmChange = this._handleFilmChange.bind(this);
+
+    // this._clearFilmList = this._clearFilmList.bind(this)
   }
 
   init(films){
     this._films = films.slice();
     render(this._container, this._filmBlockComponent);
     this._renderFilmList();
+    // document.addEventListener('keydown', this._clearFilmList)
   }
 
   _renderSort() {
@@ -45,7 +48,8 @@ export default class FilmList {
   }
 
   _renderFilmCard(film) {
-    const filmCardPresenter = new FilmPresenter(this._filmBlockComponent.getElement().querySelector(SELECTOR_FILM_CONTAINER), this._footer, this._handleFilmChange);
+    const filmCardContainer = this._filmBlockComponent.getElement().querySelector(SELECTOR_FILM_CONTAINER);
+    const filmCardPresenter = new FilmPresenter(filmCardContainer, this._footer, this._handleFilmChange);
     filmCardPresenter.init(film, this._films);
     this._filmPresenter.set(film.id, filmCardPresenter); // добавляет каждый созданный FilmPresenter в Мапу
   }
