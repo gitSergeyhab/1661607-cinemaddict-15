@@ -1,4 +1,4 @@
-import abstractfilmList from './abstract-film-list';
+import AbstractFilmList from './abstract-film-list';
 import MainFilmsBlock from '../view/films/main-films-block.js';
 import BtnShowMore from '../view/films/show-more-btn.js';
 import Sort from '../view/sort.js';
@@ -9,7 +9,7 @@ import {RenderPosition} from '../constants.js';
 
 const FILM_COUNT_PER_STEP = 5;
 
-export default class ExtraFilmList extends abstractfilmList {
+export default class ExtraFilmList extends AbstractFilmList {
   constructor(container) {
     super(container);
 
@@ -27,8 +27,7 @@ export default class ExtraFilmList extends abstractfilmList {
   }
 
   _clearFilmList() {
-    this._filmPresenter.forEach((presenter) => presenter.destroy()); // удаляет все FilmPresenter в Мапе
-    this._filmPresenter.clear(); // очищает Мапу
+    super._clearFilmList();
     this._alreadyDrawnFilm = FILM_COUNT_PER_STEP; //возвращает счетчик в начало
   }
 
@@ -61,7 +60,7 @@ export default class ExtraFilmList extends abstractfilmList {
     this._btnShowMoreComponent.setClickHandler(this._handleLoadMoreButtonClick);
   }
 
-  _renderFilmList() {
+  _renderFilmList() { //"Повторяет метод родительского класса" - он не повторяет - в родителе вызывается this._renderFilmCards() а тут this._renderMainBlock();
     if (!this._films.length) {
       this._renderNoFilms();
       return;

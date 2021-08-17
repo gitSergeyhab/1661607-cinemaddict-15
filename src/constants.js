@@ -12,18 +12,8 @@ const RenderPosition = {
   AFTER_END: 'afterend',
 };
 
-
-// черт его знает, как это вообще можно назвать:
-const NoFilmMessageKey = {
-  ALL: 'ALL',
-  WATCH_LIST: 'WATCH_LIST',
-  HISTORY: 'HISTORY',
-  FAVORITE: 'FAVORITE',
-};
-
 export {
   ActiveClass,
   DEFAULT_POSTER,
-  RenderPosition,
-  NoFilmMessageKey
+  RenderPosition
 };
