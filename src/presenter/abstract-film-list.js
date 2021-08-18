@@ -4,13 +4,18 @@ import FilmPresenter from './film.js';
 
 import {render} from '../utils/dom-utils.js';
 import {updateItem} from '../utils/utils.js';
-import {NoFilmMessageKey} from '../constants.js';
+
+const EmptyResultMessage = {
+  ALL: 'There are no movies in our database',
+  WATCH_LIST: 'There are no movies to watch now',
+  HISTORY: 'There are no watched movies now',
+  FAVORITE: 'There are no favorite movies now',
+};
 
 
 const SELECTOR_FILM_CONTAINER = '.films-list__container';
 
-// ??? может, не делать вообще абстрактный сласс, а сразу относледовать FilmList от ExtraFilmList ???
-export default class abstractfilmList {
+export default class AbstractFilmList {
   constructor(container) {
     this._container = container;
     this._filmPresenter = new Map();
@@ -43,7 +48,7 @@ export default class abstractfilmList {
   }
 
   _renderNoFilms() {
-    render(this._filmBlockComponent, new NoFilms(NoFilmMessageKey.ALL));
+    render(this._filmBlockComponent, new NoFilms(EmptyResultMessage.ALL));
   }
 
   _handleFilmChange(updateFilm) {
@@ -54,9 +59,7 @@ export default class abstractfilmList {
   _renderFilmList() {
     if (!this._films.length) {
       this._renderNoFilms();
-      return;
+      return 0; // линтер ругается на пустой return
     }
-
-    this._renderFilmCards();
   }
 }

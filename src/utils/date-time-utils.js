@@ -10,7 +10,7 @@ const getDayMonthYear = (dateStamp) => dateStamp ? dayjs(dateStamp).format('DD M
 
 const getFullDate = (dateStamp) => dateStamp ? dayjs(dateStamp).format('YYYY/MM/DD hh:mm') : '';
 
-const getRandomDateStamp = () => getRandomInt(-(new Date()), new Date());
+const getRandomDateStamp = () => dayjs((getRandomInt(-(new Date()), new Date()))).format('YYYY-MM-DD');
 
 
 export {
