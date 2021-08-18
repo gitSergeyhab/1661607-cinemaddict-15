@@ -1,9 +1,7 @@
 import Abstract from '../abstract.js';
 
 
-const createNoFilm = (message) => `
-<h2 class="films-list__title">${message}</h2>
-`;
+const createNoFilm = (message) => `<h2 class="films-list__title">${message}</h2>`;
 
 export default class NoFilms extends Abstract{
   constructor(filter) {
@@ -15,4 +13,3 @@ export default class NoFilms extends Abstract{
     return createNoFilm(this._filter);
   }
 }
-

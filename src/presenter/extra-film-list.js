@@ -8,4 +8,9 @@ export default class ExtraFilmList extends AbstractFilmList {
 
     this._filmBlockComponent = new ExtraFilmsBlock(name);
   }
+
+  _renderFilmList() {
+    super._renderFilmList();
+    this._renderFilmCards();
+  }
 }

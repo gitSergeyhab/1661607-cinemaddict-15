@@ -12,8 +12,16 @@ const RenderPosition = {
   AFTER_END: 'afterend',
 };
 
+const SortType = {
+  DEFAULT: 'default',
+  DATE: 'date',
+  RATING: 'rating',
+};
+
+
 export {
   ActiveClass,
   DEFAULT_POSTER,
-  RenderPosition
+  RenderPosition,
+  SortType
 };

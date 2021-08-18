@@ -59,9 +59,7 @@ export default class AbstractFilmList {
   _renderFilmList() {
     if (!this._films.length) {
       this._renderNoFilms();
-      return;
+      return 0; // линтер ругается на пустой return
     }
-
-    this._renderFilmCards();
   }
 }

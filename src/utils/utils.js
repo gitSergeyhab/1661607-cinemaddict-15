@@ -1,4 +1,7 @@
+import dayjs from 'dayjs';
+
 const ADDITIONAL_BLOCK_LENGTH = 2;
+const MIN_DATE = dayjs('0000-00-00');
 
 const getRandomInt = (min, max) => {
   [min, max] = [Math.min(min, max), Math.max(min, max)];
@@ -29,6 +32,9 @@ const updateItem = (items, update) => {
   return index === -1 ? items : [...items.slice(0, index), update, ...items.slice(index + 1)];
 };
 
+const sortDate = (a, b) => dayjs(b.filmInfo.release.date || MIN_DATE).diff(dayjs(a.filmInfo.release.date || MIN_DATE));
+const sortRating = (a, b) => (b.filmInfo.totalRating || 0) - (a.filmInfo.totalRating || 0);
+
 export {
   getRandomInt,
   getRandFromList,
@@ -36,5 +42,7 @@ export {
   getRandomListNoRepeat,
   getRandomBoolean,
   getListWithoutNull,
-  updateItem
+  updateItem,
+  sortDate,
+  sortRating
 };
