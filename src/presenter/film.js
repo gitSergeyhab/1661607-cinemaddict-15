@@ -3,7 +3,6 @@ import FilmPopup from '../view/popup/film-popup.js';
 import Comment from '../view/popup/comment.js';
 
 import {render, remove, replace} from '../utils/dom-utils.js';
-import {RenderPosition} from '../constants.js';
 
 
 const SELECTOR_POPUP = 'section.film-details';
@@ -38,8 +37,6 @@ export default class Film {
     this._filmCardComponent = new FilmCard(film);
 
     this._filmPopupComponent = new FilmPopup(film);
-    // const commentContainer = this._filmPopupComponent.getElement().querySelector('.film-details__comments-list');
-    // this._renderComments(commentContainer, this._film.comments);
 
     // навесить обработчики
     this._filmCardComponent.setOpenPopupClickHandler(this._handlerFilmCardClick); // обработчик открытия попапа на карточку
@@ -52,8 +49,8 @@ export default class Film {
     this._filmPopupComponent.setHistoryClickHandler(this._handleHistoryClick);
     this._filmPopupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
 
-
-    if (prevFilmCardComponent === null || prevFilmPopupComponent === null) {//если создается
+    //если создается
+    if (prevFilmCardComponent === null || prevFilmPopupComponent === null) {
       render(this._filmsContainer, this._filmCardComponent);
       return;
     }
@@ -81,33 +78,35 @@ export default class Film {
   }
 
   _closePopup() {
-    const popup = document.querySelector(SELECTOR_POPUP);
+    this._filmPopupComponent.reset(this._film);
+    const newPopup = this._filmPopupComponent.getElement();
+    newPopup.remove();
+    document.body.classList.remove(CLASS_HIDE_SCROLL);
+    document.removeEventListener('keydown', this._handlerEscKeyDown);
 
-    if (popup) {
-      this._filmPopupComponent.reset(this._film);
-      popup.remove();
-      document.body.classList.remove(CLASS_HIDE_SCROLL);
-      document.removeEventListener('keydown', this._handlerEscKeyDown);
-    }
   }
 
   _renderPopup() {
-    this._closePopup();
-    document.addEventListener('keydown', this._handlerEscKeyDown);
+    const popup = document.querySelector(SELECTOR_POPUP);
+    if (popup) {
+      replace(this._filmPopupComponent, popup);
+    } else {
+      document.addEventListener('keydown', this._handlerEscKeyDown);
+      render(document.body, this._filmPopupComponent);
+    }
     document.body.classList.add(CLASS_HIDE_SCROLL);
-    render(document.body, this._filmPopupComponent, RenderPosition.AFTER_END);
-    render(document.body, this._filmPopupComponent);
+    this._filmPopupComponent.reset(this._film);
   }
 
 
   _handlerClosePopupClick() {
-    this._closePopup();
+    this._closePopup(); // вроде без ошибок
   }
 
-  _handlerEscKeyDown(evt) {
+  _handlerEscKeyDown(evt) { // ??? вроде все то же, но работает с ошибками ???
     if (evt.key === ESCAPE) {
-      evt.preventDefault();
-      this._closePopup();
+      document.querySelector('.film-details__close-btn').click(); // Uncaught TypeError: Cannot read property 'click' of null
+      // this._closePopup(); // smart.js:17  Uncaught TypeError: Cannot read property 'replaceChild' of null ???
     }
   }
 

@@ -12,12 +12,11 @@ import {renderAll} from '../../utils/dom-utils.js';
 import {getFullDate} from '../../utils/date-time-utils.js';
 
 
-
 const makeButtonActive = (value) => value ? ActiveClass.POPUP : '';
 
 const getGenre = (genre) => `<span class="film-details__genre">${genre}</span>`;
 
-// ВЫНЕСТИ в ОТДЕЛЬНУЮ ВЬЮХУ НЕ СМОГ - вьюха попапа должна обновлятья вмете с комментами
+// ВЫНЕСТИ в ОТДЕЛЬНУЮ ВЬЮХУ НЕ СМОГ - вьюха попапа должна обновлятья вмете с комментами - поэтому запихал комменты сюда.
 const createComment = ({id,author,comment,date,emotion}) => `
   <li class="film-details__comment" data-comment-id=${id}>
     <span class="film-details__comment-emoji">
@@ -33,7 +32,7 @@ const createComment = ({id,author,comment,date,emotion}) => `
     </div>
   </li>`;
 
-const showEmoji = (emoji) => !emoji ? '!!!' : `
+const showEmoji = (emoji) => `
   <img src="images/emoji/${emoji}.png" width="55" height="55" alt="emoji-${emoji}">
   <input class="visually-hidden" name="selected-emoji" type="text" id="selected-emoji" value="${emoji}">
   `;  // не нашел в верстке никакого скрытого поля ввода, добавил от балды
@@ -136,7 +135,7 @@ const createFilmPopup = ({
           ${comments.map((comment) => createComment(comment)).join('\n')}
         </ul>
         <div class="film-details__new-comment">
-          <div class="film-details__add-emoji-label">${showEmoji(addedEmoji)}</div>
+          <div class="film-details__add-emoji-label">${addedEmoji ? showEmoji(addedEmoji) : ''}</div>
           <label class="film-details__comment-label">
             <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${addedComment || ''}</textarea>
           </label>
@@ -180,8 +179,6 @@ export default class FilmPopup extends Smart {
 
     this._setEmojiListener();
     this._setCommentListener();
-
-    this._scrollHight = null;
   }
 
   getTemplate() {
@@ -189,15 +186,13 @@ export default class FilmPopup extends Smart {
   }
 
   updateElement() {
-    const scrollTop = this.getElement().scrollTop; // запомнить скрол
+    const scrollTop = this.getElement().scrollTop;
     super.updateElement();
-    this.getElement().scrollTop = scrollTop; // добавить скролл после замены
+    this.getElement().scrollTop = scrollTop;
   }
 
   reset(film) {
-    this.updateState(
-      FilmPopup.parseFilmToState(film),
-    );
+    this.updateState(FilmPopup.parseFilmToState(film));
   }
 
   _restoreHandlers() {
@@ -219,17 +214,13 @@ export default class FilmPopup extends Smart {
   }
 
   _clickEmojiHandler(evt) {
-    // console.log(this._state)
     evt.preventDefault();
     this.updateState({addedEmoji: evt.target.id.split('-')[1]});
-    // console.log(this._state)
   }
 
   _commentInputHandler(evt) {
-    // console.log(this._state)
     evt.preventDefault();
     this.updateState({addedComment: evt.target.value}, true);
-    // console.log(this._state)
   }
 
   _closePopupClickHandler(evt) {
@@ -272,7 +263,6 @@ export default class FilmPopup extends Smart {
     this._callback.favoriteClick = cb;
     this.getElement().querySelector('.film-details__control-button--favorite').addEventListener('click', this._favoriteClickHandler);
   }
-
 
 
   static parseFilmToState(film) {
