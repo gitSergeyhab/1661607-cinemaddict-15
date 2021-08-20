@@ -38,8 +38,8 @@ export default class Film {
     this._filmCardComponent = new FilmCard(film);
 
     this._filmPopupComponent = new FilmPopup(film);
-    const commentContainer = this._filmPopupComponent.getElement().querySelector('.film-details__comments-list');
-    this._renderComments(commentContainer, this._film.comments);
+    // const commentContainer = this._filmPopupComponent.getElement().querySelector('.film-details__comments-list');
+    // this._renderComments(commentContainer, this._film.comments);
 
     // навесить обработчики
     this._filmCardComponent.setOpenPopupClickHandler(this._handlerFilmCardClick); // обработчик открытия попапа на карточку
@@ -82,7 +82,9 @@ export default class Film {
 
   _closePopup() {
     const popup = document.querySelector(SELECTOR_POPUP);
+
     if (popup) {
+      this._filmPopupComponent.reset(this._film);
       popup.remove();
       document.body.classList.remove(CLASS_HIDE_SCROLL);
       document.removeEventListener('keydown', this._handlerEscKeyDown);

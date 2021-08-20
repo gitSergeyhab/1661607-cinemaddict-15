@@ -35,6 +35,11 @@ const updateItem = (items, update) => {
 const sortDate = (a, b) => dayjs(b.filmInfo.release.date || MIN_DATE).diff(dayjs(a.filmInfo.release.date || MIN_DATE));
 const sortRating = (a, b) => (b.filmInfo.totalRating || 0) - (a.filmInfo.totalRating || 0);
 
+const getNotImplementedError = (method) => {
+  throw new Error(`Abstract method not implemented: ${method}`);
+};
+
+
 export {
   getRandomInt,
   getRandFromList,
@@ -44,5 +49,6 @@ export {
   getListWithoutNull,
   updateItem,
   sortDate,
-  sortRating
+  sortRating,
+  getNotImplementedError
 };

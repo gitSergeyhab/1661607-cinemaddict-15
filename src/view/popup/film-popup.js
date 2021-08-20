@@ -1,4 +1,4 @@
-import Abstract from '../abstract.js';
+import Smart from '../smart.js';
 import {
   getHoursAndMinutes,
   getDayMonthYear
@@ -9,11 +9,34 @@ import {
 } from '../../constants.js';
 import {getListWithoutNull} from '../../utils/utils.js';
 import {renderAll} from '../../utils/dom-utils.js';
+import {getFullDate} from '../../utils/date-time-utils.js';
+
 
 
 const makeButtonActive = (value) => value ? ActiveClass.POPUP : '';
 
 const getGenre = (genre) => `<span class="film-details__genre">${genre}</span>`;
+
+// ВЫНЕСТИ в ОТДЕЛЬНУЮ ВЬЮХУ НЕ СМОГ - вьюха попапа должна обновлятья вмете с комментами
+const createComment = ({id,author,comment,date,emotion}) => `
+  <li class="film-details__comment" data-comment-id=${id}>
+    <span class="film-details__comment-emoji">
+      <img src="./images/emoji/${emotion || 'smile'}.png" width="55" height="55" alt="emoji-smile">
+    </span>
+    <div>
+      <p class="film-details__comment-text">${comment || ''}</p>
+      <p class="film-details__comment-info">
+        <span class="film-details__comment-author">${author || ''}</span>
+        <span class="film-details__comment-day">${getFullDate(date)}</span>
+        <button class="film-details__comment-delete">Delete</button>
+      </p>
+    </div>
+  </li>`;
+
+const showEmoji = (emoji) => !emoji ? '!!!' : `
+  <img src="images/emoji/${emoji}.png" width="55" height="55" alt="emoji-${emoji}">
+  <input class="visually-hidden" name="selected-emoji" type="text" id="selected-emoji" value="${emoji}">
+  `;  // не нашел в верстке никакого скрытого поля ввода, добавил от балды
 
 
 const createFilmPopup = ({
@@ -26,6 +49,7 @@ const createFilmPopup = ({
   userDetails: {
     watchList, alreadyWatched, favorite,
   },
+  hasComments, addedEmoji, addedComment,
 }) => `
 <section class="film-details data-film-id="${id}">
   <form class="film-details__inner" action="" method="get">
@@ -104,16 +128,17 @@ const createFilmPopup = ({
 
       <div class="film-details__bottom-container">
       <section class="film-details__comments-wrap">
-        <h3 class="film-details__comments-title">
+        <h3 class="film-details__comments-title ${hasComments ? '' : 'visually-hidden'}">
           Comments <span class="film-details__comments-count">${comments.length}</span>
         </h3>
 
         <ul class="film-details__comments-list">
+          ${comments.map((comment) => createComment(comment)).join('\n')}
         </ul>
         <div class="film-details__new-comment">
-          <div class="film-details__add-emoji-label"></div>
+          <div class="film-details__add-emoji-label">${showEmoji(addedEmoji)}</div>
           <label class="film-details__comment-label">
-            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
+            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${addedComment || ''}</textarea>
           </label>
           <div class="film-details__emoji-list">
             <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile">
@@ -140,21 +165,72 @@ const createFilmPopup = ({
 </section>`;
 
 
-export default class FilmPopup extends Abstract {
+export default class FilmPopup extends Smart {
   constructor(film) {
     super();
-    this._film = film;
+    this._state = FilmPopup.parseFilmToState(film);
 
     this._closePopupClickHandler = this._closePopupClickHandler.bind(this);
     this._watchListClickHandler = this._watchListClickHandler.bind(this);
     this._historyClickHandler = this._historyClickHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
+
+    this._clickEmojiHandler = this._clickEmojiHandler.bind(this);
+    this._commentInputHandler = this._commentInputHandler.bind(this);
+
+    this._setEmojiListener();
+    this._setCommentListener();
+
+    this._scrollHight = null;
   }
 
   getTemplate() {
-    return createFilmPopup(this._film);
+    return createFilmPopup(this._state);
   }
 
+  updateElement() {
+    const scrollTop = this.getElement().scrollTop; // запомнить скрол
+    super.updateElement();
+    this.getElement().scrollTop = scrollTop; // добавить скролл после замены
+  }
+
+  reset(film) {
+    this.updateState(
+      FilmPopup.parseFilmToState(film),
+    );
+  }
+
+  _restoreHandlers() {
+    this._setCommentListener();
+    this._setEmojiListener();
+    this.setClosePopupClickHandler(this._callback.closePopupClick);
+    this.setWatchListClickHandler(this._callback.watchListClick);
+    this.setHistoryClickHandler(this._callback.historyClick);
+    this.setFavoriteClickHandler(this._callback.favoriteClick);
+  }
+
+  _setCommentListener() {
+    this.getElement().querySelector('.film-details__comment-input').addEventListener('input', this._commentInputHandler);
+  }
+
+  _setEmojiListener(){
+    const emojiInputs = this.getElement().querySelectorAll('.film-details__emoji-item');
+    emojiInputs.forEach((input) => input.addEventListener('click', this._clickEmojiHandler));
+  }
+
+  _clickEmojiHandler(evt) {
+    // console.log(this._state)
+    evt.preventDefault();
+    this.updateState({addedEmoji: evt.target.id.split('-')[1]});
+    // console.log(this._state)
+  }
+
+  _commentInputHandler(evt) {
+    // console.log(this._state)
+    evt.preventDefault();
+    this.updateState({addedComment: evt.target.value}, true);
+    // console.log(this._state)
+  }
 
   _closePopupClickHandler(evt) {
     evt.preventDefault();
@@ -195,5 +271,18 @@ export default class FilmPopup extends Abstract {
   setFavoriteClickHandler(cb) {
     this._callback.favoriteClick = cb;
     this.getElement().querySelector('.film-details__control-button--favorite').addEventListener('click', this._favoriteClickHandler);
+  }
+
+
+
+  static parseFilmToState(film) {
+    return {...film, addedComment: null, addedEmoji: null, hasComments: film.comments.length > 0};
+  }
+
+  static parseStateToFilm(state) {
+    delete state.addedComment;
+    delete state.addedEmoji;
+    delete state.hasComments;
+    return state;
   }
 }
