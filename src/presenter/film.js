@@ -1,6 +1,5 @@
 import FilmCard from '../view/films/film-card.js';
 import FilmPopup from '../view/popup/film-popup.js';
-import Comment from '../view/popup/comment.js';
 
 import {render, remove, replace} from '../utils/dom-utils.js';
 
@@ -66,15 +65,6 @@ export default class Film {
   destroy() {
     remove(this._filmCardComponent);
     remove(this._filmPopupComponent);
-  }
-
-  _renderComment(container, comment) {
-    const commentItem = new Comment(comment);
-    render(container, commentItem);
-  }
-
-  _renderComments(container, comments) {
-    comments.forEach((comment) => this._renderComment(container, comment));
   }
 
   _closePopup() {
