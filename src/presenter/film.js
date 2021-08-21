@@ -78,35 +78,30 @@ export default class Film {
   }
 
   _closePopup() {
-    this._filmPopupComponent.reset(this._film);
-    const newPopup = this._filmPopupComponent.getElement();
-    newPopup.remove();
-    document.body.classList.remove(CLASS_HIDE_SCROLL);
-    document.removeEventListener('keydown', this._handlerEscKeyDown);
-
+    const popup = document.querySelector(SELECTOR_POPUP);
+    if (popup) {
+      popup.remove();
+      document.body.classList.remove(CLASS_HIDE_SCROLL);
+      document.removeEventListener('keydown', this._handlerEscKeyDown);
+    }
   }
 
   _renderPopup() {
-    const popup = document.querySelector(SELECTOR_POPUP);
-    if (popup) {
-      replace(this._filmPopupComponent, popup);
-    } else {
-      document.addEventListener('keydown', this._handlerEscKeyDown);
-      render(document.body, this._filmPopupComponent);
-    }
+    this._closePopup();
+    document.addEventListener('keydown', this._handlerEscKeyDown);
     document.body.classList.add(CLASS_HIDE_SCROLL);
-    this._filmPopupComponent.reset(this._film);
+    render(document.body, this._filmPopupComponent);
+    this._filmPopupComponent.reset(this._film); // нужно сбрасывать стэйт здесь: в _closePopup() сбрасывать нельзя - this.updateElement() не работает - ...
+    // ... при повторном рендеринге родителя у this._filmPopupComponent.getElement уже нет, так как сам .getElement был удален при первом _closePopup()
   }
-
 
   _handlerClosePopupClick() {
-    this._closePopup(); // вроде без ошибок
+    this._closePopup();
   }
 
-  _handlerEscKeyDown(evt) { // ??? вроде все то же, но работает с ошибками ???
+  _handlerEscKeyDown(evt) {
     if (evt.key === ESCAPE) {
-      document.querySelector('.film-details__close-btn').click(); // Uncaught TypeError: Cannot read property 'click' of null
-      // this._closePopup(); // smart.js:17  Uncaught TypeError: Cannot read property 'replaceChild' of null ???
+      this._closePopup();
     }
   }
 
