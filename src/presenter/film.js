@@ -1,9 +1,7 @@
 import FilmCard from '../view/films/film-card.js';
 import FilmPopup from '../view/popup/film-popup.js';
-import Comment from '../view/popup/comment.js';
 
 import {render, remove, replace} from '../utils/dom-utils.js';
-import {RenderPosition} from '../constants.js';
 
 
 const SELECTOR_POPUP = 'section.film-details';
@@ -38,8 +36,6 @@ export default class Film {
     this._filmCardComponent = new FilmCard(film);
 
     this._filmPopupComponent = new FilmPopup(film);
-    const commentContainer = this._filmPopupComponent.getElement().querySelector('.film-details__comments-list');
-    this._renderComments(commentContainer, this._film.comments);
 
     // навесить обработчики
     this._filmCardComponent.setOpenPopupClickHandler(this._handlerFilmCardClick); // обработчик открытия попапа на карточку
@@ -52,8 +48,8 @@ export default class Film {
     this._filmPopupComponent.setHistoryClickHandler(this._handleHistoryClick);
     this._filmPopupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
 
-
-    if (prevFilmCardComponent === null || prevFilmPopupComponent === null) {//если создается
+    //если создается
+    if (prevFilmCardComponent === null || prevFilmPopupComponent === null) {
       render(this._filmsContainer, this._filmCardComponent);
       return;
     }
@@ -71,15 +67,6 @@ export default class Film {
     remove(this._filmPopupComponent);
   }
 
-  _renderComment(container, comment) {
-    const commentItem = new Comment(comment);
-    render(container, commentItem);
-  }
-
-  _renderComments(container, comments) {
-    comments.forEach((comment) => this._renderComment(container, comment));
-  }
-
   _closePopup() {
     const popup = document.querySelector(SELECTOR_POPUP);
     if (popup) {
@@ -93,10 +80,10 @@ export default class Film {
     this._closePopup();
     document.addEventListener('keydown', this._handlerEscKeyDown);
     document.body.classList.add(CLASS_HIDE_SCROLL);
-    render(document.body, this._filmPopupComponent, RenderPosition.AFTER_END);
     render(document.body, this._filmPopupComponent);
+    this._filmPopupComponent.reset(this._film); // нужно сбрасывать стэйт здесь: в _closePopup() сбрасывать нельзя - this.updateElement() не работает - ...
+    // ... при повторном рендеринге родителя у this._filmPopupComponent.getElement уже нет, так как сам .getElement был удален при первом _closePopup()
   }
-
 
   _handlerClosePopupClick() {
     this._closePopup();
@@ -104,7 +91,6 @@ export default class Film {
 
   _handlerEscKeyDown(evt) {
     if (evt.key === ESCAPE) {
-      evt.preventDefault();
       this._closePopup();
     }
   }

@@ -1,4 +1,5 @@
 import { createElement } from '../utils/dom-utils';
+import {getNotImplementedError} from '../utils/utils.js';
 
 export default class Abstract {
   constructor () {
@@ -10,7 +11,7 @@ export default class Abstract {
   }
 
   getTemplate() {
-    throw new Error('Abstract method not implemented: getTemplate');
+    getNotImplementedError('getTemplate');
   }
 
   getElement() {
