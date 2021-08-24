@@ -40,7 +40,7 @@ const showEmoji = (emoji) => `
 
 const createFilmPopup = ({
   id,
-  comments,
+  // comments,
   filmInfo: {
     title, alternativeTitle, ageRating, director, writers, actors, totalRating, poster, runtime, genre, description,
     release: {date, releaseCountry},
@@ -49,7 +49,7 @@ const createFilmPopup = ({
     watchList, alreadyWatched, favorite,
   },
   hasComments, addedEmoji, addedComment,
-}) => `
+}, comments) => `
 <section class="film-details data-film-id="${id}">
   <form class="film-details__inner" action="" method="get">
 
@@ -165,9 +165,10 @@ const createFilmPopup = ({
 
 
 export default class FilmPopup extends Smart {
-  constructor(film) {
+  constructor(film, comments) {
     super();
     this._state = FilmPopup.parseFilmToState(film);
+    this._comments = comments;
 
     this._closePopupClickHandler = this._closePopupClickHandler.bind(this);
     this._watchListClickHandler = this._watchListClickHandler.bind(this);
@@ -182,7 +183,7 @@ export default class FilmPopup extends Smart {
   }
 
   getTemplate() {
-    return createFilmPopup(this._state);
+    return createFilmPopup(this._state, this._comments);
   }
 
   updateElement() {

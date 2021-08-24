@@ -2,6 +2,8 @@ import FilmCard from '../view/films/film-card.js';
 import FilmPopup from '../view/popup/film-popup.js';
 
 import {render, remove, replace} from '../utils/dom-utils.js';
+import {UserAction, UpdateType} from '../constants.js';
+
 
 
 const SELECTOR_POPUP = 'section.film-details';
@@ -10,8 +12,9 @@ const ESCAPE = 'Escape';
 
 
 export default class Film {
-  constructor(filmsContainer, changeData) {
+  constructor(filmsContainer, commentsModel, changeData) {
     this._filmsContainer = filmsContainer;
+    this._commentsModel = commentsModel;
     this._changeData = changeData;
 
     this._filmCardComponent = null;
@@ -29,13 +32,14 @@ export default class Film {
 
   init(film) {
     this._film = film;
+    this._comments = this._getNeedComments();
 
     const prevFilmCardComponent = this._filmCardComponent;
     const prevFilmPopupComponent = this._filmPopupComponent;
 
-    this._filmCardComponent = new FilmCard(film);
+    this._filmCardComponent = new FilmCard(film, this._comments);
 
-    this._filmPopupComponent = new FilmPopup(film);
+    this._filmPopupComponent = new FilmPopup(film, this._comments);
 
     // навесить обработчики
     this._filmCardComponent.setOpenPopupClickHandler(this._handlerFilmCardClick); // обработчик открытия попапа на карточку
@@ -65,6 +69,16 @@ export default class Film {
   destroy() {
     remove(this._filmCardComponent);
     remove(this._filmPopupComponent);
+  }
+
+  _getComments() {
+    return this._commentsModel.comments;
+  }
+
+  _getNeedComments() {
+    const comments = this._getComments();
+    const needComments = comments.filter((comment) =>  this._film.comments.some((filmComment) => filmComment === comment.id));
+    return needComments;
   }
 
   _closePopup() {
@@ -100,20 +114,20 @@ export default class Film {
   }
 
   _handleWatchListClick() {
-    this._changeData((
-      {...this._film, userDetails: {...this._film.userDetails, watchList: !this._film.userDetails.watchList}}
-    ));
+    this._changeData(UserAction.UPDATE_FILM, UpdateType.MINOR,
+      {...this._film, userDetails: {...this._film.userDetails, watchList: !this._film.userDetails.watchList}},
+    );
   }
 
   _handleHistoryClick() {
-    this._changeData((
+    this._changeData(UserAction.UPDATE_FILM, UpdateType.MAJOR,
       {...this._film, userDetails: {...this._film.userDetails, alreadyWatched: !this._film.userDetails.alreadyWatched}}
-    ));
+    );
   }
 
   _handleFavoriteClick() {
-    this._changeData((
+    this._changeData(UserAction.UPDATE_FILM, UpdateType.MINOR,
       {...this._film, userDetails: {...this._film.userDetails, favorite: !this._film.userDetails.favorite}}
-    ));
+    );
   }
 }

@@ -18,10 +18,24 @@ const SortType = {
   RATING: 'rating',
 };
 
+const UserAction = {
+  UPDATE_FILM: 'UPDATE_FILM',
+  ADD_COMMENT: 'ADD_COMMENT',
+  DELETE_COMMENT: 'DELETE_COMMENT',
+};
+
+const UpdateType = {
+  PATCH: 'PATCH', // comments            - перерисовка всех филмлистов
+  MINOR: 'MINOR', // favorite, watchList - перерисовка всех филмлистов и фильтров
+  MAJOR: 'MAJOR', // history             - перерисовка всех филмлистов и фильтров и профиля
+};
+
 
 export {
   ActiveClass,
   DEFAULT_POSTER,
   RenderPosition,
-  SortType
+  SortType,
+  UserAction,
+  UpdateType
 };

@@ -2,7 +2,7 @@ import Abstract from './abstract';
 import {SortType} from '../constants.js';
 
 
-const ACTIV_SORT_BTN_CLASS = 'sort__button--active';
+const ACTIVE_SORT_BTN_CLASS = 'sort__button--active';
 
 
 const createSort = () => `<ul class="sort">
@@ -22,10 +22,10 @@ export default class Sort extends Abstract {
     return createSort();
   }
 
-  _markChoosenSort(target){
+  _markChosenSort(target){
     const sorts = this.getElement().querySelectorAll('.sort__button');
-    sorts.forEach((sort) => sort.classList.remove(ACTIV_SORT_BTN_CLASS));
-    target.classList.add(ACTIV_SORT_BTN_CLASS);
+    sorts.forEach((sort) => sort.classList.remove(ACTIVE_SORT_BTN_CLASS));
+    target.classList.add(ACTIVE_SORT_BTN_CLASS);
   }
 
   _sortTypeChangeHandler(evt) {
@@ -35,7 +35,7 @@ export default class Sort extends Abstract {
       return;
     }
     this._callback.clickSort(sortType);
-    this._markChoosenSort(evt.target);
+    this._markChosenSort(evt.target);
   }
 
   setSortTypeChangeHandler(cb) {

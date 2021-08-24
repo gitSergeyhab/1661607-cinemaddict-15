@@ -15,6 +15,8 @@ import {
   COUNTS,
   createMockFilm
 } from './mock.js';
+import FilmsModel from './model/films-model.js';
+import CommentsModel from './model/comments-model.js';
 
 const FilmSectionName = {
   TOP_RATED: 'Top rated',
@@ -50,7 +52,18 @@ const statistic = footer.querySelector('.footer__statistics');
 
 
 //  DATA
-const mockFilms = new Array(getRandomInt(COUNTS.FILM.MIN, COUNTS.FILM.MAX)).fill().map((item, i) => createMockFilm(i));
+const oldMockFilms = new Array(getRandomInt(COUNTS.FILM.MIN, COUNTS.FILM.MAX)).fill().map((item, i) => createMockFilm(i));
+const mockFilms = [];
+oldMockFilms.forEach((film) => {
+  const comments = film.comments;
+  const newComments = comments.map((comment) => comment.id);
+  const newFilm = {...film, comments: newComments};
+  mockFilms.push(newFilm);
+})
+
+const mockComments = oldMockFilms.reduce((acc, elem) => ([...acc, ...elem.comments]) ,[]);
+const commentsModel = new CommentsModel();
+commentsModel.comments = mockComments;
 
 
 //FUNCTIONS
@@ -96,15 +109,23 @@ render(main, new Menu(watchList.length, history.length, favorites.length));
 const filmSection = new FilmSection();
 render(main, filmSection);
 
-const mainFilmListPresenter = new FilmListPresenter(filmSection);
-mainFilmListPresenter.init(mockFilms);
+const mainFilmsModel = new FilmsModel();
+mainFilmsModel.films = mockFilms;
+
+const mainFilmListPresenter = new FilmListPresenter(filmSection, mainFilmsModel, commentsModel);
+mainFilmListPresenter.init();
 
 // 1.3.2.рендеринг Top rated, Most commented Film Blocks
-const topFilmListPresenter = new ExtraFilmListPresenter(filmSection, FilmSectionName.TOP_RATED);
-topFilmListPresenter.init(topFilms);
 
-const mostCommentedFilmListPresenter = new ExtraFilmListPresenter(filmSection, FilmSectionName.MOST_COMMENTED);
-mostCommentedFilmListPresenter.init(mostCommentedFilms);
+const topRatedFilmsModel = new FilmsModel();
+topRatedFilmsModel.films = topFilms;
+const topFilmListPresenter = new ExtraFilmListPresenter(filmSection, topRatedFilmsModel, commentsModel, FilmSectionName.TOP_RATED);
+topFilmListPresenter.init();
+
+const mostCommentedFilmsModel = new FilmsModel();
+mostCommentedFilmsModel.films = mostCommentedFilms;
+const mostCommentedFilmListPresenter = new ExtraFilmListPresenter(filmSection, mostCommentedFilmsModel, commentsModel, FilmSectionName.MOST_COMMENTED);
+mostCommentedFilmListPresenter.init();
 
 
 //1.4.footer statistic
