@@ -28,11 +28,9 @@ export default class AbstractFilmList {
 
     this._noFilmComponent = new NoFilms(EmptyResultMessage.ALL);
     this._sortComponent = null;
-    // this._btnShowMoreComponent = null;
 
     this._filmsCount = this._getFilms().length;
 
-    // this._handleFilmChange = this._handleFilmChange.bind(this);//
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
 
@@ -75,22 +73,21 @@ export default class AbstractFilmList {
     render(this._filmBlockComponent, this._noFilmComponent);
   }
 
-  _handleFilmChange(updateFilm) {
-    // this._films = updateItem(this._films, updateFilm); // обновляет данные -> вставляет новый фильм вместо старого
+  // _handleFilmChange(updateFilm) {
+  //   // this._films = updateItem(this._films, updateFilm); // обновляет данные -> вставляет новый фильм вместо старого
 
-    // Здесь будем вызывать обновление модели
-    this._filmPresenter.get(updateFilm.id).init(updateFilm); //овторно инициализируем FilmPresenter
-  }
+  //   // Здесь будем вызывать обновление модели
+  //   this._filmPresenter.get(updateFilm.id).init(updateFilm); //овторно инициализируем FilmPresenter
+  // }
 
   _handleViewAction(actionType, updateType, update) {
     switch(actionType) {
       case UserAction.UPDATE_FILM:
         this._filmsModel.updateFilm(updateType, update);
         break;
-      case UserAction.ADD_COMMENT:
-        this._filmsModel.updateFilm(updateType, update);
-        break;
-      // case ???
+      // case UserAction.ADD_COMMENT:
+      //   this._filmsModel.updateFilm(updateType, update);
+      //   break;
     }
   }
 

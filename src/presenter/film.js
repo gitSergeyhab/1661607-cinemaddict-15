@@ -28,6 +28,13 @@ export default class Film {
     this._handleWatchListClick = this._handleWatchListClick.bind(this);
     this._handleHistoryClick = this._handleHistoryClick.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
+
+    this._handleDeleteComment = this._handleDeleteComment.bind(this);
+
+    this._handleViewActionComment = this._handleViewActionComment.bind(this);
+    this._handleModelEventComment = this._handleModelEventComment.bind(this);
+
+    this._commentsModel.addObserver(this._handleModelEventComment);
   }
 
   init(film) {
@@ -37,7 +44,7 @@ export default class Film {
     const prevFilmCardComponent = this._filmCardComponent;
     const prevFilmPopupComponent = this._filmPopupComponent;
 
-    this._filmCardComponent = new FilmCard(film, this._comments);
+    this._filmCardComponent = new FilmCard(film);
 
     this._filmPopupComponent = new FilmPopup(film, this._comments);
 
@@ -51,6 +58,8 @@ export default class Film {
     this._filmPopupComponent.setWatchListClickHandler(this._handleWatchListClick);
     this._filmPopupComponent.setHistoryClickHandler(this._handleHistoryClick);
     this._filmPopupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
+
+    this._filmPopupComponent.setDeleteCommentHandler(this._handleDeleteComment);
 
     //если создается
     if (prevFilmCardComponent === null || prevFilmPopupComponent === null) {
@@ -130,4 +139,27 @@ export default class Film {
       {...this._film, userDetails: {...this._film.userDetails, favorite: !this._film.userDetails.favorite}}
     );
   }
+
+  _handleDeleteComment(id) {
+    console.log(id)
+    const needCom = this._getComments().find((comment) => comment.id === id);
+
+    console.log(needCom)
+    this._handleViewActionComment(UserAction.DELETE_COMMENT, UpdateType.PATCH,
+      {...this._getComments(), userDetails: {...this._film.userDetails, watchList: !this._film.userDetails.watchList}},
+    );
+  }
+
+  _handleViewActionComment(actionType, updateType, update) {
+    switch(actionType) {
+      case UserAction.ADD_COMMENT:
+        this._commentsModel.addComment(updateType, update);
+        break;
+      case UserAction.DELETE_COMMENT:
+        this._commentsModel.delComment(updateType, update);
+        break;
+    }
+  }
+
+  _handleModelEventComment(){}
 }
