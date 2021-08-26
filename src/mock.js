@@ -11,7 +11,7 @@ import {getRandomDateStamp} from './utils/date-time-utils.js';
 
 export const COUNTS = {
   COMMENT: {
-    MIN: 0,
+    MIN: 4,
     MAX: 5,
   },
   FILM: {

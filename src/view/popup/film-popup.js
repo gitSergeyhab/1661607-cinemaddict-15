@@ -180,9 +180,11 @@ export default class FilmPopup extends Smart {
     this._commentInputHandler = this._commentInputHandler.bind(this);
 
     this._deleteCommentHandler = this._deleteCommentHandler.bind(this);
+    this._keyDownCtrlEnterHandler = this._keyDownCtrlEnterHandler.bind(this);
 
     this._setEmojiListener();
     this._setCommentListener();
+    // document.addEventListener('keydown', this._keyDownCtrlEnterHandler);
   }
 
   getTemplate() {
@@ -202,12 +204,18 @@ export default class FilmPopup extends Smart {
   _restoreHandlers() {
     this._setCommentListener();
     this._setEmojiListener();
+
     this.setClosePopupClickHandler(this._callback.closePopupClick);
     this.setWatchListClickHandler(this._callback.watchListClick);
     this.setHistoryClickHandler(this._callback.historyClick);
     this.setFavoriteClickHandler(this._callback.favoriteClick);
+
     this.setDeleteCommentHandler(this._callback.deleteCommentClick);
+    this.setAddCommentHandler(this._callback.addCommentSend);
   }
+
+
+
 
   _setCommentListener() {
     this.getElement().querySelector('.film-details__comment-input').addEventListener('input', this._commentInputHandler);
@@ -228,6 +236,7 @@ export default class FilmPopup extends Smart {
     this.updateState({addedComment: evt.target.value}, true);
   }
 
+
   _closePopupClickHandler(evt) {
     evt.preventDefault();
     this._callback.closePopupClick();
@@ -245,6 +254,7 @@ export default class FilmPopup extends Smart {
 
   _favoriteClickHandler(evt) {
     evt.preventDefault();
+
     this._callback.favoriteClick();
   }
 
@@ -252,6 +262,15 @@ export default class FilmPopup extends Smart {
     evt.preventDefault();
     const id = evt.target.dataset.id;
     this._callback.deleteCommentClick(id);
+  }
+
+  _keyDownCtrlEnterHandler(evt) {
+    const commentArea = this.getElement().querySelector('.film-details__comment-input');
+    const emotion = this.getElement().querySelector('#selected-emoji');
+    if (evt.ctrlKey && evt.keyCode === 13 /*&& commentArea === document.activeElement*/ && emotion) { // ??? в любом случае отправлять или если только commentArea === document.activeElement ???
+      const value = commentArea.value;
+      this._callback.addCommentSend(value, emotion.value);
+    }
   }
 
   setClosePopupClickHandler(cb) {
@@ -279,7 +298,11 @@ export default class FilmPopup extends Smart {
     this.getElement().querySelectorAll('.film-details__comment-delete').forEach((delBtn) => {
       delBtn.addEventListener('click', this._deleteCommentHandler);
     });
+  }
 
+  setAddCommentHandler(cb) {
+    this._callback.addCommentSend = cb;
+    document.addEventListener('keydown', this._keyDownCtrlEnterHandler);
   }
 
 

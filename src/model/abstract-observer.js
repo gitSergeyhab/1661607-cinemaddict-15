@@ -12,7 +12,7 @@ export default class AbstractObserver {
   }
 
   _notify(evt, payload) {
-    console.log(evt, payload)
+    // console.log(evt, payload)
     this._observers.forEach((observer) => observer(evt, payload));
   }
 }
