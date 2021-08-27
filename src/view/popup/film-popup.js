@@ -184,7 +184,6 @@ export default class FilmPopup extends Smart {
 
     this._setEmojiListener();
     this._setCommentListener();
-    // document.addEventListener('keydown', this._keyDownCtrlEnterHandler);
   }
 
   getTemplate() {
@@ -213,9 +212,6 @@ export default class FilmPopup extends Smart {
     this.setDeleteCommentHandler(this._callback.deleteCommentClick);
     this.setAddCommentHandler(this._callback.addCommentSend);
   }
-
-
-
 
   _setCommentListener() {
     this.getElement().querySelector('.film-details__comment-input').addEventListener('input', this._commentInputHandler);
@@ -267,9 +263,10 @@ export default class FilmPopup extends Smart {
   _keyDownCtrlEnterHandler(evt) {
     const commentArea = this.getElement().querySelector('.film-details__comment-input');
     const emotion = this.getElement().querySelector('#selected-emoji');
-    if (evt.ctrlKey && evt.keyCode === 13 /*&& commentArea === document.activeElement*/ && emotion) { // ??? в любом случае отправлять или если только commentArea === document.activeElement ???
-      const value = commentArea.value;
+    const value = commentArea.value.trim();
+    if (evt.ctrlKey && evt.key === 'Enter' && value /*&& commentArea === document.activeElement*/ && emotion) { // ??? в любом случае отправлять или если только commentArea === document.activeElement ???
       this._callback.addCommentSend(value, emotion.value);
+      document.removeEventListener('keydown', this._keyDownCtrlEnterHandler);
     }
   }
 

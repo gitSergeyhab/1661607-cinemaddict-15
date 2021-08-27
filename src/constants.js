@@ -25,6 +25,7 @@ const UserAction = {
 };
 
 const UpdateType = {
+  NONE: 'NONE', // ничего не перерисовывать - когда выполняется совместно с другим UpdateType и он обновляет вьюху
   PATCH: 'PATCH', // comments            - перерисовка всех филмлистов
   MINOR: 'MINOR', // favorite, watchList - перерисовка всех филмлистов и фильтров
   MAJOR: 'MAJOR', // history             - перерисовка всех филмлистов и фильтров и профиля

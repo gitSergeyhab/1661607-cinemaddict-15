@@ -59,7 +59,7 @@ oldMockFilms.forEach((film) => {
   const newComments = comments.map((comment) => comment.id);
   const newFilm = {...film, comments: newComments};
   mockFilms.push(newFilm);
-})
+});
 
 const mockComments = oldMockFilms.reduce((acc, elem) => ([...acc, ...elem.comments]) ,[]);
 const commentsModel = new CommentsModel();

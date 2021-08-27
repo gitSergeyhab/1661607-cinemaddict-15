@@ -26,12 +26,6 @@ const getListWithoutNull = (list) => list ? list.filter(Boolean).join(', ') : ''
 
 const sortAndCut = (list, sortFunction, length = ADDITIONAL_BLOCK_LENGTH) => list.slice().sort(sortFunction).slice(0, length);
 
-
-// const updateItem = (items, update) => {
-//   const index = items.findIndex((item) => item.id === update.id);
-//   return index === -1 ? items : [...items.slice(0, index), update, ...items.slice(index + 1)];
-// };
-
 const sortDate = (a, b) => dayjs(b.filmInfo.release.date || MIN_DATE).diff(dayjs(a.filmInfo.release.date || MIN_DATE));
 const sortRating = (a, b) => (b.filmInfo.totalRating || 0) - (a.filmInfo.totalRating || 0);
 
@@ -47,7 +41,6 @@ export {
   getRandomListNoRepeat,
   getRandomBoolean,
   getListWithoutNull,
-  // updateItem,
   sortDate,
   sortRating,
   getNotImplementedError

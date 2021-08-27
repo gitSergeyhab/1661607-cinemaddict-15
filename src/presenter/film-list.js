@@ -6,7 +6,6 @@ import Sort from '../view/sort.js';
 import {render, remove} from '../utils/dom-utils.js';
 import {sortDate, sortRating} from '../utils/utils';
 import {RenderPosition, SortType} from '../constants.js';
-import {UserAction, UpdateType} from '../constants.js';
 
 
 const FILM_COUNT_PER_STEP = 5;
@@ -95,6 +94,11 @@ export default class ExtraFilmList extends AbstractFilmList {
     this._btnShowMoreComponent.setClickHandler(this._handleLoadMoreButtonClick);
   }
 
+  _renderFilmList() {
+    super._renderFilmList();
+    this._renderMainBlock();
+  }
+
   _handleSortTypeChange(sortType){
     if (this._sortType === sortType) {
       return;
@@ -108,43 +112,5 @@ export default class ExtraFilmList extends AbstractFilmList {
   _handleLoadMoreButtonClick() {
     this._filmsShown += FILM_COUNT_PER_STEP;
     this._renderFilmCards(this._getFilms());
-  }
-
-  // _handleModelEvent(updateType, data) {
-  //   // console.log(this._openedPopup)
-  //   switch(updateType) {
-  //     case UpdateType.PATCH:// комментарии
-  //       this._filmPresenter.get(data.id).init(data);
-  //       // обновить фильмы в других filmlist по data.id
-  //       break;
-  //     case UpdateType.MINOR:// favorite, watchList
-  //       // this._filmPresenter.get(data.id).init(data);
-  //       this._clearFilmList();
-  //       this._renderFilmList();
-  //       // обновить другие filmlist
-  //       // обновить filters
-  //       // восстановить открытый попап
-  //       break;
-  //     case UpdateType.MAJOR:
-  //       // this._filmPresenter.get(data.id).init(data);
-  //       this._clearFilmList();
-  //       this._renderFilmList();
-  //       // обновить другие filmlist
-  //       // обновить filters
-  //       // обновить Profile
-  //       // восстановить открытый попап
-  //       break;
-  //   }
-  // }
-
-  // const UpdateType = {
-  //   PATCH: 'PATCH', // comments            - перерисовка всех филмлистов
-  //   MINOR: 'MINOR', // favorite, watchList - перерисовка всех филмлистов и фильтров
-  //   MAJOR: 'MAJOR', // history             - перерисовка всех филмлистов и фильтров и профиля
-  // };
-
-  _renderFilmList() {
-    super._renderFilmList();
-    this._renderMainBlock();
   }
 }
