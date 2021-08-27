@@ -51,7 +51,7 @@ export default class ExtraFilmList extends AbstractFilmList {
     render(this._container, this._sortComponent, RenderPosition.BEFORE_BEGIN);
   }
 
-  _clearFilmList(resetRenderedTaskCount = false, resetSortType = false) {
+  _clearFilmList(resetRenderedFilmCount = false, resetSortType = false) {
     super._clearFilmList();
 
     remove(this._sortComponent); // ?
@@ -62,7 +62,7 @@ export default class ExtraFilmList extends AbstractFilmList {
       this._sortType = SortType.DEFAULT;
     }
 
-    if (resetRenderedTaskCount) {
+    if (resetRenderedFilmCount) {
       this._filmsShown = FILM_COUNT_PER_STEP;
     } else {
       this._filmsShown = Math.min(this._filmsCount, this._filmsShown);

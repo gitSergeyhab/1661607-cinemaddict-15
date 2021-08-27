@@ -26,6 +26,10 @@ const getListWithoutNull = (list) => list ? list.filter(Boolean).join(', ') : ''
 
 const sortAndCut = (list, sortFunction, length = ADDITIONAL_BLOCK_LENGTH) => list.slice().sort(sortFunction).slice(0, length);
 
+const getTopFilms = (films) => sortAndCut(films, (a, b) => (b.filmInfo.totalRating || 0) - (a.filmInfo.totalRating || 0));
+const getMosCommentedFilms = (films) => sortAndCut(films, (a, b) => b.comments.length - a.comments.length);
+
+
 const sortDate = (a, b) => dayjs(b.filmInfo.release.date || MIN_DATE).diff(dayjs(a.filmInfo.release.date || MIN_DATE));
 const sortRating = (a, b) => (b.filmInfo.totalRating || 0) - (a.filmInfo.totalRating || 0);
 
@@ -38,6 +42,8 @@ export {
   getRandomInt,
   getRandFromList,
   sortAndCut,
+  getTopFilms,
+  getMosCommentedFilms,
   getRandomListNoRepeat,
   getRandomBoolean,
   getListWithoutNull,

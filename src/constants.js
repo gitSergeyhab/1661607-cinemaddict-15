@@ -31,6 +31,13 @@ const UpdateType = {
   MAJOR: 'MAJOR', // history             - перерисовка всех филмлистов и фильтров и профиля
 };
 
+const FilterType = {
+  ALL_MOVIES: 'All movies',
+  WATCH_LIST: 'Watchlist',
+  HISTORY: 'History',
+  FAVORITES: 'Favorites',
+};
+
 
 export {
   ActiveClass,
@@ -38,5 +45,6 @@ export {
   RenderPosition,
   SortType,
   UserAction,
-  UpdateType
+  UpdateType,
+  FilterType
 };
