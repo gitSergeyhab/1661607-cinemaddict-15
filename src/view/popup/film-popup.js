@@ -2,11 +2,10 @@ import Smart from '../smart.js';
 
 import he from 'he';
 
-import {getHoursAndMinutes, getDayMonthYear} from '../../utils/date-time-utils.js';
+import {getHoursAndMinutes, getDayMonthYear, humanizeDate} from '../../utils/date-time-utils.js';
 import {DEFAULT_POSTER, ActiveClass} from '../../constants.js';
 import {getListWithoutNull} from '../../utils/utils.js';
 import {renderAll} from '../../utils/dom-utils.js';
-import {getFullDate} from '../../utils/date-time-utils.js';
 
 
 const makeButtonActive = (value) => value ? ActiveClass.POPUP : '';
@@ -22,7 +21,7 @@ const createComment = ({id,author,comment,date,emotion}) => `
       <p class="film-details__comment-text">${he.encode(comment) || ''}</p>
       <p class="film-details__comment-info">
         <span class="film-details__comment-author">${author || ''}</span>
-        <span class="film-details__comment-day">${getFullDate(date)}</span>
+        <span class="film-details__comment-day">${humanizeDate(date)}</span>
         <button class="film-details__comment-delete" data-id=${id}>Delete</button>
       </p>
     </div>
