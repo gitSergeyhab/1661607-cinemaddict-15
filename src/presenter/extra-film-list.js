@@ -2,23 +2,18 @@ import AbstractFilmList from './abstract-film-list';
 import ExtraFilmsBlock from '../view/films/extra-films-block.js';
 
 import {getTopFilms, getMosCommentedFilms} from '../utils/utils.js';
+import {FilmSectionName} from '../constants.js';
 
-const FilmSectionName = {
-  TOP_RATED: 'Top rated',
-  MOST_COMMENTED: 'Most commented',
-};
 
 export default class ExtraFilmList extends AbstractFilmList {
   constructor(container, filmsModel, commentsModel, name) {
     super(container, filmsModel, commentsModel);
     this._name = name;
-    console.log(this._name)
 
     this._filmBlockComponent = new ExtraFilmsBlock(name);
   }
 
   _getFilms() {
-
     switch (this._name) {
       case FilmSectionName.TOP_RATED:
         return getTopFilms(this._filmsModel.films);

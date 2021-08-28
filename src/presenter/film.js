@@ -2,18 +2,11 @@ import FilmCard from '../view/films/film-card.js';
 import FilmPopup from '../view/popup/film-popup.js';
 
 import {render, remove, replace} from '../utils/dom-utils.js';
-import {UserAction, UpdateType} from '../constants.js';
+import {UserAction, UpdateType, Mode} from '../constants.js';
 
 
 const CLASS_HIDE_SCROLL = 'hide-overflow';
 const ESCAPE = 'Escape';
-
-const Mode = {
-  DEFAULT: 'DEFAULT',
-  POPUP: 'POPUP',
-  ALL: 'ALL',
-};
-
 const CARD_CLICK_CLASSES =  ['film-card__title', 'film-card__poster', 'film-card__comments'];
 
 
@@ -30,11 +23,11 @@ export default class Film {
     this._filmPopupComponent = null;
 
     // привязать обработчики
-    this._handlerFilmCardClick = this._handlerFilmCardClick.bind(this);
-    this._handlerEscKeyDown = this._handlerEscKeyDown.bind(this);
-    this._handlerClosePopupClick = this._handlerClosePopupClick.bind(this);
+    this._handleFilmCardClick = this._handleFilmCardClick.bind(this);
+    this._handleEscKeyDown = this._handleEscKeyDown.bind(this);
+    this._handleClosePopupClick = this._handleClosePopupClick.bind(this);
 
-    this._handlerAnyFilmCardClick = this._handlerAnyFilmCardClick.bind(this); // закрывает попап при тыке на любую карточку
+    this._handleAnyFilmCardClick = this._handleAnyFilmCardClick.bind(this); // закрывает попап при тыке на любую карточку
 
     this._handleWatchListClick = this._handleWatchListClick.bind(this);
     this._handleHistoryClick = this._handleHistoryClick.bind(this);
@@ -57,12 +50,12 @@ export default class Film {
     this._filmPopupComponent = new FilmPopup(film, this._getNeedComments());
 
     // навесить обработчики
-    this._filmCardComponent.setOpenPopupClickHandler(this._handlerFilmCardClick); // обработчик открытия попапа на карточку
+    this._filmCardComponent.setOpenPopupClickHandler(this._handleFilmCardClick); // обработчик открытия попапа на карточку
     this._filmCardComponent.setWatchListClickHandler(this._handleWatchListClick);
     this._filmCardComponent.setHistoryClickHandler(this._handleHistoryClick);
     this._filmCardComponent.setFavoriteClickHandler(this._handleFavoriteClick);
 
-    this._filmPopupComponent.setClosePopupClickHandler(this._handlerClosePopupClick); // обработчик закрытия попапа на попап(кнопку)
+    this._filmPopupComponent.setClosePopupClickHandler(this._handleClosePopupClick); // обработчик закрытия попапа на попап(кнопку)
     this._filmPopupComponent.setWatchListClickHandler(this._handleWatchListClick);
     this._filmPopupComponent.setHistoryClickHandler(this._handleHistoryClick);
     this._filmPopupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
@@ -113,8 +106,8 @@ export default class Film {
     if (this._mode !== Mode.DEFAULT) {
       this._openedPopup[0] = null;
       document.body.classList.remove(CLASS_HIDE_SCROLL);
-      document.removeEventListener('keydown', this._handlerEscKeyDown);
-      document.removeEventListener('click', this._handlerAnyFilmCardClick);
+      document.removeEventListener('keydown', this._handleEscKeyDown);
+      document.removeEventListener('click', this._handleAnyFilmCardClick);
 
       this._filmPopupComponent.getElement().remove();
       this._mode = Mode.DEFAULT;
@@ -124,8 +117,8 @@ export default class Film {
   _renderPopup() {
     this._openedPopup[0] = this._film.id; // чтоб можно было перерендерит незакрытый попап после
 
-    document.addEventListener('keydown', this._handlerEscKeyDown);
-    document.addEventListener('click', this._handlerAnyFilmCardClick);
+    document.addEventListener('keydown', this._handleEscKeyDown);
+    document.addEventListener('click', this._handleAnyFilmCardClick);
 
     document.body.classList.add(CLASS_HIDE_SCROLL);
     render(document.body, this._filmPopupComponent);
@@ -135,29 +128,29 @@ export default class Film {
   }
 
 
-  _handlerClosePopupClick() {
+  _handleClosePopupClick() {
     this._closePopup();
   }
 
-  _handlerEscKeyDown(evt) {
+  _handleEscKeyDown(evt) {
     if (evt.key === ESCAPE) {
       this._closePopup();
     }
   }
 
-  _handlerAnyFilmCardClick(evt) {
+  _handleAnyFilmCardClick(evt) {
     const target = evt.target;
     if (target && CARD_CLICK_CLASSES.some((className) => target.classList.contains(className))) {
       this._mode === Mode.POPUP ? this._closePopup() : null;
     }
   }
 
-  _handlerFilmCardClick() {
+  _handleFilmCardClick() {
     setTimeout(() => this._renderPopup(), 0); // чтоб рендерился после _closePopup()
   }
 
   _handleWatchListClick() {
-    this._changeData(UserAction.UPDATE_FILM, UpdateType.MINOR,
+    this._changeData(UserAction.UPDATE_FILM, UpdateType.PATCH,
       {...this._film, userDetails: {...this._film.userDetails, watchList: !this._film.userDetails.watchList}},
     );
   }
@@ -169,7 +162,7 @@ export default class Film {
   }
 
   _handleFavoriteClick() {
-    this._changeData(UserAction.UPDATE_FILM, UpdateType.MINOR,
+    this._changeData(UserAction.UPDATE_FILM, UpdateType.PATCH,
       {...this._film, userDetails: {...this._film.userDetails, favorite: !this._film.userDetails.favorite}},
     );
   }
@@ -180,7 +173,7 @@ export default class Film {
       commentToDel,
     );
     const leftComments = this._film.comments.filter((comment) => comment !== id);
-    this._changeData(UserAction.UPDATE_FILM, UpdateType.MINOR,
+    this._changeData(UserAction.UPDATE_FILM, UpdateType.PATCH,
       {...this._film, comments: leftComments},
     );
   }
@@ -198,7 +191,7 @@ export default class Film {
     );
 
     const comments = [...this._film.comments, id];
-    this._changeData(UserAction.UPDATE_FILM, UpdateType.MINOR,
+    this._changeData(UserAction.UPDATE_FILM, UpdateType.PATCH,
       {...this._film, comments: comments},
     );
   }

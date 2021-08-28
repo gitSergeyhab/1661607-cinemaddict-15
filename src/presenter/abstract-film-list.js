@@ -3,44 +3,30 @@ import NoFilms from '../view/films/no-films.js';
 import FilmPresenter from './film.js';
 
 import {render} from '../utils/dom-utils.js';
-import {UserAction, UpdateType} from '../constants.js';
-
-const EmptyResultMessage = {
-  ALL: 'There are no movies in our database',
-  WATCH_LIST: 'There are no movies to watch now',
-  HISTORY: 'There are no watched movies now',
-  FAVORITE: 'There are no favorite movies now',
-};
-
-const Mode = {
-  DEFAULT: 'DEFAULT',
-  POPUP: 'POPUP',
-  ALL: 'ALL',
-};
+import {UserAction, UpdateType, Mode, FilterType, EmptyResultMessage} from '../constants.js';
 
 
 const SELECTOR_FILM_CONTAINER = '.films-list__container';
 const CLASS_HIDE_SCROLL = 'hide-overflow';
 
+
 export default class AbstractFilmList {
   constructor(container, filmsModel, commentsModel) {
     this._container = container;
 
-    this._filmsModel = filmsModel;
-    this._commentsModel = commentsModel;
-
-    this._noFilmComponent = new NoFilms(EmptyResultMessage.ALL);
+    this._noFilmComponent = null;
     this._filmBlockComponent = null; // задается в дочерних филмлистах
     this._sortComponent = null;// задается (или нет) в дочерних филмлистах
 
     this._filmPresenter = new Map();
 
-    this._filmsCount = this._getFilms().length;
-
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
 
+    this._filmsModel = filmsModel;
     this._filmsModel.addObserver(this._handleModelEvent);
+
+    this._commentsModel = commentsModel;
     this._commentsModel.addObserver(this._handleModelEvent);
 
     this._openedPopup = [null];
@@ -52,14 +38,17 @@ export default class AbstractFilmList {
   }
 
   _renderPopup() {
-    const needFilm = this._getFilms().find((film) => film.id === this._openedPopup[0]);
+    const needFilm = this._getAllFilms().find((film) => film.id === this._openedPopup[0]);
     if (needFilm) {
       this._renderFilmCard(needFilm, Mode.POPUP);
-      // return;
     }
   }
 
   _getFilms() {
+    return this._filmsModel.films;
+  }
+
+  _getAllFilms() { // нужен для перерендеринга незакрытого Popup в Extra Blocks
     return this._filmsModel.films;
   }
 
@@ -90,6 +79,7 @@ export default class AbstractFilmList {
   }
 
   _renderNoFilms() {
+    this._noFilmComponent = new NoFilms(EmptyResultMessage[FilterType.ALL_MOVIES]);
     render(this._filmBlockComponent, this._noFilmComponent);
   }
 
@@ -107,32 +97,27 @@ export default class AbstractFilmList {
     }
   }
 
-  _handleModelEvent(updateType, data) {
+  _handleModelEvent(updateType) {
     switch(updateType) {
-      case UpdateType.PATCH:// скорее всего не понадибится
-        this._filmPresenter.get(data.id).init(data);
-        // обновить фильмы в других filmlist по data.id
-        break;
-      case UpdateType.MINOR:// favorite, watchList
+      case UpdateType.PATCH:// favorite, watchList, comments
         this._clearFilmList();
         this._renderFilmList();
-        // обновить другие filmlist
-        // обновить filters
         break;
-      case UpdateType.MAJOR:
+      case UpdateType.MINOR:// filter-menu / stats
+        this._clearFilmList(false, true);
+        this._renderFilmList();
+        break;
+      case UpdateType.MAJOR: //history
         this._clearFilmList();
         this._renderFilmList();
-        // обновить другие filmlist
-        // обновить filters
-        // обновить Profile
+        // + обновить Profile
         break;
     }
   }
 
   _renderFilmList() {
-    if (!this._filmsCount) {
+    if (!this._getFilms().length) {
       this._renderNoFilms();
-      return;
     }
 
     if (this._openedPopup[0] !== null) {

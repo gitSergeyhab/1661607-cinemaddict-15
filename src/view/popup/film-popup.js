@@ -1,12 +1,6 @@
 import Smart from '../smart.js';
-import {
-  getHoursAndMinutes,
-  getDayMonthYear
-} from '../../utils/date-time-utils.js';
-import {
-  DEFAULT_POSTER,
-  ActiveClass
-} from '../../constants.js';
+import {getHoursAndMinutes, getDayMonthYear} from '../../utils/date-time-utils.js';
+import {DEFAULT_POSTER, ActiveClass} from '../../constants.js';
 import {getListWithoutNull} from '../../utils/utils.js';
 import {renderAll} from '../../utils/dom-utils.js';
 import {getFullDate} from '../../utils/date-time-utils.js';
@@ -16,7 +10,6 @@ const makeButtonActive = (value) => value ? ActiveClass.POPUP : '';
 
 const getGenre = (genre) => `<span class="film-details__genre">${genre}</span>`;
 
-// ВЫНЕСТИ в ОТДЕЛЬНУЮ ВЬЮХУ НЕ СМОГ - вьюха попапа должна обновлятья вмете с комментами - поэтому запихал комменты сюда.
 const createComment = ({id,author,comment,date,emotion}) => `
   <li class="film-details__comment" data-comment-id=${id}>
     <span class="film-details__comment-emoji">

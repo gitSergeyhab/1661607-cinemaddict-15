@@ -2,43 +2,43 @@ import AbstractFilmList from './abstract-film-list';
 import MainFilmsBlock from '../view/films/main-films-block.js';
 import BtnShowMore from '../view/films/show-more-btn.js';
 import Sort from '../view/sort.js';
+import NoFilms from '../view/films/no-films.js';
 
 import {render, remove} from '../utils/dom-utils.js';
 import {sortDate, sortRating} from '../utils/utils';
-import {RenderPosition, SortType} from '../constants.js';
+import {RenderPosition, SortType, EmptyResultMessage} from '../constants.js';
+import {filter} from '../utils/filter.js';
 
 
 const FILM_COUNT_PER_STEP = 5;
 
 
 export default class ExtraFilmList extends AbstractFilmList {
-  constructor(container, filmsModel, commentsModel) {
+  constructor(container, filmsModel, commentsModel, filtersModel) {
     super(container, filmsModel, commentsModel);
 
     this._filmBlockComponent = new MainFilmsBlock();
     this._btnShowMoreComponent = new BtnShowMore();
-
 
     this._filmsShown = FILM_COUNT_PER_STEP;
     this._sortType = SortType.DEFAULT;
 
     this._handleLoadMoreButtonClick = this._handleLoadMoreButtonClick.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
-  }
 
-  init(){
-    super.init();
+    this._filtersModel = filtersModel;
+    this._filtersModel.addObserver(this._handleModelEvent);
   }
-
 
   _getFilms() {
+    const filteredFilms = filter[this._filtersModel.getFilter()](this._filmsModel.films);
     switch (this._sortType) {
       case SortType.DATE:
-        return this._filmsModel.films.slice().sort(sortDate);
+        return filteredFilms.sort(sortDate);
       case SortType.RATING:
-        return this._filmsModel.films.slice().sort(sortRating);
+        return filteredFilms.sort(sortRating);
     }
-    return super._getFilms();
+    return filteredFilms; // данные в листе уже мутированы - дефолт уже не дефолт (видимо, пока нет данных с сервера)
   }
 
   _renderSort() {
@@ -54,7 +54,7 @@ export default class ExtraFilmList extends AbstractFilmList {
   _clearFilmList(resetRenderedFilmCount = false, resetSortType = false) {
     super._clearFilmList();
 
-    remove(this._sortComponent); // ?
+    remove(this._sortComponent);
     remove(this._noFilmComponent);
     remove(this._btnShowMoreComponent);
 
@@ -64,13 +64,16 @@ export default class ExtraFilmList extends AbstractFilmList {
 
     if (resetRenderedFilmCount) {
       this._filmsShown = FILM_COUNT_PER_STEP;
-    } else {
-      this._filmsShown = Math.min(this._filmsCount, this._filmsShown);
     }
   }
 
+  _renderNoFilms() {
+    this._noFilmComponent = new NoFilms(EmptyResultMessage[this._filtersModel.getFilter()]);
+    render(this._filmBlockComponent, this._noFilmComponent);
+  }
+
   _hideBtnShowMore() {
-    const allFilmsAreShown = this._filmsShown >= this._filmsCount;
+    const allFilmsAreShown = this._filmsShown >= this._getFilms().length;
     this._btnShowMoreComponent.getElement().style.display = allFilmsAreShown ? 'none' : 'block';
   }
 
@@ -83,8 +86,8 @@ export default class ExtraFilmList extends AbstractFilmList {
   _renderMainBlock() {
     const filmsForRender = this._getFilms().slice(0, this._filmsShown);
     super._renderFilmCards(filmsForRender);
-    this._renderSort();// ?
-    if (this._filmsShown < this._filmsCount) {
+    this._renderSort();
+    if (this._filmsShown < this._getFilms().length) {
       this._renderLoadMoreBtn();
     }
   }

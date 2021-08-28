@@ -15,8 +15,8 @@ export const COUNTS = {
     MAX: 15,
   },
   FILM: {
-    MIN: 5,
-    MAX: 7,
+    MIN: 15,
+    MAX: 25,
   },
   NAMES: {
     MIN: 1,

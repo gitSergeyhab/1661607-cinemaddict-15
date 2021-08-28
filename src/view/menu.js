@@ -2,8 +2,6 @@ import Abstract from './abstract.js';
 import {FilterType} from '../constants.js';
 
 
-console.log(FilterType)
-
 const ACTIVE_FILTER_BTN_CLASS = 'main-navigation__item--active';
 
 
