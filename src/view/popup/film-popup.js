@@ -1,4 +1,7 @@
 import Smart from '../smart.js';
+
+import he from 'he';
+
 import {getHoursAndMinutes, getDayMonthYear} from '../../utils/date-time-utils.js';
 import {DEFAULT_POSTER, ActiveClass} from '../../constants.js';
 import {getListWithoutNull} from '../../utils/utils.js';
@@ -16,7 +19,7 @@ const createComment = ({id,author,comment,date,emotion}) => `
       <img src="./images/emoji/${emotion || 'smile'}.png" width="55" height="55" alt="emoji-smile">
     </span>
     <div>
-      <p class="film-details__comment-text">${comment || ''}</p>
+      <p class="film-details__comment-text">${he.encode(comment) || ''}</p>
       <p class="film-details__comment-info">
         <span class="film-details__comment-author">${author || ''}</span>
         <span class="film-details__comment-day">${getFullDate(date)}</span>
