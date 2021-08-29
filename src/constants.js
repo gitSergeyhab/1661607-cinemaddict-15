@@ -18,10 +18,55 @@ const SortType = {
   RATING: 'rating',
 };
 
+const UserAction = {
+  UPDATE_FILM: 'UPDATE_FILM',
+  ADD_COMMENT: 'ADD_COMMENT',
+  DELETE_COMMENT: 'DELETE_COMMENT',
+  CHANGE_FILTER: 'CHANGE_FILTER',
+};
+
+const UpdateType = {
+  NONE: 'NONE', // ничего не перерисовывать - когда выполняется совместно с другим UpdateType и он обновляет вьюху
+  PATCH: 'PATCH', // comments,  favorite, watchList  - перерисовка всех филмлистов
+  MINOR: 'MINOR', // menu-filter / stats - перерисовка всех филмлистов и фильтров
+  MAJOR: 'MAJOR', // history             - перерисовка всех филмлистов и фильтров и профиля
+};
+
+const FilterType = {
+  ALL_MOVIES: 'All movies',
+  WATCH_LIST: 'Watchlist',
+  HISTORY: 'History',
+  FAVORITES: 'Favorites',
+};
+
+const Mode = {
+  DEFAULT: 'DEFAULT',
+  POPUP: 'POPUP',
+  ALL: 'ALL',
+};
+
+const FilmSectionName = {
+  TOP_RATED: 'Top rated',
+  MOST_COMMENTED: 'Most commented',
+};
+
+const EmptyResultMessage = {
+  [FilterType.ALL_MOVIES]: 'There are no movies in our database',
+  [FilterType.WATCH_LIST]: 'There are no movies to watch now',
+  [FilterType.HISTORY]: 'There are no watched movies now',
+  [FilterType.FAVORITES]: 'There are no favorite movies now',
+};
+
 
 export {
   ActiveClass,
   DEFAULT_POSTER,
   RenderPosition,
-  SortType
+  SortType,
+  UserAction,
+  UpdateType,
+  FilterType,
+  Mode,
+  FilmSectionName,
+  EmptyResultMessage
 };

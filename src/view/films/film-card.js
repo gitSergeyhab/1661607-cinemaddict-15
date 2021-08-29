@@ -1,11 +1,5 @@
-import {
-  getHoursAndMinutes,
-  getYear
-} from '../../utils/date-time-utils.js';
-import {
-  DEFAULT_POSTER,
-  ActiveClass
-} from '../../constants.js';
+import {getHoursAndMinutes, getYear} from '../../utils/date-time-utils.js';
+import {DEFAULT_POSTER, ActiveClass} from '../../constants.js';
 import Abstract from '../abstract.js';
 
 

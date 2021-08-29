@@ -1,25 +1,21 @@
 import Profile from './view/profile.js';
-import Menu from './view/menu.js';
 import FilmSection from './view/films/films.js';
 import FooterStatistic from './view/films/footer-statistic.js';
 
 import FilmListPresenter from './presenter/film-list.js';
 import ExtraFilmListPresenter from './presenter/extra-film-list.js';
+import MenuPresenter from './presenter/menu.js';
+
+import FilmsModel from './model/films-model.js';
+import CommentsModel from './model/comments-model.js';
+import FiltersModel from './model/filters-model.js';
 
 import {render} from './utils/dom-utils.js';
-import {
-  getRandomInt,
-  sortAndCut
-} from './utils/utils.js';
-import {
-  COUNTS,
-  createMockFilm
-} from './mock.js';
+import {getRandomInt} from './utils/utils.js';
+import {FilmSectionName} from './constants.js';
 
-const FilmSectionName = {
-  TOP_RATED: 'Top rated',
-  MOST_COMMENTED: 'Most commented',
-};
+import {COUNTS,createMockFilm} from './mock.js';
+
 
 const Rating = {
   NOVICE: {
@@ -50,7 +46,22 @@ const statistic = footer.querySelector('.footer__statistics');
 
 
 //  DATA
-const mockFilms = new Array(getRandomInt(COUNTS.FILM.MIN, COUNTS.FILM.MAX)).fill().map((item, i) => createMockFilm(i));
+const oldMockFilms = new Array(getRandomInt(COUNTS.FILM.MIN, COUNTS.FILM.MAX)).fill().map((item, i) => createMockFilm(i));
+const mockFilms = [];
+oldMockFilms.forEach((film) => {
+  const comments = film.comments;
+  const newComments = comments.map((comment) => comment.id);
+  const newFilm = {...film, comments: newComments};
+  mockFilms.push(newFilm);
+});
+
+
+const filmsModel = new FilmsModel();
+filmsModel.films = mockFilms;
+
+const mockComments = oldMockFilms.reduce((acc, elem) => ([...acc, ...elem.comments]) ,[]);
+const commentsModel = new CommentsModel();
+commentsModel.comments = mockComments;
 
 
 //FUNCTIONS
@@ -72,23 +83,19 @@ const getRatingByWatched = (count) => {
 
 
 //. START
-// отсортированные и отрезаные куски фильмов для блока Top rated и Most commented
-const topFilms = sortAndCut(mockFilms, (a, b) => (b.filmInfo.totalRating || 0) - (a.filmInfo.totalRating || 0));
-const mostCommentedFilms = sortAndCut(mockFilms, (a, b) => b.comments.length - a.comments.length);
-
 // списки фильмов по фильтрам
-const watchList = filterFilmsByDetailField(mockFilms, UserDetailFields.WATCH_LIST);
-const history = filterFilmsByDetailField(mockFilms, UserDetailFields.HISTORY);
-const favorites = filterFilmsByDetailField(mockFilms, UserDetailFields.FAVORITE);
 
+const history = filterFilmsByDetailField(mockFilms, UserDetailFields.HISTORY);
 
 //1.РЕНДЕРИНГ
 // 1.1.header
 render(header, new Profile(getRatingByWatched(history.length)));
 
 
-//1.2.menu and sort
-render(main, new Menu(watchList.length, history.length, favorites.length));
+//1.2.menu
+const filtersModel = new FiltersModel();
+const menuPresenter = new MenuPresenter(main, filmsModel, filtersModel);
+menuPresenter.init();
 
 
 // 1.3.film block
@@ -96,15 +103,16 @@ render(main, new Menu(watchList.length, history.length, favorites.length));
 const filmSection = new FilmSection();
 render(main, filmSection);
 
-const mainFilmListPresenter = new FilmListPresenter(filmSection);
-mainFilmListPresenter.init(mockFilms);
+const mainFilmListPresenter = new FilmListPresenter(filmSection, filmsModel, commentsModel, filtersModel);
+mainFilmListPresenter.init();
 
 // 1.3.2.рендеринг Top rated, Most commented Film Blocks
-const topFilmListPresenter = new ExtraFilmListPresenter(filmSection, FilmSectionName.TOP_RATED);
-topFilmListPresenter.init(topFilms);
 
-const mostCommentedFilmListPresenter = new ExtraFilmListPresenter(filmSection, FilmSectionName.MOST_COMMENTED);
-mostCommentedFilmListPresenter.init(mostCommentedFilms);
+const topFilmListPresenter = new ExtraFilmListPresenter(filmSection, filmsModel, commentsModel, FilmSectionName.TOP_RATED);
+topFilmListPresenter.init();
+
+const mostCommentedFilmListPresenter = new ExtraFilmListPresenter(filmSection, filmsModel, commentsModel, FilmSectionName.MOST_COMMENTED);
+mostCommentedFilmListPresenter.init();
 
 
 //1.4.footer statistic

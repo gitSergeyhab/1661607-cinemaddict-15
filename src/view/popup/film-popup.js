@@ -1,36 +1,32 @@
 import Smart from '../smart.js';
-import {
-  getHoursAndMinutes,
-  getDayMonthYear
-} from '../../utils/date-time-utils.js';
-import {
-  DEFAULT_POSTER,
-  ActiveClass
-} from '../../constants.js';
+
+import he from 'he';
+
+import {getHoursAndMinutes, getDayMonthYear, humanizeDate} from '../../utils/date-time-utils.js';
+import {DEFAULT_POSTER, ActiveClass} from '../../constants.js';
 import {getListWithoutNull} from '../../utils/utils.js';
 import {renderAll} from '../../utils/dom-utils.js';
-import {getFullDate} from '../../utils/date-time-utils.js';
 
 
 const makeButtonActive = (value) => value ? ActiveClass.POPUP : '';
 
 const getGenre = (genre) => `<span class="film-details__genre">${genre}</span>`;
 
-// ВЫНЕСТИ в ОТДЕЛЬНУЮ ВЬЮХУ НЕ СМОГ - вьюха попапа должна обновлятья вмете с комментами - поэтому запихал комменты сюда.
 const createComment = ({id,author,comment,date,emotion}) => `
   <li class="film-details__comment" data-comment-id=${id}>
     <span class="film-details__comment-emoji">
       <img src="./images/emoji/${emotion || 'smile'}.png" width="55" height="55" alt="emoji-smile">
     </span>
     <div>
-      <p class="film-details__comment-text">${comment || ''}</p>
+      <p class="film-details__comment-text">${he.encode(comment) || ''}</p>
       <p class="film-details__comment-info">
         <span class="film-details__comment-author">${author || ''}</span>
-        <span class="film-details__comment-day">${getFullDate(date)}</span>
-        <button class="film-details__comment-delete">Delete</button>
+        <span class="film-details__comment-day">${humanizeDate(date)}</span>
+        <button class="film-details__comment-delete" data-id=${id}>Delete</button>
       </p>
     </div>
   </li>`;
+
 
 const showEmoji = (emoji) => `
   <img src="images/emoji/${emoji}.png" width="55" height="55" alt="emoji-${emoji}">
@@ -40,7 +36,7 @@ const showEmoji = (emoji) => `
 
 const createFilmPopup = ({
   id,
-  comments,
+  // comments,
   filmInfo: {
     title, alternativeTitle, ageRating, director, writers, actors, totalRating, poster, runtime, genre, description,
     release: {date, releaseCountry},
@@ -49,7 +45,7 @@ const createFilmPopup = ({
     watchList, alreadyWatched, favorite,
   },
   hasComments, addedEmoji, addedComment,
-}) => `
+}, comments) => `
 <section class="film-details data-film-id="${id}">
   <form class="film-details__inner" action="" method="get">
 
@@ -165,9 +161,10 @@ const createFilmPopup = ({
 
 
 export default class FilmPopup extends Smart {
-  constructor(film) {
+  constructor(film, comments) {
     super();
     this._state = FilmPopup.parseFilmToState(film);
+    this._comments = comments;
 
     this._closePopupClickHandler = this._closePopupClickHandler.bind(this);
     this._watchListClickHandler = this._watchListClickHandler.bind(this);
@@ -177,12 +174,15 @@ export default class FilmPopup extends Smart {
     this._clickEmojiHandler = this._clickEmojiHandler.bind(this);
     this._commentInputHandler = this._commentInputHandler.bind(this);
 
+    this._deleteCommentHandler = this._deleteCommentHandler.bind(this);
+    this._keyDownCtrlEnterHandler = this._keyDownCtrlEnterHandler.bind(this);
+
     this._setEmojiListener();
     this._setCommentListener();
   }
 
   getTemplate() {
-    return createFilmPopup(this._state);
+    return createFilmPopup(this._state, this._comments);
   }
 
   updateElement() {
@@ -198,10 +198,14 @@ export default class FilmPopup extends Smart {
   _restoreHandlers() {
     this._setCommentListener();
     this._setEmojiListener();
+
     this.setClosePopupClickHandler(this._callback.closePopupClick);
     this.setWatchListClickHandler(this._callback.watchListClick);
     this.setHistoryClickHandler(this._callback.historyClick);
     this.setFavoriteClickHandler(this._callback.favoriteClick);
+
+    this.setDeleteCommentHandler(this._callback.deleteCommentClick);
+    this.setAddCommentHandler(this._callback.addCommentSend);
   }
 
   _setCommentListener() {
@@ -223,6 +227,7 @@ export default class FilmPopup extends Smart {
     this.updateState({addedComment: evt.target.value}, true);
   }
 
+
   _closePopupClickHandler(evt) {
     evt.preventDefault();
     this._callback.closePopupClick();
@@ -240,9 +245,25 @@ export default class FilmPopup extends Smart {
 
   _favoriteClickHandler(evt) {
     evt.preventDefault();
+
     this._callback.favoriteClick();
   }
 
+  _deleteCommentHandler(evt) {
+    evt.preventDefault();
+    const id = evt.target.dataset.id;
+    this._callback.deleteCommentClick(id);
+  }
+
+  _keyDownCtrlEnterHandler(evt) {
+    const commentArea = this.getElement().querySelector('.film-details__comment-input');
+    const emotion = this.getElement().querySelector('#selected-emoji');
+    const value = commentArea.value.trim();
+    if (evt.ctrlKey && evt.key === 'Enter' && value /*&& commentArea === document.activeElement*/ && emotion) { // ??? в любом случае отправлять или если только commentArea === document.activeElement ???
+      this._callback.addCommentSend(value, emotion.value);
+      document.removeEventListener('keydown', this._keyDownCtrlEnterHandler);
+    }
+  }
 
   setClosePopupClickHandler(cb) {
     this._callback.closePopupClick = cb;
@@ -262,6 +283,18 @@ export default class FilmPopup extends Smart {
   setFavoriteClickHandler(cb) {
     this._callback.favoriteClick = cb;
     this.getElement().querySelector('.film-details__control-button--favorite').addEventListener('click', this._favoriteClickHandler);
+  }
+
+  setDeleteCommentHandler(cb) {
+    this._callback.deleteCommentClick = cb;
+    this.getElement().querySelectorAll('.film-details__comment-delete').forEach((delBtn) => {
+      delBtn.addEventListener('click', this._deleteCommentHandler);
+    });
+  }
+
+  setAddCommentHandler(cb) {
+    this._callback.addCommentSend = cb;
+    document.addEventListener('keydown', this._keyDownCtrlEnterHandler);
   }
 
 

@@ -4,7 +4,7 @@ import {
   getRandFromList,
   getRandomListNoRepeat
 } from './utils/utils.js';
-import {getRandomDateStamp} from './utils/date-time-utils.js';
+import {getRandomDateStamp, getRandomDateStampComment} from './utils/date-time-utils.js';
 
 
 //CONSTANTS
@@ -12,11 +12,11 @@ import {getRandomDateStamp} from './utils/date-time-utils.js';
 export const COUNTS = {
   COMMENT: {
     MIN: 0,
-    MAX: 5,
+    MAX: 15,
   },
   FILM: {
     MIN: 15,
-    MAX: 20,
+    MAX: 25,
   },
   NAMES: {
     MIN: 1,
@@ -80,7 +80,7 @@ const createMockComment = (id) => ({
   id,
   author: getRandFromList(COMMENT_AUTORS),
   comment: getRandFromList(DESCRIPTIONS),
-  date: new Date(),
+  date: getRandomDateStampComment(),
   emotion: getRandFromList(EMOTIONS),
 });
 

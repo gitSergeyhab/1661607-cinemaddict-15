@@ -1,4 +1,4 @@
-import { createElement } from '../utils/dom-utils';
+import {createElement} from '../utils/dom-utils';
 import {getNotImplementedError} from '../utils/utils.js';
 
 export default class Abstract {

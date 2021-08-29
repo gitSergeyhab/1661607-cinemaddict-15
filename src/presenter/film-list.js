@@ -2,91 +2,94 @@ import AbstractFilmList from './abstract-film-list';
 import MainFilmsBlock from '../view/films/main-films-block.js';
 import BtnShowMore from '../view/films/show-more-btn.js';
 import Sort from '../view/sort.js';
+import NoFilms from '../view/films/no-films.js';
 
-import {render} from '../utils/dom-utils.js';
+import {render, remove} from '../utils/dom-utils.js';
 import {sortDate, sortRating} from '../utils/utils';
-import {RenderPosition, SortType} from '../constants.js';
+import {RenderPosition, SortType, EmptyResultMessage} from '../constants.js';
+import {filter} from '../utils/filter.js';
 
 
 const FILM_COUNT_PER_STEP = 5;
 
-export default class ExtraFilmList extends AbstractFilmList {
-  constructor(container) {
-    super(container);
 
-    this._sortComponent = new Sort();
+export default class ExtraFilmList extends AbstractFilmList {
+  constructor(container, filmsModel, commentsModel, filtersModel) {
+    super(container, filmsModel, commentsModel);
+
     this._filmBlockComponent = new MainFilmsBlock();
     this._btnShowMoreComponent = new BtnShowMore();
 
-    this._filmsShown = 0;
+    this._filmsShown = FILM_COUNT_PER_STEP;
     this._sortType = SortType.DEFAULT;
 
     this._handleLoadMoreButtonClick = this._handleLoadMoreButtonClick.bind(this);
-    this._handleTypeChangeClick = this._handleTypeChangeClick.bind(this);
+    this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
+
+    this._filtersModel = filtersModel;
+    this._filtersModel.addObserver(this._handleModelEvent);
   }
 
-  init(films){
-    this._renderSort();
-    super.init(films);
-    this._filmsSortDefault = films.slice();
+  _getFilms() {
+    const filteredFilms = filter[this._filtersModel.getFilter()](this._filmsModel.films);
+    switch (this._sortType) {
+      case SortType.DATE:
+        return filteredFilms.sort(sortDate);
+      case SortType.RATING:
+        return filteredFilms.sort(sortRating);
+    }
+    return filteredFilms; // данные в листе уже мутированы - дефолт уже не дефолт (видимо, пока нет данных с сервера)
   }
 
   _renderSort() {
-    render(this._container, this._sortComponent);
-    this._sortComponent.setSortTypeChangeHandler(this._handleTypeChangeClick);
+    if (this._sortComponent !== null) {
+      this._sortComponent = null;
+    }
+
+    this._sortComponent = new Sort(this._sortType);
+    this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
+    render(this._container, this._sortComponent, RenderPosition.BEFORE_BEGIN);
   }
 
-  _clearFilmList() {
+  _clearFilmList(resetRenderedFilmCount = false, resetSortType = false) {
     super._clearFilmList();
-    this._filmsShown = 0; //возвращает счетчик в начало
+
+    remove(this._sortComponent);
+    remove(this._noFilmComponent);
+    remove(this._btnShowMoreComponent);
+
+    if (resetSortType) {
+      this._sortType = SortType.DEFAULT;
+    }
+
+    if (resetRenderedFilmCount) {
+      this._filmsShown = FILM_COUNT_PER_STEP;
+    }
+  }
+
+  _renderNoFilms() {
+    this._noFilmComponent = new NoFilms(EmptyResultMessage[this._filtersModel.getFilter()]);
+    render(this._filmBlockComponent, this._noFilmComponent);
   }
 
   _hideBtnShowMore() {
-    const allFilmsAreShown = this._filmsShown + FILM_COUNT_PER_STEP >= this._films.length;
+    const allFilmsAreShown = this._filmsShown >= this._getFilms().length;
     this._btnShowMoreComponent.getElement().style.display = allFilmsAreShown ? 'none' : 'block';
   }
 
-  _renderFilmCards() {
-    this._films
-      .slice(this._filmsShown, this._filmsShown + FILM_COUNT_PER_STEP)
-      .forEach((film) => this._renderFilmCard(film));
-
+  _renderFilmCards(films) {
+    const filmsForRender = films.slice(this._filmsShown - FILM_COUNT_PER_STEP, this._filmsShown);
+    super._renderFilmCards(filmsForRender);
     this._hideBtnShowMore();
   }
 
   _renderMainBlock() {
-    this._renderFilmCards();
-    if (this._filmsShown + FILM_COUNT_PER_STEP < this._films.length) {
+    const filmsForRender = this._getFilms().slice(0, this._filmsShown);
+    super._renderFilmCards(filmsForRender);
+    this._renderSort();
+    if (this._filmsShown < this._getFilms().length) {
       this._renderLoadMoreBtn();
     }
-  }
-
-  _sotrFilms(sortType) {
-    switch (sortType) {
-      case SortType.DATE:
-        this._films = this._films.sort(sortDate);
-        break;
-      case SortType.RATING:
-        this._films = this._films.sort(sortRating);
-        break;
-      default:
-        this._films = this._filmsSortDefault.slice();
-    }
-    this._sortType = sortType;
-  }
-
-  _handleTypeChangeClick(sortType){
-    if (this._sortType === sortType) {
-      return;
-    }
-    this._clearFilmList();
-    this._sotrFilms(sortType);
-    this._renderMainBlock();
-  }
-
-  _handleLoadMoreButtonClick() { // обработчик добавления фильмов на кнопку
-    this._filmsShown += FILM_COUNT_PER_STEP;
-    this._renderFilmCards();
   }
 
   _renderLoadMoreBtn() {
@@ -97,5 +100,20 @@ export default class ExtraFilmList extends AbstractFilmList {
   _renderFilmList() {
     super._renderFilmList();
     this._renderMainBlock();
+  }
+
+  _handleSortTypeChange(sortType){
+    if (this._sortType === sortType) {
+      return;
+    }
+
+    this._sortType = sortType;
+    this._clearFilmList();
+    this._renderMainBlock();
+  }
+
+  _handleLoadMoreButtonClick() {
+    this._filmsShown += FILM_COUNT_PER_STEP;
+    this._renderFilmCards(this._getFilms());
   }
 }
