@@ -1,6 +1,7 @@
 import Profile from './view/profile.js';
 import FilmSection from './view/films/films.js';
 import FooterStatistic from './view/films/footer-statistic.js';
+import Statistic from './view/statistic.js';
 
 import FilmListPresenter from './presenter/film-list.js';
 import ExtraFilmListPresenter from './presenter/extra-film-list.js';
@@ -14,8 +15,7 @@ import {render, remove} from './utils/dom-utils.js';
 import {getRandomInt, getRatingByWatched} from './utils/utils.js';
 import {FilmSectionName, FilterType} from './constants.js';
 
-import {COUNTS,createMockFilm} from './mock.js';
-import Statistic from './view/statistic.js';
+import {COUNTS, createMockFilm} from './mock.js';
 
 
 const UserDetailFields = { // удалить
@@ -90,6 +90,7 @@ const handleSiteMenuClick = (target) => {
     render(main, statisticsComponent);
     return;
   }
+
   filmSection.getElement().style.display = 'flex';
   mainFilmListPresenter.showSort();
   remove(statisticsComponent);
@@ -97,3 +98,8 @@ const handleSiteMenuClick = (target) => {
 
 const menuPresenter = new MenuPresenter(main, filmsModel, filtersModel, handleSiteMenuClick);
 menuPresenter.init();
+
+filmSection.getElement().style.display = 'none';
+mainFilmListPresenter.hideSort();
+statisticsComponent = new Statistic(mockFilms);
+render(main, statisticsComponent);

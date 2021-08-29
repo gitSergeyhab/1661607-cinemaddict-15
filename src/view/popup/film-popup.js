@@ -36,7 +36,6 @@ const showEmoji = (emoji) => `
 
 const createFilmPopup = ({
   id,
-  // comments,
   filmInfo: {
     title, alternativeTitle, ageRating, director, writers, actors, totalRating, poster, runtime, genre, description,
     release: {date, releaseCountry},
