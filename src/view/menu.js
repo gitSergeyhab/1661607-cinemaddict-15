@@ -15,32 +15,56 @@ const createMenu = (watchListLength, historyLength, favoritestLength, currentFil
       <a href="#favorites" data-filter="${FilterType.FAVORITES}" class="main-navigation__item ${currentFilter === FilterType.FAVORITES ? ACTIVE_FILTER_BTN_CLASS : ''}">Favorites <span class="main-navigation__item-count">${favoritestLength}</span></a>
     </div>
 
-    <a href="#stats" class="main-navigation__additional">Stats</a>
+    <a href="#stats" data-filter="${FilterType.STATS}" class="main-navigation__additional">Stats</a>
   </nav>`;
 
 export default class Menu extends Abstract{
-  constructor(watchListLength, historyLength, favoritestLength, filter) {
+  constructor(watchListLength, historyLength, favoritesLength, filter) {
     super();
     this._watchListLength = watchListLength;
     this._historyLength = historyLength;
-    this._favoritestLength = favoritestLength;
+    this._favoritesLength = favoritesLength;
     this._filter = filter;
 
+    this._statsElement = this.getElement().querySelector('.main-navigation__additional');
+
     this._clickFilterHandler = this._clickFilterHandler.bind(this);
+    this._clickNavigationHandler = this._clickNavigationHandler.bind(this);
+
+    this._markOnlyStats();
   }
 
   getTemplate() {
-    return createMenu(this._watchListLength, this._historyLength, this._favoritestLength, this._filter);
+    return createMenu(this._watchListLength, this._historyLength, this._favoritesLength, this._filter);
+  }
+
+  _markOnlyStats() {
+    const filters = this.getElement().querySelectorAll('.main-navigation__item');
+    this._statsElement.addEventListener('click', () => {
+      filters.forEach((filter) => filter.classList.remove(ACTIVE_FILTER_BTN_CLASS));
+      this._statsElement.classList.add(ACTIVE_FILTER_BTN_CLASS);
+    });
   }
 
   _clickFilterHandler(evt) {
     evt.preventDefault();
+    this._statsElement.classList.remove(ACTIVE_FILTER_BTN_CLASS);
     this._callback.clickFilter(evt.target.dataset.filter);
+  }
+
+  _clickNavigationHandler(evt) {
+    evt.preventDefault();
+    this._callback.clickNavigation(evt.target.dataset.filter);
   }
 
   setClickFilterHandler(cb) {
     this._callback.clickFilter = cb;
-    this.getElement().addEventListener('click', this._clickFilterHandler);
+    this.getElement().querySelector('.main-navigation__items').addEventListener('click', this._clickFilterHandler);
+  }
+
+  setClickNavigationHandler(cb) {
+    this._callback.clickNavigation = cb;
+    this.getElement().addEventListener('click', this._clickNavigationHandler);
   }
 }
 

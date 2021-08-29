@@ -18,24 +18,24 @@ const humanizeDate = (date) => {
     return 'now';
   }
   if (diff < MINUTE * 2 * 60) {
-    return `${ Math.floor(diff / MINUTE)} minutes ago`;
+    return `${Math.floor(diff / MINUTE)} minutes ago`;
   }
   if (diff < MINUTE * 60 * 24) {
-    return `${ Math.floor(diff / MINUTE / 60)} hours ago`;
+    return `${Math.floor(diff / MINUTE / 60)} hours ago`;
   }
   if (diff < MINUTE * 2 * 60 * 24) {
     return 'yesterday';
   }
   if (diff < MINUTE * 2 * 60 * 24 * 7) {
-    return `${ Math.floor(diff / MINUTE / 60 / 24)} days ago`;
+    return `${Math.floor(diff / MINUTE / 60 / 24)} days ago`;
   }
   if (diff < MINUTE * 2 * 60 * 24 * 7 * 4) {
-    return `${ Math.floor(diff / MINUTE / 60 / 24 / 7)} weeks ago`;
+    return `${Math.floor(diff / MINUTE / 60 / 24 / 7)} weeks ago`;
   }
   if (diff <  MINUTE * 2 * 60 * 24 * 7 * 4.35 * 12) {
-    return `${ Math.round(diff / MINUTE / 60 / 24 / 7 / 4.35)} months ago`;
+    return `${Math.round(diff / MINUTE / 60 / 24 / 7 / 4.35)} months ago`;
   }
-  return `${ Math.round(diff / MINUTE / 60 / 24 / 7 / 4.35 / 12 )} years ago`;
+  return `${Math.round(diff / MINUTE / 60 / 24 / 7 / 4.35 / 12)} years ago`;
 };
 
 

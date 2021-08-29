@@ -37,6 +37,7 @@ const FilterType = {
   WATCH_LIST: 'Watchlist',
   HISTORY: 'History',
   FAVORITES: 'Favorites',
+  STATS: 'stats',
 };
 
 const Mode = {
@@ -57,6 +58,21 @@ const EmptyResultMessage = {
   [FilterType.FAVORITES]: 'There are no favorite movies now',
 };
 
+const Rating = {
+  NOVICE: {
+    name: 'Novice',
+    count: 1,
+  },
+  FAN: {
+    name: 'Fan',
+    count: 11,
+  },
+  MOVIE_BUFF: {
+    name: 'Movie Buff',
+    count: 21,
+  },
+};
+
 
 export {
   ActiveClass,
@@ -68,5 +84,6 @@ export {
   FilterType,
   Mode,
   FilmSectionName,
-  EmptyResultMessage
+  EmptyResultMessage,
+  Rating
 };

@@ -6,14 +6,14 @@ import NoFilms from '../view/films/no-films.js';
 
 import {render, remove} from '../utils/dom-utils.js';
 import {sortDate, sortRating} from '../utils/utils';
-import {RenderPosition, SortType, EmptyResultMessage} from '../constants.js';
+import {RenderPosition, SortType, EmptyResultMessage, FilterType} from '../constants.js';
 import {filter} from '../utils/filter.js';
 
 
 const FILM_COUNT_PER_STEP = 5;
 
 
-export default class ExtraFilmList extends AbstractFilmList {
+export default class FilmList extends AbstractFilmList {
   constructor(container, filmsModel, commentsModel, filtersModel) {
     super(container, filmsModel, commentsModel);
 
@@ -28,6 +28,16 @@ export default class ExtraFilmList extends AbstractFilmList {
 
     this._filtersModel = filtersModel;
     this._filtersModel.addObserver(this._handleModelEvent);
+  }
+
+  hideSort() {
+    this._sortComponent.getElement().style.display = 'none';
+    this._sortType = SortType.DEFAULT;
+    this._filtersModel.setFilter(FilterType.ALL_MOVIES);
+  }
+
+  showSort() {
+    this._sortComponent.getElement().style.display = 'flex';
   }
 
   _getFilms() {
