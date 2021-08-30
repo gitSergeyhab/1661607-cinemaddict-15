@@ -7,12 +7,14 @@ import {filter} from  '../utils/filter.js';
 
 
 export default class MenuPresenter {
-  constructor(container, filmsModel, filtersModel) {
+  constructor(container, filmsModel, filtersModel, handleSiteMenuClick) {
     this._container = container;
     this._filmsModel = filmsModel;
     this._filtersModel = filtersModel;
 
     this._menuComponent = null;
+
+    this._handleSiteMenuClick = handleSiteMenuClick;
 
     this._handleFilterClick = this._handleFilterClick.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
@@ -24,6 +26,7 @@ export default class MenuPresenter {
   init() {
     this._renderFilter();
     this._menuComponent.setClickFilterHandler(this._handleFilterClick);
+    this._menuComponent.setClickNavigationHandler(this._handleSiteMenuClick);
   }
 
   _removeFilter() {

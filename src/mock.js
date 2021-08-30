@@ -71,7 +71,7 @@ const NAMES = ['', 'Фрэнсис Форд Коппола', 'Кристофер
 
 const COUNTRIES = ['USA', 'USSR', 'UK', 'France', 'Italy', ''];
 
-const GENRES = ['thriller', 'horror', 'comedy', 'fantasy', 'action', 'animation', ''];
+const GENRES = ['Thriller', 'Horror', 'Action', 'Adventure', 'Family', 'Sci-Fi', 'Animation', 'Fantasy', 'Comedy', 'TV Series'];
 
 
 // FUNCTIONS
@@ -89,7 +89,6 @@ export const createMockFilm = (id) => ({
   id,
   comments: new Array(getRandomInt(COUNTS.COMMENT.MIN, COUNTS.COMMENT.MAX)).fill().map((item, i) => createMockComment(`${id}-${i}`)),
   filmInfo: {
-    // ??? С сервера приходит snake_case. Потом опять переписывать или делать адаптеры, в которых все равно будет snake_case ???
     title: getRandFromList(FILM_NAMES),
     alternativeTitle: getRandFromList(FILM_NAMES),
     totalRating: getRandomInt(COUNTS.RATING.MIN, COUNTS.RATING.MAX * COUNTS.RATING.DEV) / COUNTS.RATING.DEV,
@@ -109,7 +108,7 @@ export const createMockFilm = (id) => ({
   userDetails: {
     watchList: getRandomBoolean(),
     alreadyWatched: getRandomBoolean(),
-    watchingDate: getRandomDateStamp(),
+    watchingDate: getRandomDateStampComment(),
     favorite: getRandomBoolean(),
   },
 });

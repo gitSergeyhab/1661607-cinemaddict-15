@@ -10,7 +10,7 @@ const getYear = (dateStamp) => dateStamp ? dayjs(dateStamp).format('YYYY') : '';
 const getDayMonthYear = (dateStamp) => dateStamp ? dayjs(dateStamp).format('DD MMMM YYYY') : '';
 
 const getRandomDateStamp = () => dayjs((getRandomInt(-(new Date()), new Date()))).format('YYYY-MM-DD');
-const getRandomDateStampComment = () => dayjs((getRandomInt(new Date() - 200000000000, new Date()))).format('YYYY-MM-DD');
+const getRandomDateStampComment = () => dayjs((getRandomInt(new Date() - 20000000000, new Date()))).format('YYYY-MM-DD');
 
 const humanizeDate = (date) => {
   const diff = dayjs().diff(dayjs(date));
@@ -18,24 +18,24 @@ const humanizeDate = (date) => {
     return 'now';
   }
   if (diff < MINUTE * 2 * 60) {
-    return `${ Math.floor(diff / MINUTE)} minutes ago`;
+    return `${Math.floor(diff / MINUTE)} minutes ago`;
   }
   if (diff < MINUTE * 60 * 24) {
-    return `${ Math.floor(diff / MINUTE / 60)} hours ago`;
+    return `${Math.floor(diff / MINUTE / 60)} hours ago`;
   }
   if (diff < MINUTE * 2 * 60 * 24) {
     return 'yesterday';
   }
   if (diff < MINUTE * 2 * 60 * 24 * 7) {
-    return `${ Math.floor(diff / MINUTE / 60 / 24)} days ago`;
+    return `${Math.floor(diff / MINUTE / 60 / 24)} days ago`;
   }
   if (diff < MINUTE * 2 * 60 * 24 * 7 * 4) {
-    return `${ Math.floor(diff / MINUTE / 60 / 24 / 7)} weeks ago`;
+    return `${Math.floor(diff / MINUTE / 60 / 24 / 7)} weeks ago`;
   }
   if (diff <  MINUTE * 2 * 60 * 24 * 7 * 4.35 * 12) {
-    return `${ Math.round(diff / MINUTE / 60 / 24 / 7 / 4.35)} months ago`;
+    return `${Math.round(diff / MINUTE / 60 / 24 / 7 / 4.35)} months ago`;
   }
-  return `${ Math.round(diff / MINUTE / 60 / 24 / 7 / 4.35 / 12 )} years ago`;
+  return `${Math.round(diff / MINUTE / 60 / 24 / 7 / 4.35 / 12)} years ago`;
 };
 
 

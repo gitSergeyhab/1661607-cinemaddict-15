@@ -103,14 +103,13 @@ export default class AbstractFilmList {
         this._clearFilmList();
         this._renderFilmList();
         break;
-      case UpdateType.MINOR:// filter-menu / stats
+      case UpdateType.MINOR:// filter-menu
         this._clearFilmList(false, true);
         this._renderFilmList();
         break;
       case UpdateType.MAJOR: //history
         this._clearFilmList();
         this._renderFilmList();
-        // + обновить Profile
         break;
     }
   }

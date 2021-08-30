@@ -36,7 +36,6 @@ const showEmoji = (emoji) => `
 
 const createFilmPopup = ({
   id,
-  // comments,
   filmInfo: {
     title, alternativeTitle, ageRating, director, writers, actors, totalRating, poster, runtime, genre, description,
     release: {date, releaseCountry},
@@ -245,7 +244,6 @@ export default class FilmPopup extends Smart {
 
   _favoriteClickHandler(evt) {
     evt.preventDefault();
-
     this._callback.favoriteClick();
   }
 
@@ -259,7 +257,7 @@ export default class FilmPopup extends Smart {
     const commentArea = this.getElement().querySelector('.film-details__comment-input');
     const emotion = this.getElement().querySelector('#selected-emoji');
     const value = commentArea.value.trim();
-    if (evt.ctrlKey && evt.key === 'Enter' && value /*&& commentArea === document.activeElement*/ && emotion) { // ??? в любом случае отправлять или если только commentArea === document.activeElement ???
+    if (evt.ctrlKey && evt.key === 'Enter' && value && commentArea === document.activeElement && emotion) {
       this._callback.addCommentSend(value, emotion.value);
       document.removeEventListener('keydown', this._keyDownCtrlEnterHandler);
     }

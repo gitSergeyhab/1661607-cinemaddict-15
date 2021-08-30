@@ -13,7 +13,7 @@ import {filter} from '../utils/filter.js';
 const FILM_COUNT_PER_STEP = 5;
 
 
-export default class ExtraFilmList extends AbstractFilmList {
+export default class FilmList extends AbstractFilmList {
   constructor(container, filmsModel, commentsModel, filtersModel) {
     super(container, filmsModel, commentsModel);
 
@@ -28,6 +28,15 @@ export default class ExtraFilmList extends AbstractFilmList {
 
     this._filtersModel = filtersModel;
     this._filtersModel.addObserver(this._handleModelEvent);
+  }
+
+  hideSort() {
+    this._sortComponent.getElement().style.display = 'none';
+    this._sortType = SortType.DEFAULT;
+  }
+
+  showSort() {
+    this._sortComponent.getElement().style.display = 'flex';
   }
 
   _getFilms() {
