@@ -6,7 +6,7 @@ import NoFilms from '../view/films/no-films.js';
 
 import {render, remove} from '../utils/dom-utils.js';
 import {sortDate, sortRating} from '../utils/utils';
-import {RenderPosition, SortType, EmptyResultMessage, FilterType} from '../constants.js';
+import {RenderPosition, SortType, EmptyResultMessage} from '../constants.js';
 import {filter} from '../utils/filter.js';
 
 
