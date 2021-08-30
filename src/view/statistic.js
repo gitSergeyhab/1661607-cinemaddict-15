@@ -14,9 +14,7 @@ const BAR_HEIGHT = 50;
 
 const renderChart = (statisticCtx, {films, date: {from, to}}) => {
   const filteredFilms = filterWatchedFilmsByTime(filter[FilterType.HISTORY](films), from, to);
-  const calculatedGenres = getSortingCountGenres(filteredFilms);
-  const genres = calculatedGenres.genre;
-  const counts = calculatedGenres.count;
+  const {genres, counts} = getSortingCountGenres(filteredFilms);
 
   return new Chart(statisticCtx, {
     plugins: [ChartDataLabels],

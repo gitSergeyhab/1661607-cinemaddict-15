@@ -25,8 +25,8 @@ const getSortingCountGenres = (films) => {
   const genresByCount = getGenres(films).map((genre) => ({genre, count: getCountItemInArray(genre, allGenres)}));
   genresByCount.sort(sortGenresByCount);
   return {
-    genre: genresByCount.map((item) => item.genre),
-    count: genresByCount.map((item) => item.count),
+    genres: genresByCount.map((item) => item.genre),
+    counts: genresByCount.map((item) => item.count),
   };
 };
 
