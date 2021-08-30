@@ -73,6 +73,14 @@ const Rating = {
   },
 };
 
+const Period = {
+  ALL: 'all',
+  DAY: 'day',
+  WEEK: 'week',
+  MONTH: 'month',
+  YEAR: 'year',
+};
+
 
 export {
   ActiveClass,
@@ -85,5 +93,6 @@ export {
   Mode,
   FilmSectionName,
   EmptyResultMessage,
-  Rating
+  Rating,
+  Period
 };

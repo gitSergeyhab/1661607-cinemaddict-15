@@ -18,12 +18,6 @@ import {FilmSectionName, FilterType} from './constants.js';
 import {COUNTS, createMockFilm} from './mock.js';
 
 
-const UserDetailFields = { // удалить
-  WATCH_LIST: 'watchList',
-  HISTORY: 'alreadyWatched',
-  FAVORITE: 'favorite',
-};
-
 const header = document.querySelector('header.header');
 const main = document.querySelector('main.main');
 const footer = document.querySelector('footer.footer');
@@ -54,16 +48,10 @@ const commentsModel = new CommentsModel();
 commentsModel.comments = mockComments;
 
 
-//FUNCTIONS
-const filterFilmsByDetailField = (films, field) => films.filter((film) => film.userDetails[field]); // удалить
-
-
 //. START
 
-const history = filterFilmsByDetailField(mockFilms, UserDetailFields.HISTORY); // удалить
-
 //1.РЕНДЕРИНГ
-render(header, new Profile(getRatingByWatched(history.length)));
+render(header, new Profile(getRatingByWatched(filmsModel.films.length)));
 
 const filmSection = new FilmSection();
 render(main, filmSection);
@@ -86,7 +74,7 @@ const handleSiteMenuClick = (target) => {
   if (target === FilterType.STATS) {
     filmSection.getElement().style.display = 'none';
     mainFilmListPresenter.hideSort();
-    statisticsComponent = new Statistic();
+    statisticsComponent = new Statistic(filmsModel.films);
     render(main, statisticsComponent);
     return;
   }
@@ -98,8 +86,3 @@ const handleSiteMenuClick = (target) => {
 
 const menuPresenter = new MenuPresenter(main, filmsModel, filtersModel, handleSiteMenuClick);
 menuPresenter.init();
-
-filmSection.getElement().style.display = 'none';
-mainFilmListPresenter.hideSort();
-statisticsComponent = new Statistic(mockFilms);
-render(main, statisticsComponent);

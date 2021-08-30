@@ -10,7 +10,7 @@ const getYear = (dateStamp) => dateStamp ? dayjs(dateStamp).format('YYYY') : '';
 const getDayMonthYear = (dateStamp) => dateStamp ? dayjs(dateStamp).format('DD MMMM YYYY') : '';
 
 const getRandomDateStamp = () => dayjs((getRandomInt(-(new Date()), new Date()))).format('YYYY-MM-DD');
-const getRandomDateStampComment = () => dayjs((getRandomInt(new Date() - 200000000000, new Date()))).format('YYYY-MM-DD');
+const getRandomDateStampComment = () => dayjs((getRandomInt(new Date() - 20000000000, new Date()))).format('YYYY-MM-DD');
 
 const humanizeDate = (date) => {
   const diff = dayjs().diff(dayjs(date));

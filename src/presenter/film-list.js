@@ -33,7 +33,6 @@ export default class FilmList extends AbstractFilmList {
   hideSort() {
     this._sortComponent.getElement().style.display = 'none';
     this._sortType = SortType.DEFAULT;
-    this._filtersModel.setFilter(FilterType.ALL_MOVIES);
   }
 
   showSort() {

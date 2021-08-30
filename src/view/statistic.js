@@ -1,61 +1,23 @@
-import Smart from './smart.js';
-
-import dayjs from 'dayjs';
-
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
-const YEARS = 120;
+import Smart from './smart.js';
 
-import {  getRandomInt,
-  getRandFromList,
-  sortAndCut,
-  getTopFilms,
-  getMostCommentedFilms,
-  getRandomListNoRepeat,
-  getRandomBoolean,
-  getListWithoutNull,
-  sortDate,
-  sortRating,
-  getNotImplementedError,
-  getRatingByWatched} from '../utils/utils.js';
-import {  render,
-  createElement,
-  renderAll,
-  remove,
-  replace} from '../utils/dom-utils.js';
-import {  getHoursAndMinutes,
-  getYear,
-  getDayMonthYear,
-  getRandomDateStamp,
-  getRandomDateStampComment,
-  humanizeDate} from '../utils/date-time-utils.js';
-
-import {getSortingCountGenres, getTotalDuration} from '../utils/stats-utils.js';
-
+import {getRatingByWatched} from '../utils/utils.js';
+import {getSortingCountGenres, getTotalDuration, getDatePeriod, filterWatchedFilmsByTime, getGenres} from '../utils/stats-utils.js';
 import {filter} from '../utils/filter.js';
-import {  ActiveClass,
-  DEFAULT_POSTER,
-  RenderPosition,
-  SortType,
-  UserAction,
-  UpdateType,
-  FilterType,
-  Mode,
-  FilmSectionName,
-  EmptyResultMessage,
-  Rating} from '../constants.js';
+import {FilterType, Period} from '../constants.js';
 
 
-// Обязательно рассчитайте высоту canvas, она зависит от количества элементов диаграммы
+const BAR_HEIGHT = 50;
 
-const renderChart = (statisticCtx, films) => {
-  // const BAR_HEIGHT = 50;
-  // const statisticCtx = document.querySelector('.statistic__chart');
-  // statisticCtx.height = BAR_HEIGHT * 5;
-  const calculatedGenres = getSortingCountGenres(films);
+
+const renderChart = (statisticCtx, {films, date: {from, to}}) => {
+  const filteredFilms = filterWatchedFilmsByTime(filter[FilterType.HISTORY](films), from, to);
+  const calculatedGenres = getSortingCountGenres(filteredFilms);
   const genres = calculatedGenres.genre;
   const counts = calculatedGenres.count;
+
   return new Chart(statisticCtx, {
     plugins: [ChartDataLabels],
     type: 'horizontalBar',
@@ -114,12 +76,15 @@ const renderChart = (statisticCtx, films) => {
   });
 };
 
+const createStatistic = ({films, date: {from, to}}) => {
+  const rank = getRatingByWatched(filter[FilterType.HISTORY](films).length);
 
-const createStatistic = ({films}) => {
-  const filmsWatchedCount = filter[FilterType.HISTORY](films).length;
-  const rank = getRatingByWatched(filmsWatchedCount);
-  const totalDuration = getTotalDuration(films);
-  const topGenre = getSortingCountGenres(films).genre[0];
+  const watchedFilmsByTime = filter[FilterType.HISTORY](filterWatchedFilmsByTime(films, from, to));
+  const totalDuration = getTotalDuration(watchedFilmsByTime);
+  const topGenre = getSortingCountGenres(watchedFilmsByTime).genre[0] || '';
+
+  const height = getGenres(watchedFilmsByTime).length * BAR_HEIGHT || BAR_HEIGHT;
+
   return `
 <section class="statistic">
   <p class="statistic__rank">
@@ -131,10 +96,10 @@ const createStatistic = ({films}) => {
   <form action="https://echo.htmlacademy.ru/" method="get" class="statistic__filters">
     <p class="statistic__filters-description">Show stats:</p>
 
-    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-all-time" value="all-time" checked>
+    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-all-time" value="all" checked>
     <label for="statistic-all-time" class="statistic__filters-label">All time</label>
 
-    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-today" value="today">
+    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-today" value="day">
     <label for="statistic-today" class="statistic__filters-label">Today</label>
 
     <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-week" value="week">
@@ -150,7 +115,7 @@ const createStatistic = ({films}) => {
   <ul class="statistic__text-list">
     <li class="statistic__text-item">
       <h4 class="statistic__item-title">You watched</h4>
-      <p class="statistic__item-text">${filmsWatchedCount} <span class="statistic__item-description">movies</span></p>
+      <p class="statistic__item-text">${watchedFilmsByTime.length} <span class="statistic__item-description">movies</span></p>
     </li>
     <li class="statistic__text-item">
       <h4 class="statistic__item-title">Total duration</h4>
@@ -163,30 +128,53 @@ const createStatistic = ({films}) => {
   </ul>
 
   <div class="statistic__chart-wrap">
-    <canvas class="statistic__chart" width="1000"></canvas>
+    <canvas class="statistic__chart" width="1000" height=${height}></canvas>
   </div>
-
 </section>`;};
 
 export default class Statistic extends Smart {
   constructor(films) {
     super();
-    this._state = {films, date: {
-      from: dayjs().subtract(YEARS, 'year').toDate(),
-      to: dayjs().toDate(),
-    }};
-    this._statisticCtx = this.getElement().querySelector('.statistic__chart');
-    this._renderChart();
+    this._state = {films, date: getDatePeriod()};
+    this._chart = null;
+    this._setChart();
+    this._changePeriod();
+    this._radioValue = Period.ALL;
+  }
+
+  _restoreHandlers() {
+    this._changePeriod();
+    this._setChart();
+  }
+
+  _getRadioPeriod() {
+    return this.getElement().querySelector('.statistic__filters');
+  }
+
+  _changePeriod() {
+    this._getRadioPeriod().addEventListener('change', (evt) => {
+      this._radioValue = evt.target.value;
+      this.updateState({date: getDatePeriod(this._radioValue)});
+      this._checkRadioValue();
+    });
+  }
+
+  _checkRadioValue() {
+    this._getRadioPeriod().querySelectorAll('input').forEach((input) => {
+      input.checked = input.value === this._radioValue;
+    });
   }
 
   getTemplate() {
-    console.log(this._state.date)
     return createStatistic(this._state);
   }
 
-  _renderChart() {
-    renderChart(this._statisticCtx, this._state.films);
+  _setChart() {
+    if (this._chart !== null) {
+      this._chart = null;
+    }
+
+    const statisticCtx = this.getElement().querySelector('.statistic__chart');
+    this._chart = renderChart(statisticCtx, this._state);
   }
-
-
 }
