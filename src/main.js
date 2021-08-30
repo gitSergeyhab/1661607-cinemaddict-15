@@ -1,4 +1,3 @@
-import Profile from './view/profile.js';
 import FilmSection from './view/films/films.js';
 import FooterStatistic from './view/films/footer-statistic.js';
 import Statistic from './view/statistic.js';
@@ -6,13 +5,14 @@ import Statistic from './view/statistic.js';
 import FilmListPresenter from './presenter/film-list.js';
 import ExtraFilmListPresenter from './presenter/extra-film-list.js';
 import MenuPresenter from './presenter/menu.js';
+import ProfilePresenter from './presenter/profile.js';
 
 import FilmsModel from './model/films-model.js';
 import CommentsModel from './model/comments-model.js';
 import FiltersModel from './model/filters-model.js';
 
 import {render, remove} from './utils/dom-utils.js';
-import {getRandomInt, getRatingByWatched} from './utils/utils.js';
+import {getRandomInt} from './utils/utils.js';
 import {FilmSectionName, FilterType} from './constants.js';
 
 import {COUNTS, createMockFilm} from './mock.js';
@@ -48,10 +48,9 @@ const commentsModel = new CommentsModel();
 commentsModel.comments = mockComments;
 
 
-//. START
-
-//1.РЕНДЕРИНГ
-render(header, new Profile(getRatingByWatched(filmsModel.films.length)));
+//РЕНДЕРИНГ
+const profile = new ProfilePresenter(header, filmsModel);
+profile.init();
 
 const filmSection = new FilmSection();
 render(main, filmSection);
@@ -65,8 +64,8 @@ topFilmListPresenter.init();
 const mostCommentedFilmListPresenter = new ExtraFilmListPresenter(filmSection, filmsModel, commentsModel, FilmSectionName.MOST_COMMENTED);
 mostCommentedFilmListPresenter.init();
 
+render(footerStatistic, new FooterStatistic(filmsModel.films.length));
 
-render(footerStatistic, new FooterStatistic(mockFilms.length));
 
 // menu to FilmBlocks toggle
 let statisticsComponent = null;

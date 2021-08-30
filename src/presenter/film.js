@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+
 import FilmCard from '../view/films/film-card.js';
 import FilmPopup from '../view/popup/film-popup.js';
 
@@ -157,7 +159,11 @@ export default class Film {
 
   _handleHistoryClick() {
     this._changeData(UserAction.UPDATE_FILM, UpdateType.MAJOR,
-      {...this._film, userDetails: {...this._film.userDetails, alreadyWatched: !this._film.userDetails.alreadyWatched}},
+      {...this._film, userDetails: {
+        ...this._film.userDetails,
+        alreadyWatched: !this._film.userDetails.alreadyWatched,
+        watchingDate: this._film.userDetails.alreadyWatched ? null : dayjs().format('YYYY-MM-DD'),
+      }},
     );
   }
 
