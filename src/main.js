@@ -17,6 +17,21 @@ import {FilmSectionName, FilterType} from './constants.js';
 
 import {COUNTS, createMockFilm} from './mock.js';
 
+import Api from './api.js';
+
+
+const URL = 'https://15.ecmascript.pages.academy/cinemaddict';
+const AUTHORIZATION = 'Basic |,,/_Black_Metal';
+
+// const URL = 'https://15.ecmascript.pages.academy/task-manager';
+// const AUTHORIZATION = 'Basic случайная_строка';
+
+const api = new Api(URL, AUTHORIZATION);
+api.getFilms()
+  .then((films) => console.log(films))
+
+api.getComments(1)
+  .then((films) => console.log(films))
 
 const header = document.querySelector('header.header');
 const main = document.querySelector('main.main');
