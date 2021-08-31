@@ -2,7 +2,7 @@
 import NoFilms from '../view/films/no-films.js';
 import FilmPresenter from './film.js';
 
-import {render} from '../utils/dom-utils.js';
+import {render, remove} from '../utils/dom-utils.js';
 import {UserAction, UpdateType, Mode, FilterType, EmptyResultMessage} from '../constants.js';
 
 
@@ -17,6 +17,8 @@ export default class AbstractFilmList {
     this._noFilmComponent = null;
     this._filmBlockComponent = null; // задается в дочерних филмлистах
     this._sortComponent = null;// задается (или нет) в дочерних филмлистах
+    this._loadingComponent = null;
+
 
     this._filmPresenter = new Map();
 
@@ -111,6 +113,9 @@ export default class AbstractFilmList {
         this._clearFilmList();
         this._renderFilmList();
         break;
+      case UpdateType.INIT:
+        this._loadingComponent ? remove(this._loadingComponent) : null;
+        this.init();
     }
   }
 

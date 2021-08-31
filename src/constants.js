@@ -30,6 +30,7 @@ const UpdateType = {
   PATCH: 'PATCH', // comments,  favorite, watchList  - перерисовка всех филмлистов
   MINOR: 'MINOR', // menu-filter / stats - перерисовка всех филмлистов и фильтров
   MAJOR: 'MAJOR', // history             - перерисовка всех филмлистов и фильтров и профиля
+  INIT: 'INIT',
 };
 
 const FilterType = {

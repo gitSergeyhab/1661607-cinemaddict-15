@@ -14,6 +14,11 @@ export default class FilmsModel extends AbstractObserver{
     return this._films;
   }
 
+  setFilms(updateType, films) {
+    this.films = films;
+    this._notify(updateType);
+  }
+
   updateFilm(updateType, update) {
     const index = this._films.findIndex((item) => item.id === update.id);
     this._films = index === -1 ? this._films :  [...this._films.slice(0, index), update, ...this._films.slice(index + 1)];
@@ -35,7 +40,7 @@ export default class FilmsModel extends AbstractObserver{
         totalRating: film['film_info']['total_rating'],
         ageRating: film['film_info']['age_rating'],
         release: {
-          release: film['film_info']['release']['date'],
+          date: film['film_info']['release']['date'],
           releaseCountry: film['film_info']['release']['release_country'],
         },
       }};
@@ -64,7 +69,7 @@ export default class FilmsModel extends AbstractObserver{
         'total_rating': film.filmInfo,
         'age_rating': film.filmInfo,
         'release': {
-          'release': film.release.date,
+          'date': film.release.date,
           'release_country': film.release.releaseCountry,
         },
       }};

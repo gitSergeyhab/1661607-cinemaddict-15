@@ -3,6 +3,8 @@ import MainFilmsBlock from '../view/films/main-films-block.js';
 import BtnShowMore from '../view/films/show-more-btn.js';
 import Sort from '../view/sort.js';
 import NoFilms from '../view/films/no-films.js';
+import Loading from '../view/loading';
+
 
 import {render, remove} from '../utils/dom-utils.js';
 import {sortDate, sortRating} from '../utils/utils';
@@ -19,6 +21,8 @@ export default class FilmList extends AbstractFilmList {
 
     this._filmBlockComponent = new MainFilmsBlock();
     this._btnShowMoreComponent = new BtnShowMore();
+    this._loadingComponent = new Loading();
+
 
     this._filmsShown = FILM_COUNT_PER_STEP;
     this._sortType = SortType.DEFAULT;
@@ -28,6 +32,8 @@ export default class FilmList extends AbstractFilmList {
 
     this._filtersModel = filtersModel;
     this._filtersModel.addObserver(this._handleModelEvent);
+
+    render(this._container, this._loadingComponent);
   }
 
   hideSort() {

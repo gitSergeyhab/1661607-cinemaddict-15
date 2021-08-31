@@ -13,7 +13,7 @@ import FiltersModel from './model/filters-model.js';
 
 import {render, remove} from './utils/dom-utils.js';
 import {getRandomInt} from './utils/utils.js';
-import {FilmSectionName, FilterType} from './constants.js';
+import {FilmSectionName, FilterType, UpdateType} from './constants.js';
 
 import {COUNTS, createMockFilm} from './mock.js';
 
@@ -23,15 +23,12 @@ import Api from './api.js';
 const URL = 'https://15.ecmascript.pages.academy/cinemaddict';
 const AUTHORIZATION = 'Basic |,,/_Black_Metal';
 
-// const URL = 'https://15.ecmascript.pages.academy/task-manager';
-// const AUTHORIZATION = 'Basic случайная_строка';
-
 const api = new Api(URL, AUTHORIZATION);
-api.getFilms()
-  .then((films) => console.log(films))
+// api.getFilms()
+//   .then((films) => console.log(films))
 
-api.getComments(1)
-  .then((films) => console.log(films))
+// api.getComments(1)
+//   .then((films) => console.log(films))
 
 const header = document.querySelector('header.header');
 const main = document.querySelector('main.main');
@@ -42,13 +39,13 @@ const footerStatistic= footer.querySelector('.footer__statistics');
 //  DATA
 const oldMockFilms = new Array(getRandomInt(COUNTS.FILM.MIN, COUNTS.FILM.MAX)).fill().map((item, i) => createMockFilm(i));
 
-const mockFilms = [];
-oldMockFilms.forEach((film) => {
-  const comments = film.comments;
-  const newComments = comments.map((comment) => comment.id);
-  const newFilm = {...film, comments: newComments};
-  mockFilms.push(newFilm);
-});
+// const mockFilms = [];
+// oldMockFilms.forEach((film) => {
+//   const comments = film.comments;
+//   const newComments = comments.map((comment) => comment.id);
+//   const newFilm = {...film, comments: newComments};
+//   mockFilms.push(newFilm);
+// });
 
 const mockComments = oldMockFilms.reduce((acc, elem) => ([...acc, ...elem.comments]), []);
 
@@ -57,7 +54,7 @@ const mockComments = oldMockFilms.reduce((acc, elem) => ([...acc, ...elem.commen
 const filtersModel = new FiltersModel();
 
 const filmsModel = new FilmsModel();
-filmsModel.films = mockFilms;
+// filmsModel.films = mockFilms;
 
 const commentsModel = new CommentsModel();
 commentsModel.comments = mockComments;
@@ -71,15 +68,15 @@ const filmSection = new FilmSection();
 render(main, filmSection);
 
 const mainFilmListPresenter = new FilmListPresenter(filmSection, filmsModel, commentsModel, filtersModel);
-mainFilmListPresenter.init();
+// mainFilmListPresenter.init();
 
 const topFilmListPresenter = new ExtraFilmListPresenter(filmSection, filmsModel, commentsModel, FilmSectionName.TOP_RATED);
-topFilmListPresenter.init();
+// topFilmListPresenter.init();
 
 const mostCommentedFilmListPresenter = new ExtraFilmListPresenter(filmSection, filmsModel, commentsModel, FilmSectionName.MOST_COMMENTED);
-mostCommentedFilmListPresenter.init();
+// mostCommentedFilmListPresenter.init();
 
-render(footerStatistic, new FooterStatistic(filmsModel.films.length));
+// render(footerStatistic, new FooterStatistic(filmsModel.films.length));
 
 
 // menu to FilmBlocks toggle
@@ -100,3 +97,8 @@ const handleSiteMenuClick = (target) => {
 
 const menuPresenter = new MenuPresenter(main, filmsModel, filtersModel, handleSiteMenuClick);
 menuPresenter.init();
+
+api.getFilms()//.then((i) => console.log(i))
+  .then((films) => filmsModel.setFilms(UpdateType.INIT, films))
+  .then(() => render(footerStatistic, new FooterStatistic(filmsModel.films.length)))
+  .catch(() => filmsModel.setFilms(UpdateType.INIT, []));

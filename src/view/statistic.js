@@ -79,7 +79,7 @@ const createStatistic = ({films, date: {from, to}}) => {
 
   const watchedFilmsByTime = filter[FilterType.HISTORY](filterWatchedFilmsByTime(films, from, to));
   const totalDuration = getTotalDuration(watchedFilmsByTime);
-  const topGenre = getSortingCountGenres(watchedFilmsByTime).genre[0] || '';
+  const topGenre = getSortingCountGenres(watchedFilmsByTime).genres[0] || '';
 
   const height = getGenres(watchedFilmsByTime).length * BAR_HEIGHT || BAR_HEIGHT;
 
