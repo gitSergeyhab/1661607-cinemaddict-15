@@ -2,6 +2,8 @@
 import NoFilms from '../view/films/no-films.js';
 import FilmPresenter from './film.js';
 
+import CommentsModel from '../model/comments-model.js';
+
 import {render, remove} from '../utils/dom-utils.js';
 import {UserAction, UpdateType, Mode, FilterType, EmptyResultMessage} from '../constants.js';
 
@@ -18,7 +20,7 @@ export default class AbstractFilmList {
     this._noFilmComponent = null;
     this._filmBlockComponent = null; // задается в дочерних филмлистах
     this._sortComponent = null;// задается (или нет) в дочерних филмлистах
-    this._loadingComponent = null;
+    this._loadingComponent = null;// задается (или нет) в дочерних филмлистах
 
 
     this._filmPresenter = new Map();
@@ -28,6 +30,10 @@ export default class AbstractFilmList {
 
     this._filmsModel = filmsModel;
     this._filmsModel.addObserver(this._handleModelEvent);
+    this._commentsModel = new CommentsModel();
+    // this._commentsModel.addObserver(this._handleModelEvent);           // ???  ТАК ПОЧЕМУ-ТО НЕ РАБОТАЕТ ???
+    //если прокинуть this._handleModelEvent в FilmPresenter и повесить наблюдатель там - все равно не работает
+
 
     this._openedPopup = [null];
   }
@@ -54,7 +60,7 @@ export default class AbstractFilmList {
 
   _renderFilmCard(film, modeRender) {
     const filmCardContainer = this._filmBlockComponent.getElement().querySelector(SELECTOR_FILM_CONTAINER);
-    const filmCardPresenter = new FilmPresenter(filmCardContainer, this._handleViewAction, this._openedPopup);
+    const filmCardPresenter = new FilmPresenter(filmCardContainer, this._handleViewAction, this._commentsModel, this._api, this._openedPopup);
     const alreadyIn = this._filmPresenter.get(film.id);
 
     if (alreadyIn) { // если фильм уже в мапе презентеров - удалить и отрендерить уже вместе с попапом
@@ -83,24 +89,26 @@ export default class AbstractFilmList {
     render(this._filmBlockComponent, this._noFilmComponent);
   }
 
-  _handleViewAction(actionType, updateType, update) {
+  _handleViewAction(actionType, updateType, update, film) {
     switch(actionType) {
       case UserAction.UPDATE_FILM:
         this._api.updateFilm(update)
           .then((response) => this._filmsModel.updateFilm(updateType, response));
         break;
       case UserAction.ADD_COMMENT:
-        // +
+        this._api.addComment(update, film.id)
+          .then((response) => this._commentsModel.addComment(updateType, response));
         break;
       case UserAction.DELETE_COMMENT:
-        //-
+        this._api.delComment(update)
+          .then(() => this._commentsModel.delComment(updateType, update));
         break;
     }
   }
 
   _handleModelEvent(updateType) {
     switch(updateType) {
-      case UpdateType.PATCH:// favorite, watchList, comments
+      case UpdateType.PATCH:// favorite, watchList
         this._clearFilmList();
         this._renderFilmList();
         break;
@@ -115,6 +123,7 @@ export default class AbstractFilmList {
       case UpdateType.INIT:
         this._loadingComponent ? remove(this._loadingComponent) : null;
         this.init();
+        break;
     }
   }
 

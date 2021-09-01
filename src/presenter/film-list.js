@@ -5,7 +5,6 @@ import Sort from '../view/sort.js';
 import NoFilms from '../view/films/no-films.js';
 import Loading from '../view/loading';
 
-
 import {render, remove} from '../utils/dom-utils.js';
 import {sortDate, sortRating} from '../utils/utils';
 import {RenderPosition, SortType, EmptyResultMessage} from '../constants.js';
@@ -13,7 +12,6 @@ import {filter} from '../utils/filter.js';
 
 
 const FILM_COUNT_PER_STEP = 5;
-
 
 export default class FilmList extends AbstractFilmList {
   constructor(container, filmsModel, filtersModel, api) {
@@ -66,7 +64,7 @@ export default class FilmList extends AbstractFilmList {
     render(this._container, this._sortComponent, RenderPosition.BEFORE_BEGIN);
   }
 
-  _clearFilmList(resetRenderedFilmCount = true, resetSortType = false) {
+  _clearFilmList(resetRenderedFilmCount = false, resetSortType = false) {
     super._clearFilmList();
 
     remove(this._sortComponent);
@@ -123,7 +121,7 @@ export default class FilmList extends AbstractFilmList {
     }
 
     this._sortType = sortType;
-    this._clearFilmList();
+    this._clearFilmList(true, false);
     this._renderMainBlock();
   }
 

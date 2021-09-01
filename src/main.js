@@ -33,8 +33,7 @@ const filmsModel = new FilmsModel();
 
 
 //РЕНДЕРИНГ
-const profile = new ProfilePresenter(header, filmsModel);
-profile.init();
+const profile = new ProfilePresenter(header, filmsModel); // инит после загрузки данных
 
 const filmSection = new FilmSection();
 render(main, filmSection);
@@ -68,6 +67,5 @@ menuPresenter.init();
 api.getFilms()
   .then((films) => filmsModel.setFilms(UpdateType.INIT, films))
   .then(() => render(footerStatistic, new FooterStatistic(filmsModel.films.length)))
+  .then(() => profile.init())
   .catch(() => filmsModel.setFilms(UpdateType.INIT, []));
-
-// api.getFilms().then((i) => console.log(i));

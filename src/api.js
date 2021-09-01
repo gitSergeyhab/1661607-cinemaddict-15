@@ -20,11 +20,6 @@ export default class Api {
       .then((films) => films.map(FilmsModel.adaptToClient));
   }
 
-  getComments(id){
-    return this._load({url: `comments/${id}`})
-      .then(Api.toJSON);
-  }
-
   updateFilm(film) {
     return this._load({
       url: `movies/${film.id}`,
@@ -34,7 +29,28 @@ export default class Api {
     })
       .then(Api.toJSON)
       .then(FilmsModel.adaptToClient);
+  }
 
+  getComments(id){//film_id
+    return this._load({url: `comments/${id}`})
+      .then(Api.toJSON);
+  }
+
+  addComment(comment, id) {//film_id
+    return this._load({
+      url: `comments/${id}`,
+      method: Method.POST,
+      body: JSON.stringify(comment),
+      headers: new Headers({'Content-Type': 'application/json'}),
+    })
+      .then(Api.toJSON);
+  }
+
+  delComment(id) {//comment_id
+    return this._load({
+      url: `comments/${id}`,
+      method: Method.DELETE,
+    });
   }
 
   _load({url, method = Method.GET, body = null, headers = new Headers()}) {

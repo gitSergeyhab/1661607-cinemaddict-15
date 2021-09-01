@@ -7,24 +7,17 @@ import CommentBlock from '../view/popup/comment-block.js';
 import {render, remove, replace} from '../utils/dom-utils.js';
 import {UserAction, UpdateType, Mode} from '../constants.js';
 
-import Api from '../api.js';
-import CommentsModel from '../model/comments-model.js';
-
 
 const CLASS_HIDE_SCROLL = 'hide-overflow';
 const ESCAPE = 'Escape';
 const CARD_CLICK_CLASSES =  ['film-card__title', 'film-card__poster', 'film-card__comments'];
 
-const URL = 'https://15.ecmascript.pages.academy/cinemaddict';
-const AUTHORIZATION = 'Basic |,,/_Black_Metal';
-
-const apiCard = new Api(URL, AUTHORIZATION);
-
 export default class Film {
-  constructor(filmsContainer, changeData, openedPopup) {
+  constructor(filmsContainer, changeData, commentsModel, api, openedPopup) {
     this._filmsContainer = filmsContainer;
-    // this._commentsModel = commentsModel;
-    this._commentsModel = new CommentsModel();
+    this._commentsModel = commentsModel;
+    this._api = api;
+
     this._changeData = changeData;
 
     this._openedPopup = openedPopup;
@@ -48,8 +41,8 @@ export default class Film {
 
     this._handleDeleteComment = this._handleDeleteComment.bind(this);
     this._handleAddComment = this._handleAddComment.bind(this);
-
   }
+
 
   init(film, modeRender = Mode.DEFAULT) {
     this._film = film;
@@ -73,9 +66,6 @@ export default class Film {
     this._filmPopupComponent.setHistoryClickHandler(this._handleHistoryClick);
     this._filmPopupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
 
-    // this._filmPopupComponent.setDeleteCommentHandler(this._handleDeleteComment);
-    // this._filmPopupComponent.setAddCommentHandler(this._handleAddComment);
-
     //если создается
     if (prevFilmCardComponent === null || prevFilmPopupComponent === null) {
       switch (this._modeRender) {
@@ -86,13 +76,13 @@ export default class Film {
         case Mode.POPUP:
           this._renderPopup();
           return;
-        default:
+        default: // карточки без попапа
           render(this._filmsContainer, this._filmCardComponent);
           return;
       }
     }
 
-    //если изменяется
+    //если изменяется //
     replace(this._filmCardComponent, prevFilmCardComponent);
     replace(this._filmPopupComponent, prevFilmPopupComponent);
 
@@ -105,13 +95,11 @@ export default class Film {
     remove(this._filmPopupComponent);
   }
 
-
   _getApiComments() {
-    apiCard.getComments(this._film.id)
+    this._api.getComments(this._film.id)
       .then((comment) => this._commentsModel.setComments(UpdateType.PATCH, comment))
       .then(() => this._renderCommentBlock());
   }
-
 
   _closePopup() {
     remove(this._commentBlock);
@@ -129,12 +117,14 @@ export default class Film {
   _renderCommentBlock() {
     const commentsContainer = this._filmPopupComponent.getElement().querySelector('.film-details__bottom-container');
     this._commentBlock = new CommentBlock(this._commentsModel.comments);
+    this._commentBlock.setDeleteCommentHandler(this._handleDeleteComment);
+    this._commentBlock.setAddCommentHandler(this._handleAddComment);
     render(commentsContainer, this._commentBlock);
-    this._commentBlock.reset(this._commentsModel.comments);
+    this._commentBlock.reset(this._commentsModel.comments); // сбрасывает стейт на комменты при закрытии попапа
   }
 
   _renderPopup() {
-    this._openedPopup[0] = this._film.id; // чтоб можно было перерендерит незакрытый попап после
+    this._openedPopup[0] = this._film.id; // чтоб можно было перерендерить незакрытый попап после очистки филмлиста
     this._getApiComments();
 
     document.addEventListener('keydown', this._handleEscKeyDown);
@@ -143,8 +133,6 @@ export default class Film {
     document.body.classList.add(CLASS_HIDE_SCROLL);
     render(document.body, this._filmPopupComponent);
     this._mode = Mode.POPUP;
-    // this._filmPopupComponent.reset(this._film); // нужно сбрасывать стэйт здесь: в _closePopup() сбрасывать нельзя - this.updateElement() не работает - ...
-    // ... при повторном рендеринге родителя у this._filmPopupComponent.getElement уже нет, так как сам .getElement был удален при первом _closePopup()
   }
 
 
@@ -193,10 +181,10 @@ export default class Film {
   }
 
   _handleDeleteComment(id) {
-    const commentToDel = this._getComments().find((comment) => comment.id === id);
-    this._changeData(UserAction.DELETE_COMMENT, UpdateType.NONE,
-      commentToDel,
+    this._changeData(UserAction.DELETE_COMMENT, UpdateType.MINOR,
+      id,
     );
+
     const leftComments = this._film.comments.filter((comment) => comment !== id);
     this._changeData(UserAction.UPDATE_FILM, UpdateType.PATCH,
       {...this._film, comments: leftComments},
@@ -208,16 +196,13 @@ export default class Film {
     if (!comment || !emotion) {
       return;
     }
-
-    const id = Math.random().toString();
-
-    this._changeData(UserAction.ADD_COMMENT, UpdateType.NONE,
-      {id: id, comment, date: new Date(), emotion},
+    this._changeData(
+      UserAction.ADD_COMMENT,
+      UpdateType.MINOR,
+      {comment, emotion},
+      this._film,
     );
 
-    const comments = [...this._film.comments, id];
-    this._changeData(UserAction.UPDATE_FILM, UpdateType.PATCH,
-      {...this._film, comments: comments},
-    );
+    this._changeData(UserAction.UPDATE_FILM, UpdateType.PATCH, this._film);
   }
 }
