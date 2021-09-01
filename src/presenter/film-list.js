@@ -16,8 +16,8 @@ const FILM_COUNT_PER_STEP = 5;
 
 
 export default class FilmList extends AbstractFilmList {
-  constructor(container, filmsModel, commentsModel, filtersModel, api) {
-    super(container, filmsModel, commentsModel, api);
+  constructor(container, filmsModel, filtersModel, api) {
+    super(container, filmsModel, api);
 
     this._filmBlockComponent = new MainFilmsBlock();
     this._btnShowMoreComponent = new BtnShowMore();

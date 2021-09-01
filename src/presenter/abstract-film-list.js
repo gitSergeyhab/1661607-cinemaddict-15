@@ -11,7 +11,7 @@ const CLASS_HIDE_SCROLL = 'hide-overflow';
 
 
 export default class AbstractFilmList {
-  constructor(container, filmsModel, commentsModel, api) {
+  constructor(container, filmsModel, api) {
     this._container = container;
     this._api = api;
 
@@ -28,9 +28,6 @@ export default class AbstractFilmList {
 
     this._filmsModel = filmsModel;
     this._filmsModel.addObserver(this._handleModelEvent);
-
-    this._commentsModel = commentsModel;
-    this._commentsModel.addObserver(this._handleModelEvent);
 
     this._openedPopup = [null];
   }
@@ -57,7 +54,7 @@ export default class AbstractFilmList {
 
   _renderFilmCard(film, modeRender) {
     const filmCardContainer = this._filmBlockComponent.getElement().querySelector(SELECTOR_FILM_CONTAINER);
-    const filmCardPresenter = new FilmPresenter(filmCardContainer, this._commentsModel, this._handleViewAction, this._openedPopup);
+    const filmCardPresenter = new FilmPresenter(filmCardContainer, this._handleViewAction, this._openedPopup);
     const alreadyIn = this._filmPresenter.get(film.id);
 
     if (alreadyIn) { // если фильм уже в мапе презентеров - удалить и отрендерить уже вместе с попапом
@@ -93,10 +90,10 @@ export default class AbstractFilmList {
           .then((response) => this._filmsModel.updateFilm(updateType, response));
         break;
       case UserAction.ADD_COMMENT:
-        this._commentsModel.addComment(updateType, update);
+        // +
         break;
       case UserAction.DELETE_COMMENT:
-        this._commentsModel.delComment(updateType, update);
+        //-
         break;
     }
   }

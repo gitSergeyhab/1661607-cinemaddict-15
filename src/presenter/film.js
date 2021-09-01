@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 
 import FilmCard from '../view/films/film-card.js';
 import FilmPopup from '../view/popup/film-popup.js';
+import CommentBlock from '../view/popup/comment-block.js';
 
 import {render, remove, replace} from '../utils/dom-utils.js';
 import {UserAction, UpdateType, Mode} from '../constants.js';
@@ -20,10 +21,10 @@ const AUTHORIZATION = 'Basic |,,/_Black_Metal';
 const apiCard = new Api(URL, AUTHORIZATION);
 
 export default class Film {
-  constructor(filmsContainer, commentsModel, changeData, openedPopup) {
+  constructor(filmsContainer, changeData, openedPopup) {
     this._filmsContainer = filmsContainer;
-    this._commentsModel = commentsModel;
-    this._commentsModel2 = new CommentsModel();
+    // this._commentsModel = commentsModel;
+    this._commentsModel = new CommentsModel();
     this._changeData = changeData;
 
     this._openedPopup = openedPopup;
@@ -31,6 +32,8 @@ export default class Film {
 
     this._filmCardComponent = null;
     this._filmPopupComponent = null;
+    this._commentBlock = null;
+    this._areCommentsIn = false;
 
     // привязать обработчики
     this._handleFilmCardClick = this._handleFilmCardClick.bind(this);
@@ -57,9 +60,7 @@ export default class Film {
     const prevFilmPopupComponent = this._filmPopupComponent;
 
     this._filmCardComponent = new FilmCard(film);
-    // this._filmPopupComponent = new FilmPopup(film, this._getNeedComments());
     this._filmPopupComponent = new FilmPopup(film);
-
 
     // навесить обработчики
     this._filmCardComponent.setOpenPopupClickHandler(this._handleFilmCardClick); // обработчик открытия попапа на карточку
@@ -67,14 +68,13 @@ export default class Film {
     this._filmCardComponent.setHistoryClickHandler(this._handleHistoryClick);
     this._filmCardComponent.setFavoriteClickHandler(this._handleFavoriteClick);
 
-    // this._filmPopupComponent.setClosePopupClickHandler(this._handleClosePopupClick); // обработчик закрытия попапа на попап(кнопку)
-    // this._filmPopupComponent.setWatchListClickHandler(this._handleWatchListClick);
-    // this._filmPopupComponent.setHistoryClickHandler(this._handleHistoryClick);
-    // this._filmPopupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
+    this._filmPopupComponent.setClosePopupClickHandler(this._handleClosePopupClick); // обработчик закрытия попапа на попап(кнопку)
+    this._filmPopupComponent.setWatchListClickHandler(this._handleWatchListClick);
+    this._filmPopupComponent.setHistoryClickHandler(this._handleHistoryClick);
+    this._filmPopupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
 
     // this._filmPopupComponent.setDeleteCommentHandler(this._handleDeleteComment);
     // this._filmPopupComponent.setAddCommentHandler(this._handleAddComment);
-    this._setHandlersToPopup();
 
     //если создается
     if (prevFilmCardComponent === null || prevFilmPopupComponent === null) {
@@ -82,11 +82,9 @@ export default class Film {
         case Mode.ALL:
           render(this._filmsContainer, this._filmCardComponent);
           this._renderPopup();
-          // this._renderNoCommentsPopup();
           return;
         case Mode.POPUP:
           this._renderPopup();
-          // this._renderNoCommentsPopup();
           return;
         default:
           render(this._filmsContainer, this._filmCardComponent);
@@ -102,50 +100,21 @@ export default class Film {
     remove(prevFilmPopupComponent);
   }
 
-
   destroy() {
     remove(this._filmCardComponent);
     remove(this._filmPopupComponent);
   }
 
-  _setHandlersToPopup() {
-    this._filmPopupComponent.setClosePopupClickHandler(this._handleClosePopupClick); // обработчик закрытия попапа на попап(кнопку)
-    this._filmPopupComponent.setWatchListClickHandler(this._handleWatchListClick);
-    this._filmPopupComponent.setHistoryClickHandler(this._handleHistoryClick);
-    this._filmPopupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
-
-    this._filmPopupComponent.setDeleteCommentHandler(this._handleDeleteComment);
-    this._filmPopupComponent.setAddCommentHandler(this._handleAddComment);
-  }
-
-
-  _getComments() {
-    return this._commentsModel.comments;
-  }
 
   _getApiComments() {
-    // console.log('_getApiComments()')
     apiCard.getComments(this._film.id)
-      .then((c) => this._commentsModel2.setComments(UpdateType.PATCH, c))
-      .then(() => this._restartPopupWithComment());
+      .then((comment) => this._commentsModel.setComments(UpdateType.PATCH, comment))
+      .then(() => this._renderCommentBlock());
   }
 
-  _restartPopupWithComment() {
-    remove(this._filmPopupComponent);
-    this._filmPopupComponent = new FilmPopup(this._film, this._commentsModel2.comments);
-
-    this._setHandlersToPopup();
-    this._renderPopup();
-
-  }
-
-  _getNeedComments() {
-    const comments = this._getComments();
-    const needComments = comments.filter((comment) =>  this._film.comments.some((filmComment) => filmComment === comment.id));
-    return needComments;
-  }
 
   _closePopup() {
+    remove(this._commentBlock);
     if (this._mode !== Mode.DEFAULT) {
       this._openedPopup[0] = null;
       document.body.classList.remove(CLASS_HIDE_SCROLL);
@@ -157,13 +126,16 @@ export default class Film {
     }
   }
 
-  // _renderNoCommentsPopup() {
-  //   this._renderPopup();
-  //   this._getApiComments();
-  // }
+  _renderCommentBlock() {
+    const commentsContainer = this._filmPopupComponent.getElement().querySelector('.film-details__bottom-container');
+    this._commentBlock = new CommentBlock(this._commentsModel.comments);
+    render(commentsContainer, this._commentBlock);
+    this._commentBlock.reset(this._commentsModel.comments);
+  }
 
   _renderPopup() {
     this._openedPopup[0] = this._film.id; // чтоб можно было перерендерит незакрытый попап после
+    this._getApiComments();
 
     document.addEventListener('keydown', this._handleEscKeyDown);
     document.addEventListener('click', this._handleAnyFilmCardClick);
@@ -171,7 +143,7 @@ export default class Film {
     document.body.classList.add(CLASS_HIDE_SCROLL);
     render(document.body, this._filmPopupComponent);
     this._mode = Mode.POPUP;
-    this._filmPopupComponent.reset(this._film); // нужно сбрасывать стэйт здесь: в _closePopup() сбрасывать нельзя - this.updateElement() не работает - ...
+    // this._filmPopupComponent.reset(this._film); // нужно сбрасывать стэйт здесь: в _closePopup() сбрасывать нельзя - this.updateElement() не работает - ...
     // ... при повторном рендеринге родителя у this._filmPopupComponent.getElement уже нет, так как сам .getElement был удален при первом _closePopup()
   }
 
@@ -195,7 +167,6 @@ export default class Film {
 
   _handleFilmCardClick() {
     setTimeout(() => this._renderPopup(), 0); // чтоб рендерился после _closePopup()
-    // setTimeout(() => this._renderNoCommentsPopup(), 0); // чтоб рендерился после _closePopup()
 
   }
 
