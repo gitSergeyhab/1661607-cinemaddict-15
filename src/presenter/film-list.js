@@ -16,8 +16,8 @@ const FILM_COUNT_PER_STEP = 5;
 
 
 export default class FilmList extends AbstractFilmList {
-  constructor(container, filmsModel, commentsModel, filtersModel) {
-    super(container, filmsModel, commentsModel);
+  constructor(container, filmsModel, commentsModel, filtersModel, api) {
+    super(container, filmsModel, commentsModel, api);
 
     this._filmBlockComponent = new MainFilmsBlock();
     this._btnShowMoreComponent = new BtnShowMore();
@@ -66,7 +66,7 @@ export default class FilmList extends AbstractFilmList {
     render(this._container, this._sortComponent, RenderPosition.BEFORE_BEGIN);
   }
 
-  _clearFilmList(resetRenderedFilmCount = false, resetSortType = false) {
+  _clearFilmList(resetRenderedFilmCount = true, resetSortType = false) {
     super._clearFilmList();
 
     remove(this._sortComponent);

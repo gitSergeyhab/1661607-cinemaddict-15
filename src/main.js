@@ -22,6 +22,8 @@ import Api from './api.js';
 
 const URL = 'https://15.ecmascript.pages.academy/cinemaddict';
 const AUTHORIZATION = 'Basic |,,/_Black_Metal';
+// const AUTHORIZATION = 'Basic ...........11';
+
 
 const api = new Api(URL, AUTHORIZATION);
 // api.getFilms()
@@ -67,13 +69,13 @@ profile.init();
 const filmSection = new FilmSection();
 render(main, filmSection);
 
-const mainFilmListPresenter = new FilmListPresenter(filmSection, filmsModel, commentsModel, filtersModel);
+const mainFilmListPresenter = new FilmListPresenter(filmSection, filmsModel, commentsModel, filtersModel, api);
 // mainFilmListPresenter.init();
 
-const topFilmListPresenter = new ExtraFilmListPresenter(filmSection, filmsModel, commentsModel, FilmSectionName.TOP_RATED);
+const topFilmListPresenter = new ExtraFilmListPresenter(filmSection, filmsModel, commentsModel, api, FilmSectionName.TOP_RATED);
 // topFilmListPresenter.init();
 
-const mostCommentedFilmListPresenter = new ExtraFilmListPresenter(filmSection, filmsModel, commentsModel, FilmSectionName.MOST_COMMENTED);
+const mostCommentedFilmListPresenter = new ExtraFilmListPresenter(filmSection, filmsModel, commentsModel, api, FilmSectionName.MOST_COMMENTED);
 // mostCommentedFilmListPresenter.init();
 
 // render(footerStatistic, new FooterStatistic(filmsModel.films.length));
@@ -102,3 +104,5 @@ api.getFilms()//.then((i) => console.log(i))
   .then((films) => filmsModel.setFilms(UpdateType.INIT, films))
   .then(() => render(footerStatistic, new FooterStatistic(filmsModel.films.length)))
   .catch(() => filmsModel.setFilms(UpdateType.INIT, []));
+
+api.getFilms().then((i) => console.log(i))

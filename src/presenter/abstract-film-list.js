@@ -11,8 +11,9 @@ const CLASS_HIDE_SCROLL = 'hide-overflow';
 
 
 export default class AbstractFilmList {
-  constructor(container, filmsModel, commentsModel) {
+  constructor(container, filmsModel, commentsModel, api) {
     this._container = container;
+    this._api = api;
 
     this._noFilmComponent = null;
     this._filmBlockComponent = null; // задается в дочерних филмлистах
@@ -88,7 +89,8 @@ export default class AbstractFilmList {
   _handleViewAction(actionType, updateType, update) {
     switch(actionType) {
       case UserAction.UPDATE_FILM:
-        this._filmsModel.updateFilm(updateType, update);
+        this._api.updateFilm(update)
+          .then((response) => this._filmsModel.updateFilm(updateType, response));
         break;
       case UserAction.ADD_COMMENT:
         this._commentsModel.addComment(updateType, update);
@@ -106,7 +108,7 @@ export default class AbstractFilmList {
         this._renderFilmList();
         break;
       case UpdateType.MINOR:// filter-menu
-        this._clearFilmList(false, true);
+        this._clearFilmList(true, true);
         this._renderFilmList();
         break;
       case UpdateType.MAJOR: //history

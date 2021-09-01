@@ -30,10 +30,11 @@ export default class Api {
       url: `movies/${film.id}`,
       method: Method.PUT,
       body: JSON.stringify(FilmsModel.adaptToServer(film)),
-      header: new Headers({'Content-Type': 'application/json'}),
+      headers: new Headers({'Content-Type': 'application/json'}),
     })
       .then(Api.toJSON)
-      .then(FilmsModel.adaptToServer);
+      .then(FilmsModel.adaptToClient);
+
   }
 
   _load({url, method = Method.GET, body = null, headers = new Headers()}) {

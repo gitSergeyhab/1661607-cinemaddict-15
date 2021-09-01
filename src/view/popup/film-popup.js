@@ -160,7 +160,7 @@ const createFilmPopup = ({
 
 
 export default class FilmPopup extends Smart {
-  constructor(film, comments) {
+  constructor(film, comments=[]) {
     super();
     this._state = FilmPopup.parseFilmToState(film);
     this._comments = comments;

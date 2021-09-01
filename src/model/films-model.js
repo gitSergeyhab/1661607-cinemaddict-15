@@ -65,12 +65,12 @@ export default class FilmsModel extends AbstractObserver{
       },
       'film_info': {
         ...film.filmInfo,
-        'alternative_title': film.filmInfo,
-        'total_rating': film.filmInfo,
-        'age_rating': film.filmInfo,
+        'alternative_title': film.filmInfo.alternativeTitle,
+        'total_rating': film.filmInfo.totalRating,
+        'age_rating': film.filmInfo.ageRating,
         'release': {
-          'date': film.release.date,
-          'release_country': film.release.releaseCountry,
+          'date': film.filmInfo.release.date,
+          'release_country': film.filmInfo.release.releaseCountry,
         },
       }};
 

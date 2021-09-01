@@ -6,16 +6,24 @@ import FilmPopup from '../view/popup/film-popup.js';
 import {render, remove, replace} from '../utils/dom-utils.js';
 import {UserAction, UpdateType, Mode} from '../constants.js';
 
+import Api from '../api.js';
+import CommentsModel from '../model/comments-model.js';
+
 
 const CLASS_HIDE_SCROLL = 'hide-overflow';
 const ESCAPE = 'Escape';
 const CARD_CLICK_CLASSES =  ['film-card__title', 'film-card__poster', 'film-card__comments'];
 
+const URL = 'https://15.ecmascript.pages.academy/cinemaddict';
+const AUTHORIZATION = 'Basic |,,/_Black_Metal';
+
+const apiCard = new Api(URL, AUTHORIZATION);
 
 export default class Film {
   constructor(filmsContainer, commentsModel, changeData, openedPopup) {
     this._filmsContainer = filmsContainer;
     this._commentsModel = commentsModel;
+    this._commentsModel2 = new CommentsModel();
     this._changeData = changeData;
 
     this._openedPopup = openedPopup;
@@ -49,7 +57,9 @@ export default class Film {
     const prevFilmPopupComponent = this._filmPopupComponent;
 
     this._filmCardComponent = new FilmCard(film);
-    this._filmPopupComponent = new FilmPopup(film, this._getNeedComments());
+    // this._filmPopupComponent = new FilmPopup(film, this._getNeedComments());
+    this._filmPopupComponent = new FilmPopup(film);
+
 
     // навесить обработчики
     this._filmCardComponent.setOpenPopupClickHandler(this._handleFilmCardClick); // обработчик открытия попапа на карточку
@@ -57,13 +67,14 @@ export default class Film {
     this._filmCardComponent.setHistoryClickHandler(this._handleHistoryClick);
     this._filmCardComponent.setFavoriteClickHandler(this._handleFavoriteClick);
 
-    this._filmPopupComponent.setClosePopupClickHandler(this._handleClosePopupClick); // обработчик закрытия попапа на попап(кнопку)
-    this._filmPopupComponent.setWatchListClickHandler(this._handleWatchListClick);
-    this._filmPopupComponent.setHistoryClickHandler(this._handleHistoryClick);
-    this._filmPopupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
+    // this._filmPopupComponent.setClosePopupClickHandler(this._handleClosePopupClick); // обработчик закрытия попапа на попап(кнопку)
+    // this._filmPopupComponent.setWatchListClickHandler(this._handleWatchListClick);
+    // this._filmPopupComponent.setHistoryClickHandler(this._handleHistoryClick);
+    // this._filmPopupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
 
-    this._filmPopupComponent.setDeleteCommentHandler(this._handleDeleteComment);
-    this._filmPopupComponent.setAddCommentHandler(this._handleAddComment);
+    // this._filmPopupComponent.setDeleteCommentHandler(this._handleDeleteComment);
+    // this._filmPopupComponent.setAddCommentHandler(this._handleAddComment);
+    this._setHandlersToPopup();
 
     //если создается
     if (prevFilmCardComponent === null || prevFilmPopupComponent === null) {
@@ -71,9 +82,11 @@ export default class Film {
         case Mode.ALL:
           render(this._filmsContainer, this._filmCardComponent);
           this._renderPopup();
+          // this._renderNoCommentsPopup();
           return;
         case Mode.POPUP:
           this._renderPopup();
+          // this._renderNoCommentsPopup();
           return;
         default:
           render(this._filmsContainer, this._filmCardComponent);
@@ -89,13 +102,41 @@ export default class Film {
     remove(prevFilmPopupComponent);
   }
 
+
   destroy() {
     remove(this._filmCardComponent);
     remove(this._filmPopupComponent);
   }
 
+  _setHandlersToPopup() {
+    this._filmPopupComponent.setClosePopupClickHandler(this._handleClosePopupClick); // обработчик закрытия попапа на попап(кнопку)
+    this._filmPopupComponent.setWatchListClickHandler(this._handleWatchListClick);
+    this._filmPopupComponent.setHistoryClickHandler(this._handleHistoryClick);
+    this._filmPopupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
+
+    this._filmPopupComponent.setDeleteCommentHandler(this._handleDeleteComment);
+    this._filmPopupComponent.setAddCommentHandler(this._handleAddComment);
+  }
+
+
   _getComments() {
     return this._commentsModel.comments;
+  }
+
+  _getApiComments() {
+    // console.log('_getApiComments()')
+    apiCard.getComments(this._film.id)
+      .then((c) => this._commentsModel2.setComments(UpdateType.PATCH, c))
+      .then(() => this._restartPopupWithComment());
+  }
+
+  _restartPopupWithComment() {
+    remove(this._filmPopupComponent);
+    this._filmPopupComponent = new FilmPopup(this._film, this._commentsModel2.comments);
+
+    this._setHandlersToPopup();
+    this._renderPopup();
+
   }
 
   _getNeedComments() {
@@ -115,6 +156,11 @@ export default class Film {
       this._mode = Mode.DEFAULT;
     }
   }
+
+  // _renderNoCommentsPopup() {
+  //   this._renderPopup();
+  //   this._getApiComments();
+  // }
 
   _renderPopup() {
     this._openedPopup[0] = this._film.id; // чтоб можно было перерендерит незакрытый попап после
@@ -149,10 +195,12 @@ export default class Film {
 
   _handleFilmCardClick() {
     setTimeout(() => this._renderPopup(), 0); // чтоб рендерился после _closePopup()
+    // setTimeout(() => this._renderNoCommentsPopup(), 0); // чтоб рендерился после _closePopup()
+
   }
 
   _handleWatchListClick() {
-    this._changeData(UserAction.UPDATE_FILM, UpdateType.PATCH,
+    this._changeData(UserAction.UPDATE_FILM, UpdateType.MINOR,
       {...this._film, userDetails: {...this._film.userDetails, watchList: !this._film.userDetails.watchList}},
     );
   }
@@ -168,7 +216,7 @@ export default class Film {
   }
 
   _handleFavoriteClick() {
-    this._changeData(UserAction.UPDATE_FILM, UpdateType.PATCH,
+    this._changeData(UserAction.UPDATE_FILM, UpdateType.MINOR,
       {...this._film, userDetails: {...this._film.userDetails, favorite: !this._film.userDetails.favorite}},
     );
   }
