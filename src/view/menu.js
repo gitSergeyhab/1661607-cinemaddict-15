@@ -50,13 +50,17 @@ export default class Menu extends Abstract{
     evt.preventDefault();
     this._statsElement.classList.remove(ACTIVE_FILTER_BTN_CLASS);
     const filter = evt.target.dataset.filter;
-    filter ? this._callback.clickFilter(filter) : null;
+    if (filter) {
+      this._callback.clickFilter(filter);
+    }
   }
 
   _clickNavigationHandler(evt) {
     evt.preventDefault();
     const filter = evt.target.dataset.filter;
-    filter ? this._callback.clickNavigation(filter) : null;
+    if (filter) {
+      this._callback.clickNavigation(filter);
+    }
   }
 
   setClickFilterHandler(cb) {

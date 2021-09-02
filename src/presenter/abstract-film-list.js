@@ -2,8 +2,6 @@
 import NoFilms from '../view/films/no-films.js';
 import FilmPresenter from './film.js';
 
-import CommentsModel from '../model/comments-model.js';
-
 import {render, remove} from '../utils/dom-utils.js';
 import {UserAction, UpdateType, Mode, FilterType, EmptyResultMessage} from '../constants.js';
 
@@ -13,7 +11,7 @@ const CLASS_HIDE_SCROLL = 'hide-overflow';
 
 
 export default class AbstractFilmList {
-  constructor(container, filmsModel, api) {
+  constructor(container, filmsModel, commentsModel, api) {
     this._container = container;
     this._api = api;
 
@@ -28,14 +26,14 @@ export default class AbstractFilmList {
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
 
+    this._commentsModel = commentsModel;
+    this._commentsModel.addObserver(this._handleModelEvent);
+
     this._filmsModel = filmsModel;
     this._filmsModel.addObserver(this._handleModelEvent);
-    this._commentsModel = new CommentsModel();
-    // this._commentsModel.addObserver(this._handleModelEvent);           // ???  ТАК ПОЧЕМУ-ТО НЕ РАБОТАЕТ ???
-    //если прокинуть this._handleModelEvent в FilmPresenter и повесить наблюдатель там - все равно не работает
 
+    this._openedFilmId = [null];
 
-    this._openedPopup = [null];
   }
 
   init(){
@@ -44,7 +42,8 @@ export default class AbstractFilmList {
   }
 
   _renderPopup() {
-    const needFilm = this._getAllFilms().find((film) => film.id === this._openedPopup[0]);
+    const needFilm = this._getAllFilms().find((film) => film.id === this._openedFilmId[0]);
+
     if (needFilm) {
       this._renderFilmCard(needFilm, Mode.POPUP);
     }
@@ -60,7 +59,7 @@ export default class AbstractFilmList {
 
   _renderFilmCard(film, modeRender) {
     const filmCardContainer = this._filmBlockComponent.getElement().querySelector(SELECTOR_FILM_CONTAINER);
-    const filmCardPresenter = new FilmPresenter(filmCardContainer, this._handleViewAction, this._commentsModel, this._api, this._openedPopup);
+    const filmCardPresenter = new FilmPresenter(filmCardContainer, this._handleViewAction, this._commentsModel, this._api, this._openedFilmId);
     const alreadyIn = this._filmPresenter.get(film.id);
 
     if (alreadyIn) { // если фильм уже в мапе презентеров - удалить и отрендерить уже вместе с попапом
@@ -100,8 +99,8 @@ export default class AbstractFilmList {
           .then((response) => this._commentsModel.addComment(updateType, response));
         break;
       case UserAction.DELETE_COMMENT:
-        this._api.delComment(update)
-          .then(() => this._commentsModel.delComment(updateType, update));
+        this._api.deleteComment(update)
+          .then(() => this._commentsModel.deleteComment(updateType, update));
         break;
     }
   }
@@ -121,7 +120,9 @@ export default class AbstractFilmList {
         this._renderFilmList();
         break;
       case UpdateType.INIT:
-        this._loadingComponent ? remove(this._loadingComponent) : null;
+        if (this._loadingComponent) {
+          remove(this._loadingComponent);
+        }
         this.init();
         break;
     }
@@ -131,8 +132,7 @@ export default class AbstractFilmList {
     if (!this._getFilms().length) {
       this._renderNoFilms();
     }
-
-    if (this._openedPopup[0] !== null) {
+    if (this._openedFilmId[0] !== null) {
       this._renderPopup();
     }
   }

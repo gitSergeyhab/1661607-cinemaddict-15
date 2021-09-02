@@ -13,20 +13,20 @@ const ESCAPE = 'Escape';
 const CARD_CLICK_CLASSES =  ['film-card__title', 'film-card__poster', 'film-card__comments'];
 
 export default class Film {
-  constructor(filmsContainer, changeData, commentsModel, api, openedPopup) {
+  constructor(filmsContainer, changeData, commentsModel, api, openedFilmId) {
     this._filmsContainer = filmsContainer;
     this._commentsModel = commentsModel;
+
     this._api = api;
 
     this._changeData = changeData;
 
-    this._openedPopup = openedPopup;
+    this._openedFilmId = openedFilmId;
     this._mode = Mode.DEFAULT; // отслеживает отрендерен ли попап (можно, наверно, и без него)
 
     this._filmCardComponent = null;
     this._filmPopupComponent = null;
     this._commentBlock = null;
-    this._areCommentsIn = false;
 
     // привязать обработчики
     this._handleFilmCardClick = this._handleFilmCardClick.bind(this);
@@ -69,11 +69,11 @@ export default class Film {
     //если создается
     if (prevFilmCardComponent === null || prevFilmPopupComponent === null) {
       switch (this._modeRender) {
-        case Mode.ALL:
+        case Mode.ALL: // рендерит и карточку и незакрытый попап // вообще все это чтобы попап при очистке листа перерисовывался. Наверное, можно как-то проще, но пришло в голову только это
           render(this._filmsContainer, this._filmCardComponent);
           this._renderPopup();
           return;
-        case Mode.POPUP:
+        case Mode.POPUP: // тоько незакрытый попап
           this._renderPopup();
           return;
         default: // карточки без попапа
@@ -97,14 +97,13 @@ export default class Film {
 
   _getApiComments() {
     this._api.getComments(this._film.id)
-      .then((comment) => this._commentsModel.setComments(UpdateType.PATCH, comment))
+      .then((comment) => this._commentsModel.comments = comment)
       .then(() => this._renderCommentBlock());
   }
 
   _closePopup() {
-    remove(this._commentBlock);
     if (this._mode !== Mode.DEFAULT) {
-      this._openedPopup[0] = null;
+      this._openedFilmId[0] = null;
       document.body.classList.remove(CLASS_HIDE_SCROLL);
       document.removeEventListener('keydown', this._handleEscKeyDown);
       document.removeEventListener('click', this._handleAnyFilmCardClick);
@@ -124,7 +123,13 @@ export default class Film {
   }
 
   _renderPopup() {
-    this._openedPopup[0] = this._film.id; // чтоб можно было перерендерить незакрытый попап после очистки филмлиста
+
+    /**
+     * А зачем мы массив используем?
+     */
+    // нужно что-нибуть мутабельное, если в филмЛистПрезентере задать this._openedFilmId = null, то он так там и останется null, что бы я в филмПрезентере ни делал
+
+    this._openedFilmId[0] = this._film.id; // чтоб можно было перерендерить незакрытый попап после очистки филмлиста
     this._getApiComments();
 
     document.addEventListener('keydown', this._handleEscKeyDown);
@@ -149,7 +154,9 @@ export default class Film {
   _handleAnyFilmCardClick(evt) {
     const target = evt.target;
     if (target && CARD_CLICK_CLASSES.some((className) => target.classList.contains(className))) {
-      this._mode === Mode.POPUP ? this._closePopup() : null;
+      if (this._mode === Mode.POPUP) {
+        this._closePopup();
+      }
     }
   }
 
@@ -181,14 +188,8 @@ export default class Film {
   }
 
   _handleDeleteComment(id) {
-    this._changeData(UserAction.DELETE_COMMENT, UpdateType.MINOR,
-      id,
-    );
-
-    const leftComments = this._film.comments.filter((comment) => comment !== id);
-    this._changeData(UserAction.UPDATE_FILM, UpdateType.PATCH,
-      {...this._film, comments: leftComments},
-    );
+    this._changeData(UserAction.DELETE_COMMENT, UpdateType.PATCH, id);
+    this._changeData(UserAction.UPDATE_FILM, UpdateType.PATCH, this._film);
   }
 
   _handleAddComment(value, emotion) {

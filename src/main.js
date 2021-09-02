@@ -9,6 +9,7 @@ import ProfilePresenter from './presenter/profile.js';
 
 import FilmsModel from './model/films-model.js';
 import FiltersModel from './model/filters-model.js';
+import CommentsModel from './model/comments-model.js';
 
 import {render, remove} from './utils/dom-utils.js';
 import {FilmSectionName, FilterType, UpdateType} from './constants.js';
@@ -31,6 +32,11 @@ const footerStatistic= footer.querySelector('.footer__statistics');
 const filtersModel = new FiltersModel();
 const filmsModel = new FilmsModel();
 
+/**
+ * Эта модель должна создаваться там же, где и модель для фильмов, т.к. в один момент времени мы работаем с одним набором комментариев
+ */
+// ??? переместил, но связи не уловил - при чем здесь работа с одним набором комментариев?  ???
+const commentsModel = new CommentsModel();
 
 //РЕНДЕРИНГ
 const profile = new ProfilePresenter(header, filmsModel); // инит после загрузки данных
@@ -38,11 +44,11 @@ const profile = new ProfilePresenter(header, filmsModel); // инит после
 const filmSection = new FilmSection();
 render(main, filmSection);
 
-const mainFilmListPresenter = new FilmListPresenter(filmSection, filmsModel, filtersModel, api);
+const mainFilmListPresenter = new FilmListPresenter(filmSection, filmsModel, commentsModel, api, filtersModel);
 
-new ExtraFilmListPresenter(filmSection, filmsModel, api, FilmSectionName.TOP_RATED);
+new ExtraFilmListPresenter(filmSection, filmsModel, commentsModel, api, FilmSectionName.TOP_RATED);
 
-new ExtraFilmListPresenter(filmSection, filmsModel, api, FilmSectionName.MOST_COMMENTED);
+new ExtraFilmListPresenter(filmSection, filmsModel, commentsModel, api, FilmSectionName.MOST_COMMENTED);
 
 
 // menu to FilmBlocks toggle

@@ -7,8 +7,8 @@ import {FilmSectionName} from '../constants.js';
 
 
 export default class ExtraFilmList extends AbstractFilmList {
-  constructor(container, filmsModel, api, name) {
-    super(container, filmsModel, api);
+  constructor(container, filmsModel, commentsModel, api, name) {
+    super(container, filmsModel, commentsModel, api);
     this._name = name;
 
     this._filmBlockComponent = new ExtraFilmsBlock(name);

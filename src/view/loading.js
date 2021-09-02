@@ -1,13 +1,13 @@
 import Abstract from './abstract.js';
 
 export default class Loading extends Abstract {
-  constructor(empty = false){
+  constructor(isLoading = false){
     super();
-    this._empty = empty;
+    this._isLoading = isLoading;
   }
 
   getTemplate() {
-    return this._empty ? '' : `<section class="films-list">
+    return this._isLoading ? '' : `<section class="films-list">
     <h2 class="films-list__title">Loading...</h2>
   </section>`;
   }

@@ -14,8 +14,8 @@ import {filter} from '../utils/filter.js';
 const FILM_COUNT_PER_STEP = 5;
 
 export default class FilmList extends AbstractFilmList {
-  constructor(container, filmsModel, filtersModel, api) {
-    super(container, filmsModel, api);
+  constructor(container, filmsModel, commentsModel, api, filtersModel) {
+    super(container, filmsModel, commentsModel, api);
 
     this._filmBlockComponent = new MainFilmsBlock();
     this._btnShowMoreComponent = new BtnShowMore();

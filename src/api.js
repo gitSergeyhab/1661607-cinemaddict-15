@@ -31,14 +31,14 @@ export default class Api {
       .then(FilmsModel.adaptToClient);
   }
 
-  getComments(id){//film_id
-    return this._load({url: `comments/${id}`})
+  getComments(filmId){
+    return this._load({url: `comments/${filmId}`})
       .then(Api.toJSON);
   }
 
-  addComment(comment, id) {//film_id
+  addComment(comment, filmId) {
     return this._load({
-      url: `comments/${id}`,
+      url: `comments/${filmId}`,
       method: Method.POST,
       body: JSON.stringify(comment),
       headers: new Headers({'Content-Type': 'application/json'}),
@@ -46,9 +46,9 @@ export default class Api {
       .then(Api.toJSON);
   }
 
-  delComment(id) {//comment_id
+  deleteComment(commentId) {
     return this._load({
-      url: `comments/${id}`,
+      url: `comments/${commentId}`,
       method: Method.DELETE,
     });
   }
