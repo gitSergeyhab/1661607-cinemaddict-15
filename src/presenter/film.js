@@ -102,6 +102,14 @@ export default class Film {
   }
 
   _closePopup() {
+
+    /*Зачем удалять дочерный блок, если все равно удалится родительский?*/
+
+    // remove(this._commentBlock);
+
+    // без этого удаления this._commentBlock дублируется при каждом переоткрытии попапа
+
+
     if (this._mode !== Mode.DEFAULT) {
       this._openedFilmId[0] = null;
       document.body.classList.remove(CLASS_HIDE_SCROLL);
