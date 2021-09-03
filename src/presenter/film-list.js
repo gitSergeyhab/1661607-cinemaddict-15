@@ -47,11 +47,11 @@ export default class FilmList extends AbstractFilmList {
     const filteredFilms = filter[this._filtersModel.getFilter()](this._filmsModel.films);
     switch (this._sortType) {
       case SortType.DATE:
-        return filteredFilms.sort(sortDate);
+        return filteredFilms.slice().sort(sortDate); // ??? не могу понять, как в таск менеджере все работает без .slice()  ???
       case SortType.RATING:
-        return filteredFilms.sort(sortRating);
+        return filteredFilms.slice().sort(sortRating);
     }
-    return filteredFilms; // данные в листе уже мутированы - дефолт уже не дефолт (видимо, пока нет данных с сервера)
+    return filteredFilms;
   }
 
   _renderSort() {
@@ -122,7 +122,7 @@ export default class FilmList extends AbstractFilmList {
 
     this._sortType = sortType;
     this._clearFilmList(true, false);
-    this._renderMainBlock();
+    this._renderFilmList();
   }
 
   _handleLoadMoreButtonClick() {

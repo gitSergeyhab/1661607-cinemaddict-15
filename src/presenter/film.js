@@ -174,7 +174,7 @@ export default class Film {
   }
 
   _handleWatchListClick() {
-    this._changeData(UserAction.UPDATE_FILM, UpdateType.MINOR,
+    this._changeData(UserAction.UPDATE_FILM, UpdateType.PATCH,
       {...this._film, userDetails: {...this._film.userDetails, watchList: !this._film.userDetails.watchList}},
     );
   }
@@ -190,7 +190,7 @@ export default class Film {
   }
 
   _handleFavoriteClick() {
-    this._changeData(UserAction.UPDATE_FILM, UpdateType.MINOR,
+    this._changeData(UserAction.UPDATE_FILM, UpdateType.PATCH,
       {...this._film, userDetails: {...this._film.userDetails, favorite: !this._film.userDetails.favorite}},
     );
   }
@@ -206,7 +206,7 @@ export default class Film {
     }
     this._changeData(
       UserAction.ADD_COMMENT,
-      UpdateType.MINOR,
+      UpdateType.PATCH,
       {comment, emotion},
       this._film,
     );
