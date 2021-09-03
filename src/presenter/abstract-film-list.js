@@ -97,10 +97,14 @@ export default class AbstractFilmList {
       case UserAction.ADD_COMMENT:
         this._api.addComment(update, film.id)
           .then((response) => this._commentsModel.addComment(updateType, response));
+        this._api.updateFilm(film)
+          .then((response) => this._filmsModel.updateFilm(updateType, response));
         break;
       case UserAction.DELETE_COMMENT:
         this._api.deleteComment(update)
           .then(() => this._commentsModel.deleteComment(updateType, update));
+        this._api.updateFilm(film)
+          .then((response) => this._filmsModel.updateFilm(updateType, response));
         break;
     }
   }

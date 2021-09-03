@@ -105,7 +105,7 @@ export default class Film {
 
     /*Зачем удалять дочерный блок, если все равно удалится родительский?*/
 
-    // remove(this._commentBlock);
+    remove(this._commentBlock);
 
     // без этого удаления this._commentBlock дублируется при каждом переоткрытии попапа
 
@@ -195,9 +195,8 @@ export default class Film {
     );
   }
 
-  _handleDeleteComment(id) {
-    this._changeData(UserAction.DELETE_COMMENT, UpdateType.PATCH, id);
-    this._changeData(UserAction.UPDATE_FILM, UpdateType.PATCH, this._film);
+  _handleDeleteComment(commentId) {
+    this._changeData(UserAction.DELETE_COMMENT, UpdateType.PATCH, commentId, this._film);
   }
 
   _handleAddComment(value, emotion) {
@@ -211,7 +210,5 @@ export default class Film {
       {comment, emotion},
       this._film,
     );
-
-    this._changeData(UserAction.UPDATE_FILM, UpdateType.PATCH, this._film);
   }
 }
