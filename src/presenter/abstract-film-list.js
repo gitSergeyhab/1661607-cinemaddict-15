@@ -3,7 +3,7 @@ import NoFilms from '../view/films/no-films.js';
 import FilmPresenter from './film.js';
 
 import {render, remove} from '../utils/dom-utils.js';
-import {UserAction, UpdateType, Mode, FilterType, EmptyResultMessage} from '../constants.js';
+import {UserAction, UpdateType, Mode, FilterType, EmptyResultMessage, FilmSectionName} from '../constants.js';
 
 
 const SELECTOR_FILM_CONTAINER = '.films-list__container';
@@ -20,7 +20,6 @@ export default class AbstractFilmList {
     this._sortComponent = null;// задается (или нет) в дочерних филмлистах
     this._loadingComponent = null;// задается (или нет) в дочерних филмлистах
 
-
     this._filmPresenter = new Map();
 
     this._handleViewAction = this._handleViewAction.bind(this);
@@ -33,7 +32,6 @@ export default class AbstractFilmList {
     this._filmsModel.addObserver(this._handleModelEvent);
 
     this._openedFilmId = [null];
-
   }
 
   init(){
@@ -132,10 +130,19 @@ export default class AbstractFilmList {
     }
   }
 
-  _renderFilmList() {
-    if (!this._getFilms().length) {
-      this._renderNoFilms();
+  _changeDisplayStyle() {
+    switch (this._name) {
+      case FilmSectionName.MOST_COMMENTED:
+        this._filmBlockComponent.getElement().style.display = this._getFilms()[0].comments.length ? 'block' : 'none';
+        break;
+      case FilmSectionName.TOP_RATED:
+        this._filmBlockComponent.getElement().style.display = this._getFilms()[0].filmInfo.totalRating ? 'block' : 'none';
     }
+  }
+
+  _renderFilmList() {
+    this._getFilms().length ? this._changeDisplayStyle() : this._renderNoFilms();
+
     if (this._openedFilmId[0] !== null) {
       this._renderPopup();
     }
