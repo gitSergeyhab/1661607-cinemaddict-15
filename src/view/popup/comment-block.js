@@ -120,6 +120,7 @@ export default class CommentBlock extends Smart {
 
   _deleteCommentHandler(evt) {
     evt.preventDefault();
+    evt.target.disabled = true;
     const id = evt.target.dataset.id;
     this._callback.deleteCommentClick(id);
   }
@@ -128,9 +129,11 @@ export default class CommentBlock extends Smart {
     const commentArea = this.getElement().querySelector('.film-details__comment-input');
     const emotion = this.getElement().querySelector('#selected-emoji');
     const value = commentArea.value.trim();
+
     if (evt.ctrlKey && evt.key === 'Enter' && value && commentArea === document.activeElement && emotion) {
       this._callback.addCommentSend(value, emotion.value);
       document.removeEventListener('keydown', this._keyDownCtrlEnterHandler);
+      this.updateState({}); // без этого повторное добавление оффлайн не работает
     }
   }
 

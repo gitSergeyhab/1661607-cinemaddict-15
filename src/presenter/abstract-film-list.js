@@ -8,6 +8,7 @@ import {UserAction, UpdateType, Mode, FilterType, EmptyResultMessage, FilmSectio
 
 const SELECTOR_FILM_CONTAINER = '.films-list__container';
 const CLASS_HIDE_SCROLL = 'hide-overflow';
+const SHAKE_ANIMATION_TIMEOUT = 5000;
 
 
 export default class AbstractFilmList {
@@ -86,6 +87,17 @@ export default class AbstractFilmList {
     render(this._filmBlockComponent, this._noFilmComponent);
   }
 
+  _findCommentElementsById(id) {
+    const popupComments= document.querySelectorAll('.film-details__comment-delete');
+    const deleteBtn = Array.from(popupComments).find((comment) => comment.dataset.id === id);
+    if (deleteBtn) {
+      const commentBlock = deleteBtn.closest('.film-details__comment');
+      return {deleteBtn, commentBlock};
+    }
+
+    throw new Error(`there is not comment with id: ${id}`);
+  }
+
   _handleViewAction(actionType, updateType, update, film) {
     switch(actionType) {
       case UserAction.UPDATE_FILM:
@@ -94,13 +106,19 @@ export default class AbstractFilmList {
         break;
       case UserAction.ADD_COMMENT:
         this._api.addComment(update, film.id)
-          .then((response) => this._commentsModel.addComment(updateType, response));
+          .then((response) => this._commentsModel.addComment(updateType, response))
+          .catch(() => AbstractFilmList.shake(document.querySelector('.film-details__inner')));
         this._api.updateFilm(film)
           .then((response) => this._filmsModel.updateFilm(updateType, response));
         break;
       case UserAction.DELETE_COMMENT:
         this._api.deleteComment(update)
-          .then(() => this._commentsModel.deleteComment(updateType, update));
+          .then(() => this._commentsModel.deleteComment(updateType, update))
+          .catch(() => {
+            const commentElement = this._findCommentElementsById(update);
+            commentElement.deleteBtn.disabled = false;
+            AbstractFilmList.shake(commentElement.commentBlock);
+          });
         this._api.updateFilm(film)
           .then((response) => this._filmsModel.updateFilm(updateType, response));
         break;
@@ -146,5 +164,10 @@ export default class AbstractFilmList {
     if (this._openedFilmId[0] !== null) {
       this._renderPopup();
     }
+  }
+
+  static shake(element) {
+    element.style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+    setTimeout(() => element.style.animation = '', SHAKE_ANIMATION_TIMEOUT);
   }
 }
