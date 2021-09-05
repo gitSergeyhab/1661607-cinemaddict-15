@@ -2,34 +2,37 @@
 import NoFilms from '../view/films/no-films.js';
 import FilmPresenter from './film.js';
 
-import {render} from '../utils/dom-utils.js';
-import {UserAction, UpdateType, Mode, FilterType, EmptyResultMessage} from '../constants.js';
+import {render, remove} from '../utils/dom-utils.js';
+import {UserAction, UpdateType, Mode, FilterType, EmptyResultMessage, FilmSectionName} from '../constants.js';
 
 
 const SELECTOR_FILM_CONTAINER = '.films-list__container';
 const CLASS_HIDE_SCROLL = 'hide-overflow';
+const SHAKE_ANIMATION_TIMEOUT = 5000;
 
 
 export default class AbstractFilmList {
-  constructor(container, filmsModel, commentsModel) {
+  constructor(container, filmsModel, commentsModel, api) {
     this._container = container;
+    this._api = api;
 
     this._noFilmComponent = null;
     this._filmBlockComponent = null; // задается в дочерних филмлистах
     this._sortComponent = null;// задается (или нет) в дочерних филмлистах
+    this._loadingComponent = null;// задается (или нет) в дочерних филмлистах
 
     this._filmPresenter = new Map();
 
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
 
-    this._filmsModel = filmsModel;
-    this._filmsModel.addObserver(this._handleModelEvent);
-
     this._commentsModel = commentsModel;
     this._commentsModel.addObserver(this._handleModelEvent);
 
-    this._openedPopup = [null];
+    this._filmsModel = filmsModel;
+    this._filmsModel.addObserver(this._handleModelEvent);
+
+    this._openedFilmId = [null];
   }
 
   init(){
@@ -38,7 +41,8 @@ export default class AbstractFilmList {
   }
 
   _renderPopup() {
-    const needFilm = this._getAllFilms().find((film) => film.id === this._openedPopup[0]);
+    const needFilm = this._getAllFilms().find((film) => film.id === this._openedFilmId[0]);
+
     if (needFilm) {
       this._renderFilmCard(needFilm, Mode.POPUP);
     }
@@ -54,7 +58,7 @@ export default class AbstractFilmList {
 
   _renderFilmCard(film, modeRender) {
     const filmCardContainer = this._filmBlockComponent.getElement().querySelector(SELECTOR_FILM_CONTAINER);
-    const filmCardPresenter = new FilmPresenter(filmCardContainer, this._commentsModel, this._handleViewAction, this._openedPopup);
+    const filmCardPresenter = new FilmPresenter(filmCardContainer, this._handleViewAction, this._commentsModel, this._api, this._openedFilmId);
     const alreadyIn = this._filmPresenter.get(film.id);
 
     if (alreadyIn) { // если фильм уже в мапе презентеров - удалить и отрендерить уже вместе с попапом
@@ -83,44 +87,87 @@ export default class AbstractFilmList {
     render(this._filmBlockComponent, this._noFilmComponent);
   }
 
-  _handleViewAction(actionType, updateType, update) {
+  _findCommentElementsById(id) {
+    const popupComments= document.querySelectorAll('.film-details__comment-delete');
+    const deleteBtn = Array.from(popupComments).find((comment) => comment.dataset.id === id);
+    if (deleteBtn) {
+      const commentBlock = deleteBtn.closest('.film-details__comment');
+      return {deleteBtn, commentBlock};
+    }
+
+    throw new Error(`there is not comment with id: ${id}`);
+  }
+
+  _handleViewAction(actionType, updateType, update, film) {
     switch(actionType) {
       case UserAction.UPDATE_FILM:
-        this._filmsModel.updateFilm(updateType, update);
+        this._api.updateFilm(update)
+          .then((response) => this._filmsModel.updateFilm(updateType, response));
         break;
       case UserAction.ADD_COMMENT:
-        this._commentsModel.addComment(updateType, update);
+        this._api.addComment(update, film.id)
+          .then((response) => this._commentsModel.addComment(updateType, response))
+          .catch(() => AbstractFilmList.shake(document.querySelector('.film-details__inner')));
+        this._api.updateFilm(film)
+          .then((response) => this._filmsModel.updateFilm(updateType, response));
         break;
       case UserAction.DELETE_COMMENT:
-        this._commentsModel.delComment(updateType, update);
+        this._api.deleteComment(update)
+          .then(() => this._commentsModel.deleteComment(updateType, update))
+          .catch(() => {
+            const commentElement = this._findCommentElementsById(update);
+            commentElement.deleteBtn.disabled = false;
+            AbstractFilmList.shake(commentElement.commentBlock);
+          });
+        this._api.updateFilm(film)
+          .then((response) => this._filmsModel.updateFilm(updateType, response));
         break;
     }
   }
 
   _handleModelEvent(updateType) {
     switch(updateType) {
-      case UpdateType.PATCH:// favorite, watchList, comments
+      case UpdateType.PATCH:// favorite, watchList
         this._clearFilmList();
         this._renderFilmList();
         break;
       case UpdateType.MINOR:// filter-menu
-        this._clearFilmList(false, true);
+        this._clearFilmList(true, true);
         this._renderFilmList();
         break;
       case UpdateType.MAJOR: //history
         this._clearFilmList();
         this._renderFilmList();
         break;
+      case UpdateType.INIT:
+        if (this._loadingComponent) {
+          remove(this._loadingComponent);
+        }
+        this.init();
+        break;
+    }
+  }
+
+  _changeDisplayStyle() {
+    switch (this._name) {
+      case FilmSectionName.MOST_COMMENTED:
+        this._filmBlockComponent.getElement().style.display = this._getFilms()[0].comments.length ? 'block' : 'none';
+        break;
+      case FilmSectionName.TOP_RATED:
+        this._filmBlockComponent.getElement().style.display = this._getFilms()[0].filmInfo.totalRating ? 'block' : 'none';
     }
   }
 
   _renderFilmList() {
-    if (!this._getFilms().length) {
-      this._renderNoFilms();
-    }
+    this._getFilms().length ? this._changeDisplayStyle() : this._renderNoFilms();
 
-    if (this._openedPopup[0] !== null) {
+    if (this._openedFilmId[0] !== null) {
       this._renderPopup();
     }
+  }
+
+  static shake(element) {
+    element.style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+    setTimeout(() => element.style.animation = '', SHAKE_ANIMATION_TIMEOUT);
   }
 }

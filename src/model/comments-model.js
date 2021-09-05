@@ -19,9 +19,9 @@ export default class CommentsModel extends AbstractObserver{
     this._notify(updateType, update);
   }
 
-  delComment(updateType, update) {
-    const index = this._comments.findIndex((comment) => comment.id === update.id);
+  deleteComment(updateType, id) {
+    const index = this._comments.findIndex((comment) => comment.id === id);
     this._comments = index === -1 ? this._comments : [...this._comments.slice(0, index), ...this._comments.slice(index + 1)];
-    this._notify(updateType/*, update*/);
+    this._notify(updateType);
   }
 }

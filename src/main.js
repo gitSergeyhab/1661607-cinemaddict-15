@@ -8,15 +8,19 @@ import MenuPresenter from './presenter/menu.js';
 import ProfilePresenter from './presenter/profile.js';
 
 import FilmsModel from './model/films-model.js';
-import CommentsModel from './model/comments-model.js';
 import FiltersModel from './model/filters-model.js';
+import CommentsModel from './model/comments-model.js';
 
 import {render, remove} from './utils/dom-utils.js';
-import {getRandomInt} from './utils/utils.js';
-import {FilmSectionName, FilterType} from './constants.js';
+import {FilmSectionName, FilterType, UpdateType} from './constants.js';
 
-import {COUNTS, createMockFilm} from './mock.js';
+import Api from './api.js';
 
+
+const URL = 'https://15.ecmascript.pages.academy/cinemaddict';
+const AUTHORIZATION = 'Basic |,,/_Black_Metal';
+
+const api = new Api(URL, AUTHORIZATION);
 
 const header = document.querySelector('header.header');
 const main = document.querySelector('main.main');
@@ -24,47 +28,27 @@ const footer = document.querySelector('footer.footer');
 const footerStatistic= footer.querySelector('.footer__statistics');
 
 
-//  DATA
-const oldMockFilms = new Array(getRandomInt(COUNTS.FILM.MIN, COUNTS.FILM.MAX)).fill().map((item, i) => createMockFilm(i));
-
-const mockFilms = [];
-oldMockFilms.forEach((film) => {
-  const comments = film.comments;
-  const newComments = comments.map((comment) => comment.id);
-  const newFilm = {...film, comments: newComments};
-  mockFilms.push(newFilm);
-});
-
-const mockComments = oldMockFilms.reduce((acc, elem) => ([...acc, ...elem.comments]), []);
-
-
 // MODELS
 const filtersModel = new FiltersModel();
-
 const filmsModel = new FilmsModel();
-filmsModel.films = mockFilms;
 
+/**
+ * Эта модель должна создаваться там же, где и модель для фильмов, т.к. в один момент времени мы работаем с одним набором комментариев
+ */
+// ??? переместил, но связи не уловил - при чем здесь работа с одним набором комментариев?  ???
 const commentsModel = new CommentsModel();
-commentsModel.comments = mockComments;
-
 
 //РЕНДЕРИНГ
-const profile = new ProfilePresenter(header, filmsModel);
-profile.init();
+const profile = new ProfilePresenter(header, filmsModel); // инит после загрузки данных
 
 const filmSection = new FilmSection();
 render(main, filmSection);
 
-const mainFilmListPresenter = new FilmListPresenter(filmSection, filmsModel, commentsModel, filtersModel);
-mainFilmListPresenter.init();
+const mainFilmListPresenter = new FilmListPresenter(filmSection, filmsModel, commentsModel, api, filtersModel);
 
-const topFilmListPresenter = new ExtraFilmListPresenter(filmSection, filmsModel, commentsModel, FilmSectionName.TOP_RATED);
-topFilmListPresenter.init();
+new ExtraFilmListPresenter(filmSection, filmsModel, commentsModel, api, FilmSectionName.TOP_RATED);
 
-const mostCommentedFilmListPresenter = new ExtraFilmListPresenter(filmSection, filmsModel, commentsModel, FilmSectionName.MOST_COMMENTED);
-mostCommentedFilmListPresenter.init();
-
-render(footerStatistic, new FooterStatistic(filmsModel.films.length));
+new ExtraFilmListPresenter(filmSection, filmsModel, commentsModel, api, FilmSectionName.MOST_COMMENTED);
 
 
 // menu to FilmBlocks toggle
@@ -85,3 +69,9 @@ const handleSiteMenuClick = (target) => {
 
 const menuPresenter = new MenuPresenter(main, filmsModel, filtersModel, handleSiteMenuClick);
 menuPresenter.init();
+
+api.getFilms()
+  .then((films) => filmsModel.setFilms(UpdateType.INIT, films))
+  .then(() => render(footerStatistic, new FooterStatistic(filmsModel.films.length)))
+  .then(() => profile.init())
+  .catch(() => filmsModel.setFilms(UpdateType.INIT, []));

@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 
 import FilmCard from '../view/films/film-card.js';
 import FilmPopup from '../view/popup/film-popup.js';
+import CommentBlock from '../view/popup/comment-block.js';
 
 import {render, remove, replace} from '../utils/dom-utils.js';
 import {UserAction, UpdateType, Mode} from '../constants.js';
@@ -11,18 +12,21 @@ const CLASS_HIDE_SCROLL = 'hide-overflow';
 const ESCAPE = 'Escape';
 const CARD_CLICK_CLASSES =  ['film-card__title', 'film-card__poster', 'film-card__comments'];
 
-
 export default class Film {
-  constructor(filmsContainer, commentsModel, changeData, openedPopup) {
+  constructor(filmsContainer, changeData, commentsModel, api, openedFilmId) {
     this._filmsContainer = filmsContainer;
     this._commentsModel = commentsModel;
+
+    this._api = api;
+
     this._changeData = changeData;
 
-    this._openedPopup = openedPopup;
+    this._openedFilmId = openedFilmId;
     this._mode = Mode.DEFAULT; // отслеживает отрендерен ли попап (можно, наверно, и без него)
 
     this._filmCardComponent = null;
     this._filmPopupComponent = null;
+    this._commentBlock = null;
 
     // привязать обработчики
     this._handleFilmCardClick = this._handleFilmCardClick.bind(this);
@@ -37,8 +41,8 @@ export default class Film {
 
     this._handleDeleteComment = this._handleDeleteComment.bind(this);
     this._handleAddComment = this._handleAddComment.bind(this);
-
   }
+
 
   init(film, modeRender = Mode.DEFAULT) {
     this._film = film;
@@ -49,7 +53,7 @@ export default class Film {
     const prevFilmPopupComponent = this._filmPopupComponent;
 
     this._filmCardComponent = new FilmCard(film);
-    this._filmPopupComponent = new FilmPopup(film, this._getNeedComments());
+    this._filmPopupComponent = new FilmPopup(film);
 
     // навесить обработчики
     this._filmCardComponent.setOpenPopupClickHandler(this._handleFilmCardClick); // обработчик открытия попапа на карточку
@@ -62,26 +66,23 @@ export default class Film {
     this._filmPopupComponent.setHistoryClickHandler(this._handleHistoryClick);
     this._filmPopupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
 
-    this._filmPopupComponent.setDeleteCommentHandler(this._handleDeleteComment);
-    this._filmPopupComponent.setAddCommentHandler(this._handleAddComment);
-
     //если создается
     if (prevFilmCardComponent === null || prevFilmPopupComponent === null) {
       switch (this._modeRender) {
-        case Mode.ALL:
+        case Mode.ALL: // рендерит и карточку и незакрытый попап // вообще все это чтобы попап при очистке листа перерисовывался. Наверное, можно как-то проще, но пришло в голову только это
           render(this._filmsContainer, this._filmCardComponent);
           this._renderPopup();
           return;
-        case Mode.POPUP:
+        case Mode.POPUP: // тоько незакрытый попап
           this._renderPopup();
           return;
-        default:
+        default: // карточки без попапа
           render(this._filmsContainer, this._filmCardComponent);
           return;
       }
     }
 
-    //если изменяется
+    //если изменяется //
     replace(this._filmCardComponent, prevFilmCardComponent);
     replace(this._filmPopupComponent, prevFilmPopupComponent);
 
@@ -94,19 +95,23 @@ export default class Film {
     remove(this._filmPopupComponent);
   }
 
-  _getComments() {
-    return this._commentsModel.comments;
-  }
-
-  _getNeedComments() {
-    const comments = this._getComments();
-    const needComments = comments.filter((comment) =>  this._film.comments.some((filmComment) => filmComment === comment.id));
-    return needComments;
+  _getApiComments() {
+    this._api.getComments(this._film.id)
+      .then((comment) => this._commentsModel.comments = comment)
+      .then(() => this._renderCommentBlock());
   }
 
   _closePopup() {
+
+    /*Зачем удалять дочерный блок, если все равно удалится родительский?*/
+
+    remove(this._commentBlock);
+
+    // без этого удаления this._commentBlock дублируется при каждом переоткрытии попапа
+
+
     if (this._mode !== Mode.DEFAULT) {
-      this._openedPopup[0] = null;
+      this._openedFilmId[0] = null;
       document.body.classList.remove(CLASS_HIDE_SCROLL);
       document.removeEventListener('keydown', this._handleEscKeyDown);
       document.removeEventListener('click', this._handleAnyFilmCardClick);
@@ -116,8 +121,24 @@ export default class Film {
     }
   }
 
+  _renderCommentBlock() {
+    const commentsContainer = this._filmPopupComponent.getElement().querySelector('.film-details__bottom-container');
+    this._commentBlock = new CommentBlock(this._commentsModel.comments);
+    this._commentBlock.setDeleteCommentHandler(this._handleDeleteComment);
+    this._commentBlock.setAddCommentHandler(this._handleAddComment);
+    render(commentsContainer, this._commentBlock);
+    this._commentBlock.reset(this._commentsModel.comments); // сбрасывает стейт на комменты при закрытии попапа
+  }
+
   _renderPopup() {
-    this._openedPopup[0] = this._film.id; // чтоб можно было перерендерит незакрытый попап после
+
+    /**
+     * А зачем мы массив используем?
+     */
+    // нужно что-нибуть мутабельное, если в филмЛистПрезентере задать this._openedFilmId = null, то он так там и останется null, что бы я в филмПрезентере ни делал
+
+    this._openedFilmId[0] = this._film.id; // чтоб можно было перерендерить незакрытый попап после очистки филмлиста
+    this._getApiComments();
 
     document.addEventListener('keydown', this._handleEscKeyDown);
     document.addEventListener('click', this._handleAnyFilmCardClick);
@@ -125,8 +146,6 @@ export default class Film {
     document.body.classList.add(CLASS_HIDE_SCROLL);
     render(document.body, this._filmPopupComponent);
     this._mode = Mode.POPUP;
-    this._filmPopupComponent.reset(this._film); // нужно сбрасывать стэйт здесь: в _closePopup() сбрасывать нельзя - this.updateElement() не работает - ...
-    // ... при повторном рендеринге родителя у this._filmPopupComponent.getElement уже нет, так как сам .getElement был удален при первом _closePopup()
   }
 
 
@@ -143,12 +162,15 @@ export default class Film {
   _handleAnyFilmCardClick(evt) {
     const target = evt.target;
     if (target && CARD_CLICK_CLASSES.some((className) => target.classList.contains(className))) {
-      this._mode === Mode.POPUP ? this._closePopup() : null;
+      if (this._mode === Mode.POPUP) {
+        this._closePopup();
+      }
     }
   }
 
   _handleFilmCardClick() {
     setTimeout(() => this._renderPopup(), 0); // чтоб рендерился после _closePopup()
+
   }
 
   _handleWatchListClick() {
@@ -173,15 +195,8 @@ export default class Film {
     );
   }
 
-  _handleDeleteComment(id) {
-    const commentToDel = this._getComments().find((comment) => comment.id === id);
-    this._changeData(UserAction.DELETE_COMMENT, UpdateType.NONE,
-      commentToDel,
-    );
-    const leftComments = this._film.comments.filter((comment) => comment !== id);
-    this._changeData(UserAction.UPDATE_FILM, UpdateType.PATCH,
-      {...this._film, comments: leftComments},
-    );
+  _handleDeleteComment(commentId) {
+    this._changeData(UserAction.DELETE_COMMENT, UpdateType.PATCH, commentId, this._film);
   }
 
   _handleAddComment(value, emotion) {
@@ -189,16 +204,11 @@ export default class Film {
     if (!comment || !emotion) {
       return;
     }
-
-    const id = Math.random().toString();
-
-    this._changeData(UserAction.ADD_COMMENT, UpdateType.NONE,
-      {id: id, comment, date: new Date(), emotion},
-    );
-
-    const comments = [...this._film.comments, id];
-    this._changeData(UserAction.UPDATE_FILM, UpdateType.PATCH,
-      {...this._film, comments: comments},
+    this._changeData(
+      UserAction.ADD_COMMENT,
+      UpdateType.PATCH,
+      {comment, emotion},
+      this._film,
     );
   }
 }

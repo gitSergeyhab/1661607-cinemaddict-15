@@ -1,13 +1,14 @@
 import AbstractFilmList from './abstract-film-list';
 import ExtraFilmsBlock from '../view/films/extra-films-block.js';
 
+
 import {getTopFilms, getMostCommentedFilms} from '../utils/utils.js';
 import {FilmSectionName} from '../constants.js';
 
 
 export default class ExtraFilmList extends AbstractFilmList {
-  constructor(container, filmsModel, commentsModel, name) {
-    super(container, filmsModel, commentsModel);
+  constructor(container, filmsModel, commentsModel, api, name) {
+    super(container, filmsModel, commentsModel, api);
     this._name = name;
 
     this._filmBlockComponent = new ExtraFilmsBlock(name);
