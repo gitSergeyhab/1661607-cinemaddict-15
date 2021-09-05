@@ -18,7 +18,7 @@ import Api from './api.js';
 
 
 const URL = 'https://15.ecmascript.pages.academy/cinemaddict';
-const AUTHORIZATION = 'Basic |,,/_Black_Metal';
+const AUTHORIZATION = 'Basic |,,/_Black_Metal_|../';
 
 const api = new Api(URL, AUTHORIZATION);
 

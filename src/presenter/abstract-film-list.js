@@ -106,21 +106,21 @@ export default class AbstractFilmList {
         break;
       case UserAction.ADD_COMMENT:
         this._api.addComment(update, film.id)
-          .then((response) => this._commentsModel.addComment(updateType, response))
+          .then((response) => this._commentsModel.addComment(UpdateType.NONE, response)) // обновление фильмов отстает (число комментов в карточке не всегда успевает обновляться при добавлении/удалении коммента в попапе), поэтому при add/del комментов - вьюхи я решил не перерисовываnm ...
+          .then(() => this._api.updateFilm(film)
+            .then((response) => this._filmsModel.updateFilm(updateType, response))) // ... чтобы не перерисовывать (моргать) два раза, перерисовываею все и сразу после обновленя данных и модели фильмов
           .catch(() => AbstractFilmList.shake(document.querySelector('.film-details__inner')));
-        this._api.updateFilm(film)
-          .then((response) => this._filmsModel.updateFilm(updateType, response));
         break;
       case UserAction.DELETE_COMMENT:
         this._api.deleteComment(update)
-          .then(() => this._commentsModel.deleteComment(updateType, update))
+          .then(() => this._commentsModel.deleteComment(UpdateType.NONE, update))
+          .then(() => this._api.updateFilm(film)
+            .then((response) => this._filmsModel.updateFilm(updateType, response)))
           .catch(() => {
             const commentElement = this._findCommentElementsById(update);
             commentElement.deleteBtn.disabled = false;
             AbstractFilmList.shake(commentElement.commentBlock);
           });
-        this._api.updateFilm(film)
-          .then((response) => this._filmsModel.updateFilm(updateType, response));
         break;
     }
   }
