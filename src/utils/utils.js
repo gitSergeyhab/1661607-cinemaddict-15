@@ -51,6 +51,8 @@ const getRatingByWatched = (count) => {
   return '';
 };
 
+const isOnline = () => window.navigator.onLine;
+
 
 export {
   getRandomInt,
@@ -64,5 +66,6 @@ export {
   sortDate,
   sortRating,
   getNotImplementedError,
-  getRatingByWatched
+  getRatingByWatched,
+  isOnline
 };

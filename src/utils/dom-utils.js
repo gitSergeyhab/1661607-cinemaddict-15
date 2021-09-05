@@ -1,6 +1,7 @@
 import {RenderPosition} from '../constants.js';
 import Abstract from '../view/abstract.js';
 
+const logo = document.querySelector('.header__logo.logo');
 
 const renderAll = (data = [], templateFunction = () => '') => data.map((item) => templateFunction(item || '')).join('\n').trim();
 
@@ -62,11 +63,23 @@ const replace = (newChild, oldChild) => {
   parent.replaceChild(newChild, oldChild);
 };
 
+const notifyOnline = () => {
+  document.title = document.title.replace(' [offline]', '');
+  // apiWithProvider.sync();
+  logo.innerHTML = 'Cinemaddict';
+};
+
+const notifyOffline = () => {
+  document.title += ' [offline]';
+  logo.innerHTML = 'Cinemaddict <span style="color: red"># OFFLINE #</span>';
+};
 
 export {
   render,
   createElement,
   renderAll,
   remove,
-  replace
+  replace,
+  notifyOnline,
+  notifyOffline
 };
