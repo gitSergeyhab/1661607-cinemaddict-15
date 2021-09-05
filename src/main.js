@@ -14,7 +14,7 @@ import CommentsModel from './model/comments-model.js';
 import {render, remove} from './utils/dom-utils.js';
 import {FilmSectionName, FilterType, UpdateType} from './constants.js';
 
-import Api from './api.js';
+import Api from './api/api.js';
 
 
 const URL = 'https://15.ecmascript.pages.academy/cinemaddict';
@@ -75,3 +75,10 @@ api.getFilms()
   .then(() => render(footerStatistic, new FooterStatistic(filmsModel.films.length)))
   .then(() => profile.init())
   .catch(() => filmsModel.setFilms(UpdateType.INIT, []));
+
+
+// window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+
+window.addEventListener('load', () => {
+  navigator.serviceWorker.register('/sw.js');
+});

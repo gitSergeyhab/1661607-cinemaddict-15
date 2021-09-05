@@ -106,9 +106,9 @@ export default class AbstractFilmList {
         break;
       case UserAction.ADD_COMMENT:
         this._api.addComment(update, film.id)
-          .then((response) => this._commentsModel.addComment(UpdateType.NONE, response)) // обновление фильмов отстает (число комментов в карточке не всегда успевает обновляться при добавлении/удалении коммента в попапе), поэтому при add/del комментов - вьюхи я решил не перерисовываnm ...
+          .then((response) => this._commentsModel.addComment(UpdateType.NONE, response)) // обновление фильмов отстает (число комментов в карточке не всегда успевает обновляться при добавлении/удалении коммента в попапе), поэтому при add/del комментов - вьюхи я решил не перерисовывать ...
           .then(() => this._api.updateFilm(film)
-            .then((response) => this._filmsModel.updateFilm(updateType, response))) // ... чтобы не перерисовывать (моргать) два раза, перерисовываею все и сразу после обновленя данных и модели фильмов
+            .then((response) => this._filmsModel.updateFilm(updateType, response))) // ... чтобы не перерисовывать (моргать) два раза, перерисовываю все и сразу после обновленя данных и модели фильмов
           .catch(() => AbstractFilmList.shake(document.querySelector('.film-details__inner')));
         break;
       case UserAction.DELETE_COMMENT:
