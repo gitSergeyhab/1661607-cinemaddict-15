@@ -1,11 +1,12 @@
-import FilmsModel from '../model/films-model';
-import CommentsModel from '../model/comments-model';
-import { isOnline } from '../utils/utils';
+import FilmsModel from '../model/films-model.js';
+import {isOnline, showOfflineMessage} from '../utils/offline-utils.js';
 
-const getSyncedItems = (items) => items.filter(({success}) => success).map(({payload}) => payload.task);
 
-const createStoreStructure = (items) => items.reduce((acc, current) => Object.assign({}, acc, {[current.id]: current}), {});
-// const createStoreStructure = (items) => items.reduce((acc, current) => ( { ...acc, [current.id]: current } ), {});
+// const getSyncedItems = (items) => items.filter(({success}) => success).map(({payload}) => payload.film);
+// ??? у меня в респонсе нет ни success, ни payload - это мой косяк или все так и задумано ???
+
+
+const createStoreStructure = (items) => items.reduce((acc, current) => ( { ...acc, [current.id]: current } ), {});
 
 
 export default class Provider {
@@ -23,59 +24,51 @@ export default class Provider {
           return films;
         });
     }
+
     const storeFilms = Object.values(this._store.getItems());
     return Promise.resolve(storeFilms.map(FilmsModel.adaptToClient));
   }
 
   updateFilm(film) {
+    if (isOnline()) {
+      return this._api.updateFilm(film)
+        .then((update) => {
+          this._store.setItem(update.id, FilmsModel.adaptToServer(update));
+          return update;
+        });
+    }
 
-    return this._api.updateFilm(film);
+    this._store.setItem(film.id, FilmsModel.adaptToServer({ ...film }));
+    return Promise.resolve(film);
   }
 
   getComments(filmId){
-    console.log('provider getComments')
+    if (!isOnline()) {
+      showOfflineMessage();
+    }
     return this._api.getComments(filmId);
   }
 
   addComment(comment, filmId) {
+    if (!isOnline()) {
+      showOfflineMessage();
+    }
     return this._api.addComment(comment, filmId);
   }
 
   deleteComment(commentId) {
+    if (!isOnline()) {
+      showOfflineMessage();
+    }
     return this._api.deleteComment(commentId);
   }
 
-  // sync(film) {
-  //   this._load({
-  //     url: '/movies/sync',
-  //     method: Method.POST,
-  //     body: JSON.stringify(film),
-  //     headers: new Headers({'Content-Type': 'application/json'}),
-  //   })
-  //     .then(Api.toJSON);
-  // }
+  sync() {
+    if (isOnline()) {
+      const storeFilms = Object.values(this._store.getItems());
+      return this._api.sync(storeFilms);
+    }
 
-  // _load({url, method = Method.GET, body = null, headers = new Headers()}) {
-  //   headers.append('Authorization', this._authorization);
-
-  //   return fetch(`${this._url}/${url}`, {method, body, headers})
-  //     .then(Api.checkStatus)
-  //     .catch(Api.catchError);
-  // }
-
-  // static checkStatus(response) {
-  //   if (response.ok) {
-  //     return response;
-  //   }
-
-  //   throw new Error(`${response.status}: ${response.statusText}`);
-  // }
-
-  // static toJSON(response) {
-  //   return response.json();
-  // }
-
-  // static catchError(err) {
-  //   throw err;
-  // }
+    return Promise.reject(new Error('Sync data failed'));
+  }
 }

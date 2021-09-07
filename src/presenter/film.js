@@ -102,13 +102,7 @@ export default class Film {
   }
 
   _closePopup() {
-
-    /*Зачем удалять дочерный блок, если все равно удалится родительский?*/
-
-    remove(this._commentBlock);
-
-    // без этого удаления this._commentBlock дублируется при каждом переоткрытии попапа
-
+    remove(this._commentBlock);// без этого удаления this._commentBlock дублируется при каждом переоткрытии попапа
 
     if (this._mode !== Mode.DEFAULT) {
       this._openedFilmId[0] = null;
@@ -131,12 +125,6 @@ export default class Film {
   }
 
   _renderPopup() {
-
-    /**
-     * А зачем мы массив используем?
-     */
-    // нужно что-нибуть мутабельное, если в филмЛистПрезентере задать this._openedFilmId = null, то он так там и останется null, что бы я в филмПрезентере ни делал
-
     this._openedFilmId[0] = this._film.id; // чтоб можно было перерендерить незакрытый попап после очистки филмлиста
     this._getApiComments();
 
@@ -180,7 +168,7 @@ export default class Film {
   }
 
   _handleHistoryClick() {
-    this._changeData(UserAction.UPDATE_FILM, UpdateType.MAJOR,
+    this._changeData(UserAction.UPDATE_FILM, UpdateType.PATCH,
       {...this._film, userDetails: {
         ...this._film.userDetails,
         alreadyWatched: !this._film.userDetails.alreadyWatched,
@@ -204,6 +192,7 @@ export default class Film {
     if (!comment || !emotion) {
       return;
     }
+
     this._changeData(
       UserAction.ADD_COMMENT,
       UpdateType.PATCH,

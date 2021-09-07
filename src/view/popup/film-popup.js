@@ -1,6 +1,5 @@
 import Abstract from '../abstract.js';
 
-
 import {getHoursAndMinutes, getDayMonthYear} from '../../utils/date-time-utils.js';
 import {DEFAULT_POSTER, ActiveClass} from '../../constants.js';
 import {getListWithoutNull} from '../../utils/utils.js';
@@ -8,9 +7,7 @@ import {renderAll} from '../../utils/dom-utils.js';
 
 
 const makeButtonActive = (value) => value ? ActiveClass.POPUP : '';
-
 const getGenre = (genre) => `<span class="film-details__genre">${genre}</span>`;
-
 
 const createFilmPopup = ({
   id,

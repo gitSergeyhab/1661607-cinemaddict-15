@@ -1,7 +1,5 @@
 import Smart from '../smart.js';
-
 import he from 'he';
-
 import {humanizeDate} from '../../utils/date-time-utils.js';
 
 
@@ -121,6 +119,7 @@ export default class CommentBlock extends Smart {
   _deleteCommentHandler(evt) {
     evt.preventDefault();
     evt.target.disabled = true;
+    evt.target.textContent = 'Deleting...';
     const id = evt.target.dataset.id;
     this._callback.deleteCommentClick(id);
   }
@@ -134,6 +133,7 @@ export default class CommentBlock extends Smart {
       this._callback.addCommentSend(value, emotion.value);
       document.removeEventListener('keydown', this._keyDownCtrlEnterHandler);
       this.updateState({}); // без этого повторное добавление оффлайн не работает
+      document.querySelector('.film-details__comment-input').disabled = true;
     }
   }
 

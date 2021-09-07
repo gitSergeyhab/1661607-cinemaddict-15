@@ -28,7 +28,7 @@ export default class ProfilePresenter {
   }
 
   _handleModelEvent(updateType) {
-    if (updateType === UpdateType.MAJOR) {
+    if (updateType === UpdateType.PATCH) {
       this.init();
     }
   }

@@ -1,4 +1,3 @@
-
 import NoFilms from '../view/films/no-films.js';
 import FilmPresenter from './film.js';
 
@@ -109,7 +108,11 @@ export default class AbstractFilmList {
           .then((response) => this._commentsModel.addComment(UpdateType.NONE, response)) // обновление фильмов отстает (число комментов в карточке не всегда успевает обновляться при добавлении/удалении коммента в попапе), поэтому при add/del комментов - вьюхи я решил не перерисовывать ...
           .then(() => this._api.updateFilm(film)
             .then((response) => this._filmsModel.updateFilm(updateType, response))) // ... чтобы не перерисовывать (моргать) два раза, перерисовываю все и сразу после обновленя данных и модели фильмов
-          .catch(() => AbstractFilmList.shake(document.querySelector('.film-details__inner')));
+          .catch(() => {
+            const form = document.querySelector('.film-details__inner');
+            form.querySelector('.film-details__comment-input').disabled = false;
+            AbstractFilmList.shake(form);
+          });
         break;
       case UserAction.DELETE_COMMENT:
         this._api.deleteComment(update)
@@ -118,6 +121,7 @@ export default class AbstractFilmList {
             .then((response) => this._filmsModel.updateFilm(updateType, response)))
           .catch(() => {
             const commentElement = this._findCommentElementsById(update);
+            commentElement.deleteBtn.textContent = 'Delete';
             commentElement.deleteBtn.disabled = false;
             AbstractFilmList.shake(commentElement.commentBlock);
           });
@@ -135,16 +139,11 @@ export default class AbstractFilmList {
         this._clearFilmList(true, true);
         this._renderFilmList();
         break;
-      case UpdateType.MAJOR: //history
-        this._clearFilmList();
-        this._renderFilmList();
-        break;
       case UpdateType.INIT:
         if (this._loadingComponent) {
           remove(this._loadingComponent);
         }
         this.init();
-        break;
     }
   }
 

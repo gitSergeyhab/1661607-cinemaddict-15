@@ -11,9 +11,8 @@ import FilmsModel from './model/films-model.js';
 import FiltersModel from './model/filters-model.js';
 import CommentsModel from './model/comments-model.js';
 
-import {render, remove, notifyOffline, notifyOnline} from './utils/dom-utils.js';
-import { isOnline } from './utils/utils.js';
-
+import {render, remove} from './utils/dom-utils.js';
+import {notifyOffline, notifyOnline, isOnline} from './utils/offline-utils.js';
 import {FilmSectionName, FilterType, UpdateType} from './constants.js';
 
 import Api from './api/api.js';
@@ -24,7 +23,6 @@ import Provider from './api/provider.js';
 const STORE_PREFIX  = 'cinemadict-localstorage';
 const STORE_VER = 'v15';
 const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
-
 const URL = 'https://15.ecmascript.pages.academy/cinemaddict';
 const AUTHORIZATION = 'Basic |,,/_Black_Metal_|../';
 
@@ -35,17 +33,11 @@ const apiWithProvider = new Provider(api, store);
 const header = document.querySelector('header.header');
 const main = document.querySelector('main.main');
 const footer = document.querySelector('footer.footer');
-const footerStatistic= footer.querySelector('.footer__statistics');
-
+const footerStatistic = footer.querySelector('.footer__statistics');
 
 // MODELS
 const filtersModel = new FiltersModel();
 const filmsModel = new FilmsModel();
-
-/**
- * Эта модель должна создаваться там же, где и модель для фильмов, т.к. в один момент времени мы работаем с одним набором комментариев
- */
-// ??? переместил, но связи не уловил - при чем здесь работа с одним набором комментариев?  ???
 const commentsModel = new CommentsModel();
 
 //РЕНДЕРИНГ
@@ -90,5 +82,10 @@ apiWithProvider.getFilms()
 window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
 
 isOnline() ? notifyOnline() : notifyOffline(); //для показа статуса сети при перезагрузке страницы
-window.addEventListener('online', notifyOnline);
-window.addEventListener('offline', notifyOffline);
+
+window.addEventListener('online', () => {
+  notifyOnline();
+  apiWithProvider.sync();
+});
+
+window.addEventListener('offline', () => notifyOffline());
