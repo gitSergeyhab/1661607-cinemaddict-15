@@ -7,6 +7,7 @@ import {isOnline, showOfflineMessage} from '../utils/offline-utils.js';
 
 
 const createStoreStructure = (items) => items.reduce((acc, current) => ( { ...acc, [current.id]: current } ), {});
+const rejectRequest = (typeRequest) => Promise.reject(new Error(`${typeRequest} failed`));
 
 
 export default class Provider {
@@ -43,30 +44,40 @@ export default class Provider {
   }
 
   getComments(filmId){
-    if (!isOnline()) {
-      showOfflineMessage();
+    if (isOnline()) {
+      return this._api.getComments(filmId);
     }
-    return this._api.getComments(filmId);
+
+    showOfflineMessage();
+    return rejectRequest('get Comments');
   }
 
   addComment(comment, filmId) {
-    if (!isOnline()) {
-      showOfflineMessage();
+    if (isOnline()) {
+      return this._api.addComment(comment, filmId);
     }
-    return this._api.addComment(comment, filmId);
+    showOfflineMessage();
+    return rejectRequest('add Comment');
   }
 
   deleteComment(commentId) {
-    if (!isOnline()) {
-      showOfflineMessage();
+    if (isOnline()) {
+      return this._api.deleteComment(commentId);
     }
-    return this._api.deleteComment(commentId);
+
+    showOfflineMessage();
+    return rejectRequest('deleteComment');
   }
 
   sync() {
     if (isOnline()) {
       const storeFilms = Object.values(this._store.getItems());
-      return this._api.sync(storeFilms);
+      return this._api.sync(storeFilms)
+      //??? не совсем понял, зачем нужны следующие 3 строки. Вроде все и без них работает ???
+        .then((response) => {
+          const updatedFilms = createStoreStructure(response.updated);
+          this._store.setItems(updatedFilms);
+        });
     }
 
     return Promise.reject(new Error('Sync data failed'));
