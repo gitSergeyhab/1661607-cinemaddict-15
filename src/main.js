@@ -26,11 +26,9 @@ const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
 const URL = 'https://15.ecmascript.pages.academy/cinemaddict';
 const AUTHORIZATION = 'Basic |,,/_Black_Metal_|../';
 
-// const api = new Api(URL, AUTHORIZATION);
-// const store = new Store(STORE_NAME, localStorage);
-// const apiWithProvider = new Provider(api, store);
-const apiWithProvider = new Api(URL, AUTHORIZATION);
-
+const api = new Api(URL, AUTHORIZATION);
+const store = new Store(STORE_NAME, localStorage);
+const apiWithProvider = new Provider(api, store);
 
 const header = document.querySelector('header.header');
 const main = document.querySelector('main.main');
@@ -81,7 +79,7 @@ apiWithProvider.getFilms()
   .catch(() => filmsModel.setFilms(UpdateType.INIT, []));
 
 
-// window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
 
 notifyNetStatus(); //для показа статуса сети при перезагрузке страницы
 
