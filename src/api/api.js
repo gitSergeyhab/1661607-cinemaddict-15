@@ -1,5 +1,6 @@
 import FilmsModel from '../model/films-model';
 
+
 const Method = {
   GET: 'GET',
   POST: 'POST',

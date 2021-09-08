@@ -25,12 +25,15 @@ const getRatingByWatched = (count) => {
   if (count >= Rating.MOVIE_BUFF.count) {
     return Rating.MOVIE_BUFF.name;
   }
+
   if (count >= Rating.FAN.count) {
     return Rating.FAN.name;
   }
+
   if (count >= Rating.NOVICE.count) {
     return Rating.NOVICE.name;
   }
+
   return '';
 };
 

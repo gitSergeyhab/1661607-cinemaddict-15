@@ -3,7 +3,7 @@ import {isOnline} from '../utils/offline-utils.js';
 import {showOfflineMessage} from '../utils/show-offline-message.js';
 
 
-const createStoreStructure = (items) => items.reduce((acc, current) => ( { ...acc, [current.id]: current } ), {});
+const createStoreStructure = (items) => items.reduce((acc, current) => ({ ...acc, [current.id]: current }), {});
 const rejectRequest = (typeRequest) => Promise.reject(new Error(`${typeRequest} failed`));
 
 
@@ -53,6 +53,7 @@ export default class Provider {
     if (isOnline()) {
       return this._api.addComment(comment, filmId);
     }
+
     showOfflineMessage();
     return rejectRequest('add Comment');
   }

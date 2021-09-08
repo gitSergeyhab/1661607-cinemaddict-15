@@ -4,7 +4,7 @@ import FilmCard from '../view/films/film-card.js';
 import FilmPopup from '../view/popup/film-popup.js';
 import CommentBlock from '../view/popup/comment-block.js';
 
-import {render, remove, replace} from '../utils/dom-utils.js';
+import {render, remove} from '../utils/dom-utils.js';
 import {UserAction, UpdateType, Mode} from '../constants.js';
 
 
@@ -15,14 +15,12 @@ const CARD_CLICK_CLASSES =  ['film-card__title', 'film-card__poster', 'film-card
 export default class Film {
   constructor(filmsContainer, changeData, commentsModel, api, openedFilmId) {
     this._filmsContainer = filmsContainer;
-    this._commentsModel = commentsModel;
-
-    this._api = api;
-
     this._changeData = changeData;
-
+    this._commentsModel = commentsModel;
+    this._api = api;
     this._openedFilmId = openedFilmId;
-    this._mode = Mode.DEFAULT; // отслеживает отрендерен ли попап (можно, наверно, и без него)
+
+    this._mode = Mode.DEFAULT; // отслеживает отрендерен ли попап
 
     this._filmCardComponent = null;
     this._filmPopupComponent = null;
@@ -46,11 +44,7 @@ export default class Film {
 
   init(film, modeRender = Mode.DEFAULT) {
     this._film = film;
-
     this._modeRender = modeRender;// Mode.DEFAULT - рендерит карточки // Mode.POPUP - незакрытый попап
-
-    const prevFilmCardComponent = this._filmCardComponent;
-    const prevFilmPopupComponent = this._filmPopupComponent;
 
     this._filmCardComponent = new FilmCard(film);
     this._filmPopupComponent = new FilmPopup(film);
@@ -67,27 +61,17 @@ export default class Film {
     this._filmPopupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
 
     //если создается
-    if (prevFilmCardComponent === null || prevFilmPopupComponent === null) {
-      switch (this._modeRender) {
-        case Mode.ALL: // рендерит и карточку и незакрытый попап // вообще все это чтобы попап при очистке листа перерисовывался. Наверное, можно как-то проще, но пришло в голову только это
-          render(this._filmsContainer, this._filmCardComponent);
-          this._renderPopup();
-          return;
-        case Mode.POPUP: // тоько незакрытый попап
-          this._renderPopup();
-          return;
-        default: // карточки без попапа
-          render(this._filmsContainer, this._filmCardComponent);
-          return;
-      }
+    switch (this._modeRender) {
+      case Mode.ALL: // рендерит и карточку и незакрытый попап // вообще все это чтобы попап при очистке листа перерисовывался. Наверное, можно как-то проще, но пришло в голову только это
+        render(this._filmsContainer, this._filmCardComponent);
+        this._renderPopup();
+        return;
+      case Mode.POPUP: // тоько незакрытый попап
+        this._renderPopup();
+        return;
+      default: // карточки без попапа
+        render(this._filmsContainer, this._filmCardComponent);
     }
-
-    // если изменяется //
-    replace(this._filmCardComponent, prevFilmCardComponent);
-    replace(this._filmPopupComponent, prevFilmPopupComponent);
-
-    remove(prevFilmCardComponent);
-    remove(prevFilmPopupComponent);
   }
 
   destroy() {
@@ -107,6 +91,7 @@ export default class Film {
     if (this._mode !== Mode.DEFAULT) {
       this._openedFilmId[0] = null;
       document.body.classList.remove(CLASS_HIDE_SCROLL);
+
       document.removeEventListener('keydown', this._handleEscKeyDown);
       document.removeEventListener('click', this._handleAnyFilmCardClick);
 
@@ -118,8 +103,10 @@ export default class Film {
   _renderCommentBlock() {
     const commentsContainer = this._filmPopupComponent.getElement().querySelector('.film-details__bottom-container');
     this._commentBlock = new CommentBlock(this._commentsModel.comments);
+
     this._commentBlock.setDeleteCommentHandler(this._handleDeleteComment);
     this._commentBlock.setAddCommentHandler(this._handleAddComment);
+
     render(commentsContainer, this._commentBlock);
     this._commentBlock.reset(this._commentsModel.comments); // сбрасывает стейт на комменты при закрытии попапа
   }

@@ -11,10 +11,9 @@ export default class MenuPresenter {
     this._container = container;
     this._filmsModel = filmsModel;
     this._filtersModel = filtersModel;
+    this._handleSiteMenuClick = handleSiteMenuClick;
 
     this._menuComponent = null;
-
-    this._handleSiteMenuClick = handleSiteMenuClick;
 
     this._handleFilterClick = this._handleFilterClick.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);

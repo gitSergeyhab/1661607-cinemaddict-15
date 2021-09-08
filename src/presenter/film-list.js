@@ -21,7 +21,6 @@ export default class FilmList extends AbstractFilmList {
     this._btnShowMoreComponent = new BtnShowMore();
     this._loadingComponent = new Loading();
 
-
     this._filmsShown = FILM_COUNT_PER_STEP;
     this._sortType = SortType.DEFAULT;
 
