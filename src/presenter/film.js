@@ -82,7 +82,7 @@ export default class Film {
       }
     }
 
-    //если изменяется //
+    // если изменяется //
     replace(this._filmCardComponent, prevFilmCardComponent);
     replace(this._filmPopupComponent, prevFilmPopupComponent);
 

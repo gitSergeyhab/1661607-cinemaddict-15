@@ -1,6 +1,6 @@
 import Abstract from '../abstract.js';
 
-import {getHoursAndMinutes, getDayMonthYear} from '../../utils/date-time-utils.js';
+import {getStringTime, getDayMonthYear} from '../../utils/date-time-utils.js';
 import {DEFAULT_POSTER, ActiveClass} from '../../constants.js';
 import {getListWithoutNull} from '../../utils/utils.js';
 import {renderAll} from '../../utils/dom-utils.js';
@@ -67,7 +67,7 @@ const createFilmPopup = ({
 
               <tr class="film-details__row">
                 <td class="film-details__term">Runtime</td>
-                <td class="film-details__cell">${getHoursAndMinutes(runtime)}</td>
+                <td class="film-details__cell">${getStringTime(runtime)}</td>
               </tr>
               <tr class="film-details__row">
                 <td class="film-details__term">Country</td>

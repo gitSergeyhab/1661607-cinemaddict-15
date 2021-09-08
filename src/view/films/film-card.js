@@ -1,4 +1,4 @@
-import {getHoursAndMinutes, getYear} from '../../utils/date-time-utils.js';
+import {getStringTime, getYear} from '../../utils/date-time-utils.js';
 import {DEFAULT_POSTER, ActiveClass} from '../../constants.js';
 import Abstract from '../abstract.js';
 
@@ -30,7 +30,7 @@ const createFilmCard = ({
 
   <p class="film-card__info">
     <span class="film-card__year">${getYear(date)}</span>
-    <span class="film-card__duration">${getHoursAndMinutes(runtime)}</span>
+    <span class="film-card__duration">${getStringTime(runtime)}</span>
     <span class="film-card__genre">${genre[0] || ''}</span>
   </p>
 

@@ -1,9 +1,6 @@
 import FilmsModel from '../model/films-model.js';
-import {isOnline, showOfflineMessage} from '../utils/offline-utils.js';
-
-
-// const getSyncedItems = (items) => items.filter(({success}) => success).map(({payload}) => payload.film);
-// ??? у меня в респонсе нет ни success, ни payload - это мой косяк или все так и задумано ???
+import {isOnline} from '../utils/offline-utils.js';
+import {showOfflineMessage} from '../utils/show-offline-message.js';
 
 
 const createStoreStructure = (items) => items.reduce((acc, current) => ( { ...acc, [current.id]: current } ), {});
@@ -73,7 +70,6 @@ export default class Provider {
     if (isOnline()) {
       const storeFilms = Object.values(this._store.getItems());
       return this._api.sync(storeFilms)
-      //??? не совсем понял, зачем нужны следующие 3 строки. Вроде все и без них работает ???
         .then((response) => {
           const updatedFilms = createStoreStructure(response.updated);
           this._store.setItems(updatedFilms);

@@ -7,7 +7,6 @@ import {UserAction, UpdateType, Mode, FilterType, EmptyResultMessage, FilmSectio
 
 
 const SELECTOR_FILM_CONTAINER = '.films-list__container';
-const CLASS_HIDE_SCROLL = 'hide-overflow';
 const SHAKE_ANIMATION_TIMEOUT = 5000;
 
 
@@ -75,7 +74,6 @@ export default class AbstractFilmList {
   _clearFilmList() {
     this._filmPresenter.forEach((presenter) => presenter.destroy()); // удаляет все FilmPresenter в Мапе
     this._filmPresenter.clear(); // очищает Мапу
-    document.body.classList.remove(CLASS_HIDE_SCROLL); // если перед очисткой был не закрыт попап
   }
 
   _renderFilmCards(films) {
@@ -121,10 +119,10 @@ export default class AbstractFilmList {
           .then(() => this._api.updateFilm(film)
             .then((response) => this._filmsModel.updateFilm(updateType, response)))
           .catch(() => {
-            const commentElement = this._findCommentElementsById(update);
-            commentElement.deleteBtn.textContent = 'Delete';
-            commentElement.deleteBtn.disabled = false;
-            AbstractFilmList.shake(commentElement.commentBlock);
+            const needComment = this._findCommentElementsById(update);
+            needComment.deleteBtn.textContent = 'Delete';
+            needComment.deleteBtn.disabled = false;
+            AbstractFilmList.shake(needComment.commentBlock);
           });
         break;
     }
@@ -132,7 +130,7 @@ export default class AbstractFilmList {
 
   _handleModelEvent(updateType) {
     switch(updateType) {
-      case UpdateType.PATCH:// favorite, watchList
+      case UpdateType.PATCH:// favorite, watchList, history
         this._clearFilmList();
         this._renderFilmList();
         break;

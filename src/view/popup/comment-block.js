@@ -88,7 +88,7 @@ export default class CommentBlock extends Smart {
     this.updateState(CommentBlock.parseCommentsToState(comment));
   }
 
-  _restoreHandlers() {
+  restoreHandlers() {
     this._setCommentListener();
     this._setEmojiListener();
 
@@ -133,7 +133,7 @@ export default class CommentBlock extends Smart {
       this._callback.addCommentSend(value, emotion.value);
       document.removeEventListener('keydown', this._keyDownCtrlEnterHandler);
       this.updateState({}); // без этого повторное добавление оффлайн не работает
-      document.querySelector('.film-details__comment-input').disabled = true;
+      this.getElement().querySelector('.film-details__comment-input').disabled = true;
     }
   }
 
@@ -153,12 +153,5 @@ export default class CommentBlock extends Smart {
 
   static parseCommentsToState(comments) {
     return {comments, addedComment: null, addedEmoji: null, hasComments: comments.length > 0};
-  }
-
-  static parseStateToComments(state) {
-    delete state.addedComment;
-    delete state.addedEmoji;
-    delete state.hasComments;
-    return state;
   }
 }

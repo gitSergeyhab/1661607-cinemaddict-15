@@ -12,7 +12,7 @@ import FiltersModel from './model/filters-model.js';
 import CommentsModel from './model/comments-model.js';
 
 import {render, remove} from './utils/dom-utils.js';
-import {notifyOffline, notifyOnline, isOnline} from './utils/offline-utils.js';
+import {notifyNetStatus} from './utils/offline-utils.js';
 import {FilmSectionName, FilterType, UpdateType} from './constants.js';
 
 import Api from './api/api.js';
@@ -29,6 +29,8 @@ const AUTHORIZATION = 'Basic |,,/_Black_Metal_|../';
 const api = new Api(URL, AUTHORIZATION);
 const store = new Store(STORE_NAME, localStorage);
 const apiWithProvider = new Provider(api, store);
+// const apiWithProvider = new Api(URL, AUTHORIZATION);
+
 
 const header = document.querySelector('header.header');
 const main = document.querySelector('main.main');
@@ -79,13 +81,13 @@ apiWithProvider.getFilms()
   .catch(() => filmsModel.setFilms(UpdateType.INIT, []));
 
 
-window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+// window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
 
-isOnline() ? notifyOnline() : notifyOffline(); //для показа статуса сети при перезагрузке страницы
+notifyNetStatus(); //для показа статуса сети при перезагрузке страницы
 
 window.addEventListener('online', () => {
-  notifyOnline();
+  notifyNetStatus();
   apiWithProvider.sync();
 });
 
-window.addEventListener('offline', () => notifyOffline());
+window.addEventListener('offline', () => notifyNetStatus());

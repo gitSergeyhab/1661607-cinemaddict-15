@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 
 import {Period} from '../constants.js';
+import {getHoursAndMinutes} from './date-time-utils.js';
 
 
 const MAX_PERIOD_IN_YEARS = 120;
@@ -29,8 +30,6 @@ const getSortingCountGenres = (films) => {
     counts: genresByCount.map((item) => item.count),
   };
 };
-
-const getHoursAndMinutes = (minutes) => minutes ? {hour: Math.floor(minutes / 60), minute: minutes % 60} : {hour: 0, minute: 0};
 
 const getTotalDuration = (films) => getHoursAndMinutes(films.reduce((acc, film) => acc + film.filmInfo.runtime, 0));
 
