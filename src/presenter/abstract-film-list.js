@@ -26,8 +26,6 @@ export default class AbstractFilmList {
     this._handleModelEvent = this._handleModelEvent.bind(this);
 
     this._commentsModel = commentsModel;
-    this._commentsModel.addObserver(this._handleModelEvent);
-
     this._filmsModel = filmsModel;
     this._filmsModel.addObserver(this._handleModelEvent);
 
@@ -104,9 +102,11 @@ export default class AbstractFilmList {
         break;
       case UserAction.ADD_COMMENT:
         this._api.addComment(update, film.id)
-          .then((response) => this._commentsModel.addComment(UpdateType.NONE, response)) // обновление фильмов отстает (число комментов в карточке не всегда успевает обновляться при добавлении/удалении коммента в попапе), поэтому при add/del комментов - вьюхи я решил не перерисовывать ...
-          .then(() => this._api.updateFilm(film)
-            .then((response) => this._filmsModel.updateFilm(updateType, response))) // ... чтобы не перерисовывать (моргать) два раза, перерисовываю все и сразу после обновленя данных и модели фильмов
+          .then((response) => {
+            this._commentsModel.addComment(response);
+            return response.movie;
+          })
+          .then((movie) => this._filmsModel.changeFilm(updateType, movie)) // ВОТ
           .catch(() => {
             const form = document.querySelector('.film-details__inner');
             form.querySelector('.film-details__comment-input').disabled = false;
@@ -115,9 +115,8 @@ export default class AbstractFilmList {
         break;
       case UserAction.DELETE_COMMENT:
         this._api.deleteComment(update)
-          .then(() => this._commentsModel.deleteComment(UpdateType.NONE, update))
-          .then(() => this._api.updateFilm(film)
-            .then((response) => this._filmsModel.updateFilm(updateType, response)))
+          .then(() => this._commentsModel.deleteComment(update))
+          .then(() => this._filmsModel.deleteId(updateType, update, film.id)) // и ВОТ )
           .catch(() => {
             const needComment = this._findCommentElementsById(update);
             needComment.deleteBtn.textContent = 'Delete';
@@ -169,3 +168,67 @@ export default class AbstractFilmList {
     setTimeout(() => element.style.animation = '', SHAKE_ANIMATION_TIMEOUT);
   }
 }
+
+
+/*
+{
+    "id": "4",
+    "comments": [
+        "18",
+        "197",
+        "198",
+        "282",
+        "440",
+        "441",
+        "477",
+        "500",
+        "503",
+        "514"
+    ],
+    "userDetails": {
+        "watchList": false,
+        "alreadyWatched": true,
+        "watchingDate": "2021-09-08T19:47:15.630Z",
+        "favorite": false
+    },
+    "filmInfo": {
+        "title": "Country Who Stole Us",
+        "poster": "images/posters/the-dance-of-life.jpg",
+        "director": "Quentin Tarantino",
+        "writers": [
+            "Robert Zemeckis",
+            "Martin Scorsese",
+            "Robert Rodrigues",
+            "Hayao Miazaki",
+            "Takeshi Kitano"
+        ],
+        "actors": [
+            "Ralph Fiennes",
+            "Leonardo DiCaprio",
+            "Cillian Murphy",
+            "Harrison Ford",
+            "Gary Oldman",
+            "Al Pacino",
+            "Tom Hanks"
+        ],
+        "release": {
+            "date": "2003-04-30T05:47:35.793Z",
+            "releaseCountry": "USA"
+        },
+        "runtime": 189,
+        "genre": [
+            "Family",
+            "Adventure",
+            "Sci-Fi",
+            "Drama",
+            "Thriller",
+            "Action"
+        ],
+        "description": "from the creators of timeless classic \"Nu, Pogodi!\" and \"Alice in Wonderland\", a film about a journey that heroes are about to make in finding themselves.",
+        "alternativeTitle": "A Little Pony Who Sold Themselves",
+        "totalRating": 5.7,
+        "ageRating": 0
+    }
+}
+
+*/

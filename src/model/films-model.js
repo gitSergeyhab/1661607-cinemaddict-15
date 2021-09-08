@@ -16,10 +16,31 @@ export default class FilmsModel extends AbstractObserver{
   }
 
   updateFilm(updateType, update) {
-    const index = this._films.findIndex((item) => item.id === update.id);
-    this._films = index === -1 ? this._films :  [ ...this._films.slice(0, index), update, ...this._films.slice(index + 1) ];
+    this._changeOneFilm(update);
     this._notify(updateType, update);
   }
+
+  changeFilm(updateType, update) {
+    this._changeOneFilm(FilmsModel.adaptToClient(update));
+    this._notify(updateType, update);
+  }
+
+  deleteId(updateType, commentId, filmId) {
+    let film = this._films.find((item) => item.id === filmId);
+    const setIds = new Set(film.comments);
+    setIds.delete(commentId);
+    const ids = [...setIds];
+    film = { ...film, comments: ids };
+    this._changeOneFilm(film);
+    this._notify(updateType);
+  }
+
+
+  _changeOneFilm(newFilm) {
+    const index = this._films.findIndex((item) => item.id === newFilm.id);
+    this._films = index === -1 ? this._films :  [ ...this._films.slice(0, index), newFilm, ...this._films.slice(index + 1) ];
+  }
+
 
   static adaptToClient(film) {
     const adaptedFilm = {
