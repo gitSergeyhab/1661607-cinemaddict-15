@@ -35,13 +35,12 @@ const main = document.querySelector('main.main');
 const footer = document.querySelector('footer.footer');
 const footerStatistic = footer.querySelector('.footer__statistics');
 
-// MODELS
 const filtersModel = new FiltersModel();
 const filmsModel = new FilmsModel();
 const commentsModel = new CommentsModel();
 
-//РЕНДЕРИНГ
-const profile = new ProfilePresenter(header, filmsModel); // инит после загрузки данных
+// Рендеринг
+const profile = new ProfilePresenter(header, filmsModel);
 
 const filmSection = new FilmSection();
 render(main, filmSection);
@@ -52,8 +51,7 @@ new ExtraFilmListPresenter(filmSection, filmsModel, commentsModel, apiWithProvid
 
 new ExtraFilmListPresenter(filmSection, filmsModel, commentsModel, apiWithProvider, FilmSectionName.MOST_COMMENTED);
 
-
-// menu to FilmBlocks toggle
+// Переключатель статистики
 let statisticsComponent = null;
 const handleSiteMenuClick = (target) => {
   if (target === FilterType.STATS) {
@@ -72,16 +70,17 @@ const handleSiteMenuClick = (target) => {
 const menuPresenter = new MenuPresenter(main, filmsModel, filtersModel, handleSiteMenuClick);
 menuPresenter.init();
 
+// Загрузка фильмов в модель
 apiWithProvider.getFilms()
   .then((films) => filmsModel.setFilms(UpdateType.INIT, films))
   .then(() => render(footerStatistic, new FooterStatistic(filmsModel.films.length)))
   .then(() => profile.init())
   .catch(() => filmsModel.setFilms(UpdateType.INIT, []));
 
-
+// Offline
 window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
 
-notifyNetStatus(); //для показа статуса сети при перезагрузке страницы
+notifyNetStatus();
 
 window.addEventListener('online', () => {
   notifyNetStatus();

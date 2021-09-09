@@ -38,7 +38,7 @@ export default class FilmList extends AbstractFilmList {
     const filteredFilms = filter[this._filtersModel.getFilter()](this._filmsModel.films);
     switch (this._sortType) {
       case SortType.DATE:
-        return filteredFilms.slice().sort(sortDate); // ??? не могу понять, как в таск менеджере все работает без .slice()  ???
+        return filteredFilms.slice().sort(sortDate);
       case SortType.RATING:
         return filteredFilms.slice().sort(sortRating);
     }

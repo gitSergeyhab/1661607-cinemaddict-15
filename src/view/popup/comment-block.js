@@ -146,7 +146,7 @@ export default class CommentBlock extends Smart {
     if (evt.ctrlKey && evt.key === 'Enter' && value && commentArea === document.activeElement && emotion) {
       this._callback.addCommentSend(value, emotion.value);
       document.removeEventListener('keydown', this._keyDownCtrlEnterHandler);
-      this.updateState({}); // без этого повторное добавление оффлайн не работает
+      this.updateState({});
       this.getElement().querySelector('.film-details__comment-input').disabled = true;
     }
   }
