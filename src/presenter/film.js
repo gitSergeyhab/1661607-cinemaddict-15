@@ -79,6 +79,7 @@ export default class Film {
     remove(this._filmPopupComponent);
   }
 
+
   _getApiComments() {
     this._api.getComments(this._film.id)
       .then((comment) => this._commentsModel.comments = comment)
@@ -145,7 +146,6 @@ export default class Film {
 
   _handleFilmCardClick() {
     setTimeout(() => this._renderPopup(), 0); // чтоб рендерился после _closePopup()
-
   }
 
   _handleWatchListClick() {

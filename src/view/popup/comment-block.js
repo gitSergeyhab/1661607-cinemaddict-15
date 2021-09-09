@@ -84,10 +84,6 @@ export default class CommentBlock extends Smart {
     this.getElement().scrollTop = scrollTop;
   }
 
-  reset(comment) {
-    this.updateState(CommentBlock.parseCommentsToState(comment));
-  }
-
   restoreHandlers() {
     this._setCommentListener();
     this._setEmojiListener();
@@ -95,6 +91,24 @@ export default class CommentBlock extends Smart {
     this.setDeleteCommentHandler(this._callback.deleteCommentClick);
     this.setAddCommentHandler(this._callback.addCommentSend);
   }
+
+
+  reset(comment) {
+    this.updateState(CommentBlock.parseCommentsToState(comment));
+  }
+
+  setDeleteCommentHandler(cb) {
+    this._callback.deleteCommentClick = cb;
+    this.getElement().querySelectorAll('.film-details__comment-delete').forEach((delBtn) => {
+      delBtn.addEventListener('click', this._deleteCommentHandler);
+    });
+  }
+
+  setAddCommentHandler(cb) {
+    this._callback.addCommentSend = cb;
+    document.addEventListener('keydown', this._keyDownCtrlEnterHandler);
+  }
+
 
   _setCommentListener() {
     this.getElement().querySelector('.film-details__comment-input').addEventListener('input', this._commentInputHandler);
@@ -105,6 +119,7 @@ export default class CommentBlock extends Smart {
     emojiInputs.forEach((input) => input.addEventListener('click', this._clickEmojiHandler));
   }
 
+
   _clickEmojiHandler(evt) {
     evt.preventDefault();
     this.updateState({addedEmoji: evt.target.id.split('-')[1]});
@@ -114,7 +129,6 @@ export default class CommentBlock extends Smart {
     evt.preventDefault();
     this.updateState({addedComment: evt.target.value}, true);
   }
-
 
   _deleteCommentHandler(evt) {
     evt.preventDefault();
@@ -135,19 +149,6 @@ export default class CommentBlock extends Smart {
       this.updateState({}); // без этого повторное добавление оффлайн не работает
       this.getElement().querySelector('.film-details__comment-input').disabled = true;
     }
-  }
-
-
-  setDeleteCommentHandler(cb) {
-    this._callback.deleteCommentClick = cb;
-    this.getElement().querySelectorAll('.film-details__comment-delete').forEach((delBtn) => {
-      delBtn.addEventListener('click', this._deleteCommentHandler);
-    });
-  }
-
-  setAddCommentHandler(cb) {
-    this._callback.addCommentSend = cb;
-    document.addEventListener('keydown', this._keyDownCtrlEnterHandler);
   }
 
 

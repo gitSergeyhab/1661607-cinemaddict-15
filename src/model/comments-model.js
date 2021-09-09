@@ -14,6 +14,7 @@ export default class CommentsModel extends AbstractObserver{
     return this._comments;
   }
 
+
   addComment(update) {
     this._comments = update.comments;
   }

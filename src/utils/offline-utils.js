@@ -15,6 +15,7 @@ export const notifyNetStatus = () => {
     logo.innerHTML = LOGO_TEXT;
     return;
   }
+
   document.title += TITLE_OFFLINE_INDICATOR;
   logo.innerHTML = `${LOGO_TEXT} <span style="color: red">${LOGO_OFFLINE_INDICATOR}</span>`;
   showOfflineMessage();

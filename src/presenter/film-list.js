@@ -33,14 +33,6 @@ export default class FilmList extends AbstractFilmList {
     render(this._container, this._loadingComponent);
   }
 
-  hideSort() {
-    this._sortComponent.getElement().style.display = 'none';
-    this._sortType = SortType.DEFAULT;
-  }
-
-  showSort() {
-    this._sortComponent.getElement().style.display = 'flex';
-  }
 
   _getFilms() {
     const filteredFilms = filter[this._filtersModel.getFilter()](this._filmsModel.films);
@@ -51,16 +43,6 @@ export default class FilmList extends AbstractFilmList {
         return filteredFilms.slice().sort(sortRating);
     }
     return filteredFilms;
-  }
-
-  _renderSort() {
-    if (this._sortComponent !== null) {
-      this._sortComponent = null;
-    }
-
-    this._sortComponent = new Sort(this._sortType);
-    this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
-    render(this._container, this._sortComponent, RenderPosition.BEFORE_BEGIN);
   }
 
   _clearFilmList(resetRenderedFilmCount = false, resetSortType = false) {
@@ -84,15 +66,41 @@ export default class FilmList extends AbstractFilmList {
     render(this._filmBlockComponent, this._noFilmComponent);
   }
 
-  _hideBtnShowMore() {
-    const allFilmsAreShown = this._filmsShown >= this._getFilms().length;
-    this._btnShowMoreComponent.getElement().style.display = allFilmsAreShown ? 'none' : 'block';
-  }
-
   _renderFilmCards(films) {
     const filmsForRender = films.slice(this._filmsShown - FILM_COUNT_PER_STEP, this._filmsShown);
     super._renderFilmCards(filmsForRender);
     this._hideBtnShowMore();
+  }
+
+  _renderFilmList() {
+    super._renderFilmList();
+    this._renderMainBlock();
+  }
+
+
+  hideSort() {
+    this._sortComponent.getElement().style.display = 'none';
+    this._sortType = SortType.DEFAULT;
+  }
+
+  showSort() {
+    this._sortComponent.getElement().style.display = 'flex';
+  }
+
+
+  _renderSort() {
+    if (this._sortComponent !== null) {
+      this._sortComponent = null;
+    }
+
+    this._sortComponent = new Sort(this._sortType);
+    this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
+    render(this._container, this._sortComponent, RenderPosition.BEFORE_BEGIN);
+  }
+
+  _hideBtnShowMore() {
+    const allFilmsAreShown = this._filmsShown >= this._getFilms().length;
+    this._btnShowMoreComponent.getElement().style.display = allFilmsAreShown ? 'none' : 'block';
   }
 
   _renderMainBlock() {
@@ -109,10 +117,6 @@ export default class FilmList extends AbstractFilmList {
     this._btnShowMoreComponent.setClickHandler(this._handleLoadMoreButtonClick);
   }
 
-  _renderFilmList() {
-    super._renderFilmList();
-    this._renderMainBlock();
-  }
 
   _handleSortTypeChange(sortType){
     if (this._sortType === sortType) {

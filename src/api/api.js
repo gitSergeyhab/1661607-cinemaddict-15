@@ -64,6 +64,7 @@ export default class Api {
       .then(Api.toJSON);
   }
 
+
   _load({url, method = Method.GET, body = null, headers = new Headers()}) {
     headers.append('Authorization', this._authorization);
 
@@ -71,6 +72,7 @@ export default class Api {
       .then(Api.checkStatus)
       .catch(Api.catchError);
   }
+
 
   static checkStatus(response) {
     if (response.ok) {

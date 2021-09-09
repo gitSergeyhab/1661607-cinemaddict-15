@@ -24,6 +24,7 @@ export default class ExtraFilmList extends AbstractFilmList {
     }
   }
 
+
   _renderFilmList() {
     super._renderFilmList();
     this._renderFilmCards(this._getFilms());

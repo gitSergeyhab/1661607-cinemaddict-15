@@ -37,9 +37,9 @@ export default class AbstractFilmList {
     this._renderFilmList();
   }
 
+
   _renderPopup() {
     const needFilm = this._getAllFilms().find((film) => film.id === this._openedFilmId[0]);
-
     if (needFilm) {
       this._renderFilmCard(needFilm, Mode.POPUP);
     }
@@ -94,6 +94,24 @@ export default class AbstractFilmList {
     throw new Error(`there is not comment with id: ${id}`);
   }
 
+  _changeDisplayStyle() {
+    switch (this._name) {
+      case FilmSectionName.MOST_COMMENTED:
+        this._filmBlockComponent.getElement().style.display = this._getFilms()[0].comments.length ? 'block' : 'none';
+        break;
+      case FilmSectionName.TOP_RATED:
+        this._filmBlockComponent.getElement().style.display = this._getFilms()[0].filmInfo.totalRating ? 'block' : 'none';
+    }
+  }
+
+  _renderFilmList() {
+    this._getFilms().length ? this._changeDisplayStyle() : this._renderNoFilms();
+    if (this._openedFilmId[0] !== null) {
+      this._renderPopup();
+    }
+  }
+
+
   _handleViewAction(actionType, updateType, update, film) {
     switch(actionType) {
       case UserAction.UPDATE_FILM:
@@ -106,7 +124,7 @@ export default class AbstractFilmList {
             this._commentsModel.addComment(response);
             return response.movie;
           })
-          .then((movie) => this._filmsModel.changeFilm(updateType, movie)) // ВОТ
+          .then((movie) => this._filmsModel.changeFilm(updateType, movie)) // ВОТ (оказалось, в респонсе еще и измененный movie есть)
           .catch(() => {
             const form = document.querySelector('.film-details__inner');
             form.querySelector('.film-details__comment-input').disabled = false;
@@ -145,23 +163,6 @@ export default class AbstractFilmList {
     }
   }
 
-  _changeDisplayStyle() {
-    switch (this._name) {
-      case FilmSectionName.MOST_COMMENTED:
-        this._filmBlockComponent.getElement().style.display = this._getFilms()[0].comments.length ? 'block' : 'none';
-        break;
-      case FilmSectionName.TOP_RATED:
-        this._filmBlockComponent.getElement().style.display = this._getFilms()[0].filmInfo.totalRating ? 'block' : 'none';
-    }
-  }
-
-  _renderFilmList() {
-    this._getFilms().length ? this._changeDisplayStyle() : this._renderNoFilms();
-
-    if (this._openedFilmId[0] !== null) {
-      this._renderPopup();
-    }
-  }
 
   static shake(element) {
     element.style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
