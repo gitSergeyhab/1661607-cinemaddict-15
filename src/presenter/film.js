@@ -26,12 +26,11 @@ export default class Film {
     this._filmPopupComponent = null;
     this._commentBlock = null;
 
-    // привязать обработчики
     this._handleFilmCardClick = this._handleFilmCardClick.bind(this);
     this._handleEscKeyDown = this._handleEscKeyDown.bind(this);
     this._handleClosePopupClick = this._handleClosePopupClick.bind(this);
 
-    this._handleAnyFilmCardClick = this._handleAnyFilmCardClick.bind(this); // закрывает попап при тыке на любую карточку
+    this._handleAnyFilmCardClick = this._handleAnyFilmCardClick.bind(this);
 
     this._handleWatchListClick = this._handleWatchListClick.bind(this);
     this._handleHistoryClick = this._handleHistoryClick.bind(this);
@@ -44,25 +43,23 @@ export default class Film {
 
   init(film, modeRender = Mode.DEFAULT) {
     this._film = film;
-    this._modeRender = modeRender;// Mode.DEFAULT - рендерит карточки // Mode.POPUP - незакрытый попап
+    this._modeRender = modeRender;
 
     this._filmCardComponent = new FilmCard(film);
     this._filmPopupComponent = new FilmPopup(film);
 
-    // навесить обработчики
-    this._filmCardComponent.setOpenPopupClickHandler(this._handleFilmCardClick); // обработчик открытия попапа на карточку
+    this._filmCardComponent.setOpenPopupClickHandler(this._handleFilmCardClick);
     this._filmCardComponent.setWatchListClickHandler(this._handleWatchListClick);
     this._filmCardComponent.setHistoryClickHandler(this._handleHistoryClick);
     this._filmCardComponent.setFavoriteClickHandler(this._handleFavoriteClick);
 
-    this._filmPopupComponent.setClosePopupClickHandler(this._handleClosePopupClick); // обработчик закрытия попапа на попап(кнопку)
+    this._filmPopupComponent.setClosePopupClickHandler(this._handleClosePopupClick);
     this._filmPopupComponent.setWatchListClickHandler(this._handleWatchListClick);
     this._filmPopupComponent.setHistoryClickHandler(this._handleHistoryClick);
     this._filmPopupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
 
-    //если создается
     switch (this._modeRender) {
-      case Mode.ALL: // рендерит и карточку и незакрытый попап // вообще все это чтобы попап при очистке листа перерисовывался. Наверное, можно как-то проще, но пришло в голову только это
+      case Mode.ALL: // рендерит и карточку и незакрытый попап
         render(this._filmsContainer, this._filmCardComponent);
         this._renderPopup();
         return;
@@ -87,7 +84,7 @@ export default class Film {
   }
 
   _closePopup() {
-    remove(this._commentBlock);// без этого удаления this._commentBlock дублируется при каждом переоткрытии попапа
+    remove(this._commentBlock);
 
     if (this._mode !== Mode.DEFAULT) {
       this._openedFilmId[0] = null;
@@ -109,11 +106,11 @@ export default class Film {
     this._commentBlock.setAddCommentHandler(this._handleAddComment);
 
     render(commentsContainer, this._commentBlock);
-    this._commentBlock.reset(this._commentsModel.comments); // сбрасывает стейт на комменты при закрытии попапа
+    this._commentBlock.reset(this._commentsModel.comments);
   }
 
   _renderPopup() {
-    this._openedFilmId[0] = this._film.id; // чтоб можно было перерендерить незакрытый попап после очистки филмлиста
+    this._openedFilmId[0] = this._film.id;
     this._getApiComments();
 
     document.addEventListener('keydown', this._handleEscKeyDown);

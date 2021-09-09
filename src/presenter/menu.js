@@ -39,7 +39,7 @@ export default class MenuPresenter {
   }
 
 
-  _handleFilterClick(filterName) { // он же _handleViewAction
+  _handleFilterClick(filterName) {
     this._filtersModel.setFilter(UpdateType.MINOR, filterName);
   }
 

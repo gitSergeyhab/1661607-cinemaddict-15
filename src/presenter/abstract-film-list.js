@@ -16,9 +16,9 @@ export default class AbstractFilmList {
     this._api = api;
 
     this._noFilmComponent = null;
-    this._filmBlockComponent = null; // задается в дочерних филмлистах
-    this._sortComponent = null;// задается (или нет) в дочерних филмлистах
-    this._loadingComponent = null;// задается (или нет) в дочерних филмлистах
+    this._filmBlockComponent = null;
+    this._sortComponent = null;
+    this._loadingComponent = null;
 
     this._filmPresenter = new Map();
 
@@ -49,7 +49,7 @@ export default class AbstractFilmList {
     return this._filmsModel.films;
   }
 
-  _getAllFilms() { // нужен для перерендеринга незакрытого Popup в Extra Blocks
+  _getAllFilms() {
     return this._filmsModel.films;
   }
 
@@ -58,7 +58,7 @@ export default class AbstractFilmList {
     const filmCardPresenter = new FilmPresenter(filmCardContainer, this._handleViewAction, this._commentsModel, this._api, this._openedFilmId);
     const alreadyIn = this._filmPresenter.get(film.id);
 
-    if (alreadyIn) { // если фильм уже в мапе презентеров - удалить и отрендерить уже вместе с попапом
+    if (alreadyIn) {
       alreadyIn.destroy();
       this._filmPresenter.delete(film.id);
       filmCardPresenter.init(film, Mode.ALL);
@@ -66,12 +66,12 @@ export default class AbstractFilmList {
       filmCardPresenter.init(film, modeRender);
     }
 
-    this._filmPresenter.set(film.id, filmCardPresenter); // (пере)записать FilmPresenter в Мапу
+    this._filmPresenter.set(film.id, filmCardPresenter);
   }
 
   _clearFilmList() {
-    this._filmPresenter.forEach((presenter) => presenter.destroy()); // удаляет все FilmPresenter в Мапе
-    this._filmPresenter.clear(); // очищает Мапу
+    this._filmPresenter.forEach((presenter) => presenter.destroy());
+    this._filmPresenter.clear();
   }
 
   _renderFilmCards(films) {
@@ -124,7 +124,7 @@ export default class AbstractFilmList {
             this._commentsModel.addComment(response);
             return response.movie;
           })
-          .then((movie) => this._filmsModel.changeFilm(updateType, movie)) // ВОТ (оказалось, в респонсе еще и измененный movie есть)
+          .then((movie) => this._filmsModel.changeFilm(updateType, movie))
           .catch(() => {
             const form = document.querySelector('.film-details__inner');
             form.querySelector('.film-details__comment-input').disabled = false;
@@ -134,7 +134,7 @@ export default class AbstractFilmList {
       case UserAction.DELETE_COMMENT:
         this._api.deleteComment(update)
           .then(() => this._commentsModel.deleteComment(update))
-          .then(() => this._filmsModel.deleteId(updateType, update, film.id)) // и ВОТ )
+          .then(() => this._filmsModel.deleteId(updateType, update, film.id))
           .catch(() => {
             const needComment = this._findCommentElementsById(update);
             needComment.deleteBtn.textContent = 'Delete';
@@ -147,11 +147,11 @@ export default class AbstractFilmList {
 
   _handleModelEvent(updateType) {
     switch(updateType) {
-      case UpdateType.PATCH:// favorite, watchList, history
+      case UpdateType.PATCH:
         this._clearFilmList();
         this._renderFilmList();
         break;
-      case UpdateType.MINOR:// filter-menu
+      case UpdateType.MINOR:
         this._clearFilmList(true, true);
         this._renderFilmList();
         break;
