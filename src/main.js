@@ -51,7 +51,7 @@ new ExtraFilmListPresenter(filmSection, filmsModel, commentsModel, apiWithProvid
 
 new ExtraFilmListPresenter(filmSection, filmsModel, commentsModel, apiWithProvider, FilmSectionName.MOST_COMMENTED);
 
-// Переключатель скатистики
+// Переключатель статистики
 let statisticsComponent = null;
 const handleSiteMenuClick = (target) => {
   if (target === FilterType.STATS) {
