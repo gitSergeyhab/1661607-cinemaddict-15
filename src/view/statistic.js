@@ -140,10 +140,15 @@ export default class Statistic extends Smart {
     this._radioValue = Period.ALL;
   }
 
-  _restoreHandlers() {
+  getTemplate() {
+    return createStatistic(this._state);
+  }
+
+  restoreHandlers() {
     this._changePeriod();
     this._setChart();
   }
+
 
   _getRadioPeriod() {
     return this.getElement().querySelector('.statistic__filters');
@@ -161,10 +166,6 @@ export default class Statistic extends Smart {
     this._getRadioPeriod().querySelectorAll('input').forEach((input) => {
       input.checked = input.value === this._radioValue;
     });
-  }
-
-  getTemplate() {
-    return createStatistic(this._state);
   }
 
   _setChart() {

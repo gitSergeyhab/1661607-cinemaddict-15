@@ -1,7 +1,5 @@
 import Smart from '../smart.js';
-
 import he from 'he';
-
 import {humanizeDate} from '../../utils/date-time-utils.js';
 
 
@@ -86,11 +84,7 @@ export default class CommentBlock extends Smart {
     this.getElement().scrollTop = scrollTop;
   }
 
-  reset(comment) {
-    this.updateState(CommentBlock.parseCommentsToState(comment));
-  }
-
-  _restoreHandlers() {
+  restoreHandlers() {
     this._setCommentListener();
     this._setEmojiListener();
 
@@ -98,45 +92,10 @@ export default class CommentBlock extends Smart {
     this.setAddCommentHandler(this._callback.addCommentSend);
   }
 
-  _setCommentListener() {
-    this.getElement().querySelector('.film-details__comment-input').addEventListener('input', this._commentInputHandler);
+
+  reset(comment) {
+    this.updateState(CommentBlock.parseCommentsToState(comment));
   }
-
-  _setEmojiListener(){
-    const emojiInputs = this.getElement().querySelectorAll('.film-details__emoji-item');
-    emojiInputs.forEach((input) => input.addEventListener('click', this._clickEmojiHandler));
-  }
-
-  _clickEmojiHandler(evt) {
-    evt.preventDefault();
-    this.updateState({addedEmoji: evt.target.id.split('-')[1]});
-  }
-
-  _commentInputHandler(evt) {
-    evt.preventDefault();
-    this.updateState({addedComment: evt.target.value}, true);
-  }
-
-
-  _deleteCommentHandler(evt) {
-    evt.preventDefault();
-    evt.target.disabled = true;
-    const id = evt.target.dataset.id;
-    this._callback.deleteCommentClick(id);
-  }
-
-  _keyDownCtrlEnterHandler(evt) {
-    const commentArea = this.getElement().querySelector('.film-details__comment-input');
-    const emotion = this.getElement().querySelector('#selected-emoji');
-    const value = commentArea.value.trim();
-
-    if (evt.ctrlKey && evt.key === 'Enter' && value && commentArea === document.activeElement && emotion) {
-      this._callback.addCommentSend(value, emotion.value);
-      document.removeEventListener('keydown', this._keyDownCtrlEnterHandler);
-      this.updateState({}); // без этого повторное добавление оффлайн не работает
-    }
-  }
-
 
   setDeleteCommentHandler(cb) {
     this._callback.deleteCommentClick = cb;
@@ -151,14 +110,49 @@ export default class CommentBlock extends Smart {
   }
 
 
-  static parseCommentsToState(comments) {
-    return {comments, addedComment: null, addedEmoji: null, hasComments: comments.length > 0};
+  _setCommentListener() {
+    this.getElement().querySelector('.film-details__comment-input').addEventListener('input', this._commentInputHandler);
   }
 
-  static parseStateToComments(state) {
-    delete state.addedComment;
-    delete state.addedEmoji;
-    delete state.hasComments;
-    return state;
+  _setEmojiListener(){
+    const emojiInputs = this.getElement().querySelectorAll('.film-details__emoji-item');
+    emojiInputs.forEach((input) => input.addEventListener('click', this._clickEmojiHandler));
+  }
+
+
+  _clickEmojiHandler(evt) {
+    evt.preventDefault();
+    this.updateState({addedEmoji: evt.target.id.split('-')[1]});
+  }
+
+  _commentInputHandler(evt) {
+    evt.preventDefault();
+    this.updateState({addedComment: evt.target.value}, true);
+  }
+
+  _deleteCommentHandler(evt) {
+    evt.preventDefault();
+    evt.target.disabled = true;
+    evt.target.textContent = 'Deleting...';
+    const id = evt.target.dataset.id;
+    this._callback.deleteCommentClick(id);
+  }
+
+  _keyDownCtrlEnterHandler(evt) {
+    const commentArea = this.getElement().querySelector('.film-details__comment-input');
+    const emotion = this.getElement().querySelector('#selected-emoji');
+    const value = commentArea.value.trim();
+
+    if (evt.ctrlKey && evt.key === 'Enter' && value && commentArea === document.activeElement && emotion) {
+      this._callback.addCommentSend(value, emotion.value);
+      document.removeEventListener('keydown', this._keyDownCtrlEnterHandler);
+      this.updateState({}); // без этого повторное добавление оффлайн не работает
+      this.getElement().querySelector('.film-details__comment-input').disabled = true;
+    }
+  }
+
+
+  static parseCommentsToState(comments) {
+    return {comments, addedComment: null, addedEmoji: null, hasComments: comments.length > 0};
   }
 }

@@ -7,8 +7,6 @@ export default class Loading extends Abstract {
   }
 
   getTemplate() {
-    return this._isLoading ? '' : `<section class="films-list">
-    <h2 class="films-list__title">Loading...</h2>
-  </section>`;
+    return this._isLoading ? '' : '<section class="films-list"> <h2 class="films-list__title">Loading...</h2></section>';
   }
 }

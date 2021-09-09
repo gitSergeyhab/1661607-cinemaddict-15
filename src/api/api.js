@@ -1,4 +1,5 @@
-import FilmsModel from './model/films-model';
+import FilmsModel from '../model/films-model';
+
 
 const Method = {
   GET: 'GET',
@@ -53,6 +54,17 @@ export default class Api {
     });
   }
 
+  sync(film) {
+    return this._load({
+      url: 'movies/sync',
+      method: Method.POST,
+      body: JSON.stringify(film),
+      headers: new Headers({'Content-Type': 'application/json'}),
+    })
+      .then(Api.toJSON);
+  }
+
+
   _load({url, method = Method.GET, body = null, headers = new Headers()}) {
     headers.append('Authorization', this._authorization);
 
@@ -60,6 +72,7 @@ export default class Api {
       .then(Api.checkStatus)
       .catch(Api.catchError);
   }
+
 
   static checkStatus(response) {
     if (response.ok) {

@@ -23,18 +23,20 @@ export default class Sort extends Abstract {
     return createSort(this._sortType);
   }
 
-  _sortTypeChangeHandler(evt) {
-    evt.preventDefault();
-    const sortType = evt.target.dataset.sortType;
-    if (!sortType) {
-      return;
-    }
-    this._callback.clickSort(sortType);
-  }
 
   setSortTypeChangeHandler(cb) {
     this._callback.clickSort = cb;
     this.getElement().addEventListener('click', this._sortTypeChangeHandler);
   }
 
+
+  _sortTypeChangeHandler(evt) {
+    evt.preventDefault();
+    const sortType = evt.target.dataset.sortType;
+    if (!sortType) {
+      return;
+    }
+
+    this._callback.clickSort(sortType);
+  }
 }

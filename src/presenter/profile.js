@@ -9,11 +9,11 @@ import {FilterType, UpdateType} from '../constants.js';
 export default class ProfilePresenter {
   constructor (container, filmsModel) {
     this._container = container;
+    this._filmsModel = filmsModel;
+
     this._profileComponent = null;
 
     this._handleModelEvent = this._handleModelEvent.bind(this);
-
-    this._filmsModel = filmsModel;
     this._filmsModel.addObserver(this._handleModelEvent);
   }
 
@@ -28,7 +28,7 @@ export default class ProfilePresenter {
   }
 
   _handleModelEvent(updateType) {
-    if (updateType === UpdateType.MAJOR) {
+    if (updateType === UpdateType.PATCH) {
       this.init();
     }
   }

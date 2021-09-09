@@ -1,41 +1,50 @@
 import dayjs from 'dayjs';
-import {getRandomInt} from './utils.js';
+
 
 const MINUTE = 60000;
+const MINUTES_IN_HOUR = 60;
+const HOURS_IN_DAY = 24;
+const DAYS_IN_WEEK = 7;
+const WEEKS_IN_MONTH = 4.35;
+const MONTHS_IN_YEAR = 12;
+const PERIOD_DELIMITER = 2;
 
-const getHoursAndMinutes = (minutes) => minutes ? `${Math.floor(minutes/60)}h ${minutes % 60}m` : '';
+
+const getHoursAndMinutes = (minutes) => minutes ? {hour: Math.floor(minutes / MINUTES_IN_HOUR), minute: minutes % MINUTES_IN_HOUR} : {hour: 0, minute: 0};
+
+const getStringTime = (minutes) => {
+  const time = getHoursAndMinutes(minutes);
+  return `${time.hour}h ${time.minute}m`;
+};
 
 const getYear = (dateStamp) => dateStamp ? dayjs(dateStamp).format('YYYY') : '';
 
 const getDayMonthYear = (dateStamp) => dateStamp ? dayjs(dateStamp).format('DD MMMM YYYY') : '';
 
-const getRandomDateStamp = () => dayjs((getRandomInt(-(new Date()), new Date()))).format('YYYY-MM-DD');
-const getRandomDateStampComment = () => dayjs((getRandomInt(new Date() - 20000000000, new Date()))).format('YYYY-MM-DD');
-
 const humanizeDate = (date) => {
   const diff = dayjs().diff(dayjs(date));
-  if (diff < MINUTE * 2) {
+  if (diff < MINUTE * PERIOD_DELIMITER) {
     return 'now';
   }
-  if (diff < MINUTE * 2 * 60) {
+  if (diff < PERIOD_DELIMITER * MINUTE * MINUTES_IN_HOUR) {
     return `${Math.floor(diff / MINUTE)} minutes ago`;
   }
-  if (diff < MINUTE * 60 * 24) {
-    return `${Math.floor(diff / MINUTE / 60)} hours ago`;
+  if (diff < HOURS_IN_DAY * MINUTE * MINUTES_IN_HOUR) {
+    return `${Math.floor(diff / MINUTE / MINUTES_IN_HOUR)} hours ago`;
   }
-  if (diff < MINUTE * 2 * 60 * 24) {
+  if (diff < MINUTE * PERIOD_DELIMITER * MINUTES_IN_HOUR * HOURS_IN_DAY) {
     return 'yesterday';
   }
-  if (diff < MINUTE * 2 * 60 * 24 * 7) {
-    return `${Math.floor(diff / MINUTE / 60 / 24)} days ago`;
+  if (diff < PERIOD_DELIMITER * MINUTE * MINUTES_IN_HOUR * HOURS_IN_DAY * DAYS_IN_WEEK) {
+    return `${Math.floor(diff / MINUTE / MINUTES_IN_HOUR / HOURS_IN_DAY)} days ago`;
   }
-  if (diff < MINUTE * 2 * 60 * 24 * 7 * 4) {
-    return `${Math.floor(diff / MINUTE / 60 / 24 / 7)} weeks ago`;
+  if (diff < PERIOD_DELIMITER * MINUTE * MINUTES_IN_HOUR * HOURS_IN_DAY * DAYS_IN_WEEK * WEEKS_IN_MONTH) {
+    return `${Math.floor(diff / MINUTE / MINUTES_IN_HOUR / HOURS_IN_DAY / DAYS_IN_WEEK)} weeks ago`;
   }
-  if (diff <  MINUTE * 2 * 60 * 24 * 7 * 4.35 * 12) {
-    return `${Math.round(diff / MINUTE / 60 / 24 / 7 / 4.35)} months ago`;
+  if (diff < PERIOD_DELIMITER * MINUTE * MINUTES_IN_HOUR * HOURS_IN_DAY * DAYS_IN_WEEK * WEEKS_IN_MONTH * MONTHS_IN_YEAR) {
+    return `${Math.round(diff / MINUTE / MINUTES_IN_HOUR / HOURS_IN_DAY / DAYS_IN_WEEK / WEEKS_IN_MONTH)} months ago`;
   }
-  return `${Math.round(diff / MINUTE / 60 / 24 / 7 / 4.35 / 12)} years ago`;
+  return `${Math.round(diff / MINUTE / MINUTES_IN_HOUR / HOURS_IN_DAY / DAYS_IN_WEEK / WEEKS_IN_MONTH / MONTHS_IN_YEAR)} years ago`;
 };
 
 
@@ -43,7 +52,6 @@ export {
   getHoursAndMinutes,
   getYear,
   getDayMonthYear,
-  getRandomDateStamp,
-  getRandomDateStampComment,
-  humanizeDate
+  humanizeDate,
+  getStringTime
 };

@@ -38,6 +38,18 @@ export default class Menu extends Abstract{
     return createMenu(this._watchListLength, this._historyLength, this._favoritesLength, this._filter);
   }
 
+
+  setClickFilterHandler(cb) {
+    this._callback.clickFilter = cb;
+    this.getElement().querySelector('.main-navigation__items').addEventListener('click', this._clickFilterHandler);
+  }
+
+  setClickNavigationHandler(cb) {
+    this._callback.clickNavigation = cb;
+    this.getElement().addEventListener('click', this._clickNavigationHandler);
+  }
+
+
   _markOnlyStats() {
     const filters = this.getElement().querySelectorAll('.main-navigation__item');
     this._statsElement.addEventListener('click', () => {
@@ -45,6 +57,7 @@ export default class Menu extends Abstract{
       this._statsElement.classList.add(ACTIVE_FILTER_BTN_CLASS);
     });
   }
+
 
   _clickFilterHandler(evt) {
     evt.preventDefault();
@@ -61,16 +74,6 @@ export default class Menu extends Abstract{
     if (filter) {
       this._callback.clickNavigation(filter);
     }
-  }
-
-  setClickFilterHandler(cb) {
-    this._callback.clickFilter = cb;
-    this.getElement().querySelector('.main-navigation__items').addEventListener('click', this._clickFilterHandler);
-  }
-
-  setClickNavigationHandler(cb) {
-    this._callback.clickNavigation = cb;
-    this.getElement().addEventListener('click', this._clickNavigationHandler);
   }
 }
 

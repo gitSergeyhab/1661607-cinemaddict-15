@@ -3,8 +3,8 @@ import {getNotImplementedError} from '../utils/utils.js';
 
 
 export default class Smart extends Abstract {
-  _restoreHandlers() {
-    getNotImplementedError('_restoreHandlers');
+  restoreHandlers() {
+    getNotImplementedError('restoreHandlers');
   }
 
   updateElement() {
@@ -16,7 +16,7 @@ export default class Smart extends Abstract {
 
     parent.replaceChild(newElement, oldElement);
 
-    this._restoreHandlers();
+    this.restoreHandlers();
   }
 
   updateState(update, justStateUpdating) {

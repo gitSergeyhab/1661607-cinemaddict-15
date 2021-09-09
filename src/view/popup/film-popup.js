@@ -1,16 +1,13 @@
 import Abstract from '../abstract.js';
 
-
-import {getHoursAndMinutes, getDayMonthYear} from '../../utils/date-time-utils.js';
+import {getStringTime, getDayMonthYear} from '../../utils/date-time-utils.js';
 import {DEFAULT_POSTER, ActiveClass} from '../../constants.js';
 import {getListWithoutNull} from '../../utils/utils.js';
 import {renderAll} from '../../utils/dom-utils.js';
 
 
 const makeButtonActive = (value) => value ? ActiveClass.POPUP : '';
-
 const getGenre = (genre) => `<span class="film-details__genre">${genre}</span>`;
-
 
 const createFilmPopup = ({
   id,
@@ -70,7 +67,7 @@ const createFilmPopup = ({
 
               <tr class="film-details__row">
                 <td class="film-details__term">Runtime</td>
-                <td class="film-details__cell">${getHoursAndMinutes(runtime)}</td>
+                <td class="film-details__cell">${getStringTime(runtime)}</td>
               </tr>
               <tr class="film-details__row">
                 <td class="film-details__term">Country</td>
@@ -112,31 +109,10 @@ export default class FilmPopup extends Abstract {
     this._watchListClickHandler = this._watchListClickHandler.bind(this);
     this._historyClickHandler = this._historyClickHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
-
   }
 
   getTemplate() {
     return createFilmPopup(this._film, this._comments);
-  }
-
-  _closePopupClickHandler(evt) {
-    evt.preventDefault();
-    this._callback.closePopupClick();
-  }
-
-  _watchListClickHandler(evt) {
-    evt.preventDefault();
-    this._callback.watchListClick();
-  }
-
-  _historyClickHandler(evt) {
-    evt.preventDefault();
-    this._callback.historyClick();
-  }
-
-  _favoriteClickHandler(evt) {
-    evt.preventDefault();
-    this._callback.favoriteClick();
   }
 
 
@@ -158,5 +134,26 @@ export default class FilmPopup extends Abstract {
   setFavoriteClickHandler(cb) {
     this._callback.favoriteClick = cb;
     this.getElement().querySelector('.film-details__control-button--favorite').addEventListener('click', this._favoriteClickHandler);
+  }
+
+
+  _closePopupClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.closePopupClick();
+  }
+
+  _watchListClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.watchListClick();
+  }
+
+  _historyClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.historyClick();
+  }
+
+  _favoriteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.favoriteClick();
   }
 }

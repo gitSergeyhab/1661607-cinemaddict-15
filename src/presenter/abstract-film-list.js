@@ -7,7 +7,6 @@ import {UserAction, UpdateType, Mode, FilterType, EmptyResultMessage, FilmSectio
 
 
 const SELECTOR_FILM_CONTAINER = '.films-list__container';
-const CLASS_HIDE_SCROLL = 'hide-overflow';
 const SHAKE_ANIMATION_TIMEOUT = 5000;
 
 
@@ -27,8 +26,6 @@ export default class AbstractFilmList {
     this._handleModelEvent = this._handleModelEvent.bind(this);
 
     this._commentsModel = commentsModel;
-    this._commentsModel.addObserver(this._handleModelEvent);
-
     this._filmsModel = filmsModel;
     this._filmsModel.addObserver(this._handleModelEvent);
 
@@ -40,9 +37,9 @@ export default class AbstractFilmList {
     this._renderFilmList();
   }
 
+
   _renderPopup() {
     const needFilm = this._getAllFilms().find((film) => film.id === this._openedFilmId[0]);
-
     if (needFilm) {
       this._renderFilmCard(needFilm, Mode.POPUP);
     }
@@ -75,7 +72,6 @@ export default class AbstractFilmList {
   _clearFilmList() {
     this._filmPresenter.forEach((presenter) => presenter.destroy()); // удаляет все FilmPresenter в Мапе
     this._filmPresenter.clear(); // очищает Мапу
-    document.body.classList.remove(CLASS_HIDE_SCROLL); // если перед очисткой был не закрыт попап
   }
 
   _renderFilmCards(films) {
@@ -98,56 +94,6 @@ export default class AbstractFilmList {
     throw new Error(`there is not comment with id: ${id}`);
   }
 
-  _handleViewAction(actionType, updateType, update, film) {
-    switch(actionType) {
-      case UserAction.UPDATE_FILM:
-        this._api.updateFilm(update)
-          .then((response) => this._filmsModel.updateFilm(updateType, response));
-        break;
-      case UserAction.ADD_COMMENT:
-        this._api.addComment(update, film.id)
-          .then((response) => this._commentsModel.addComment(updateType, response))
-          .catch(() => AbstractFilmList.shake(document.querySelector('.film-details__inner')));
-        this._api.updateFilm(film)
-          .then((response) => this._filmsModel.updateFilm(updateType, response));
-        break;
-      case UserAction.DELETE_COMMENT:
-        this._api.deleteComment(update)
-          .then(() => this._commentsModel.deleteComment(updateType, update))
-          .catch(() => {
-            const commentElement = this._findCommentElementsById(update);
-            commentElement.deleteBtn.disabled = false;
-            AbstractFilmList.shake(commentElement.commentBlock);
-          });
-        this._api.updateFilm(film)
-          .then((response) => this._filmsModel.updateFilm(updateType, response));
-        break;
-    }
-  }
-
-  _handleModelEvent(updateType) {
-    switch(updateType) {
-      case UpdateType.PATCH:// favorite, watchList
-        this._clearFilmList();
-        this._renderFilmList();
-        break;
-      case UpdateType.MINOR:// filter-menu
-        this._clearFilmList(true, true);
-        this._renderFilmList();
-        break;
-      case UpdateType.MAJOR: //history
-        this._clearFilmList();
-        this._renderFilmList();
-        break;
-      case UpdateType.INIT:
-        if (this._loadingComponent) {
-          remove(this._loadingComponent);
-        }
-        this.init();
-        break;
-    }
-  }
-
   _changeDisplayStyle() {
     switch (this._name) {
       case FilmSectionName.MOST_COMMENTED:
@@ -160,11 +106,63 @@ export default class AbstractFilmList {
 
   _renderFilmList() {
     this._getFilms().length ? this._changeDisplayStyle() : this._renderNoFilms();
-
     if (this._openedFilmId[0] !== null) {
       this._renderPopup();
     }
   }
+
+
+  _handleViewAction(actionType, updateType, update, film) {
+    switch(actionType) {
+      case UserAction.UPDATE_FILM:
+        this._api.updateFilm(update)
+          .then((response) => this._filmsModel.updateFilm(updateType, response));
+        break;
+      case UserAction.ADD_COMMENT:
+        this._api.addComment(update, film.id)
+          .then((response) => {
+            this._commentsModel.addComment(response);
+            return response.movie;
+          })
+          .then((movie) => this._filmsModel.changeFilm(updateType, movie)) // ВОТ (оказалось, в респонсе еще и измененный movie есть)
+          .catch(() => {
+            const form = document.querySelector('.film-details__inner');
+            form.querySelector('.film-details__comment-input').disabled = false;
+            AbstractFilmList.shake(form);
+          });
+        break;
+      case UserAction.DELETE_COMMENT:
+        this._api.deleteComment(update)
+          .then(() => this._commentsModel.deleteComment(update))
+          .then(() => this._filmsModel.deleteId(updateType, update, film.id)) // и ВОТ )
+          .catch(() => {
+            const needComment = this._findCommentElementsById(update);
+            needComment.deleteBtn.textContent = 'Delete';
+            needComment.deleteBtn.disabled = false;
+            AbstractFilmList.shake(needComment.commentBlock);
+          });
+        break;
+    }
+  }
+
+  _handleModelEvent(updateType) {
+    switch(updateType) {
+      case UpdateType.PATCH:// favorite, watchList, history
+        this._clearFilmList();
+        this._renderFilmList();
+        break;
+      case UpdateType.MINOR:// filter-menu
+        this._clearFilmList(true, true);
+        this._renderFilmList();
+        break;
+      case UpdateType.INIT:
+        if (this._loadingComponent) {
+          remove(this._loadingComponent);
+        }
+        this.init();
+    }
+  }
+
 
   static shake(element) {
     element.style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;

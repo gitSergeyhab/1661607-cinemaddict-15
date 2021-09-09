@@ -1,8 +1,6 @@
 import Abstract from '../abstract.js';
 
 
-const createNoFilm = (message) => `<h2 class="films-list__title">${message}</h2>`;
-
 export default class NoFilms extends Abstract{
   constructor(filter) {
     super();
@@ -10,6 +8,6 @@ export default class NoFilms extends Abstract{
   }
 
   getTemplate() {
-    return createNoFilm(this._filter);
+    return `<h2 class="films-list__title">${this._filter}</h2>`;
   }
 }

@@ -4,7 +4,6 @@ import Abstract from '../view/abstract.js';
 
 const renderAll = (data = [], templateFunction = () => '') => data.map((item) => templateFunction(item || '')).join('\n').trim();
 
-
 const render = (container, element, place = RenderPosition.BEFORE_END) => {
   container = (container instanceof Abstract) ? container.getElement() : container;
   element = (element instanceof Abstract) ? element.getElement() : element;
