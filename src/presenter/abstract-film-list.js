@@ -1,14 +1,14 @@
 
 import NoFilms from '../view/films/no-films.js';
 import FilmPresenter from './film.js';
+import FilmsModel from '../model/films-model.js';
+import Abstract from '../view/abstract.js';
 
 import {render, remove} from '../utils/dom-utils.js';
-import {UserAction, UpdateType, Mode, FilterType, EmptyResultMessage, FilmSectionName} from '../constants.js';
+import {UserAction, UpdateType, Mode, FilterType, EmptyResultMessage} from '../constants.js';
 
 
 const SELECTOR_FILM_CONTAINER = '.films-list__container';
-const SHAKE_ANIMATION_TIMEOUT = 5000;
-
 
 export default class AbstractFilmList {
   constructor(container, filmsModel, commentsModel, api) {
@@ -94,23 +94,15 @@ export default class AbstractFilmList {
     throw new Error(`there is not comment with id: ${id}`);
   }
 
-  _changeDisplayStyle() {
-    switch (this._name) {
-      case FilmSectionName.MOST_COMMENTED:
-        this._filmBlockComponent.getElement().style.display = this._getFilms()[0].comments.length ? 'block' : 'none';
-        break;
-      case FilmSectionName.TOP_RATED:
-        this._filmBlockComponent.getElement().style.display = this._getFilms()[0].filmInfo.totalRating ? 'block' : 'none';
-    }
-  }
-
   _renderFilmList() {
-    this._getFilms().length ? this._changeDisplayStyle() : this._renderNoFilms();
+    if (!this._getFilms().length) {
+      this._renderNoFilms();
+    }
+
     if (this._openedFilmId[0] !== null) {
       this._renderPopup();
     }
   }
-
 
   _handleViewAction(actionType, updateType, update, film) {
     switch(actionType) {
@@ -124,11 +116,11 @@ export default class AbstractFilmList {
             this._commentsModel.addComment(response);
             return response.movie;
           })
-          .then((movie) => this._filmsModel.changeFilm(updateType, movie))
+          .then((movie) => this._filmsModel.updateFilm(updateType, FilmsModel.adaptToClient(movie)))
           .catch(() => {
             const form = document.querySelector('.film-details__inner');
             form.querySelector('.film-details__comment-input').disabled = false;
-            AbstractFilmList.shake(form);
+            Abstract.shake(form);
           });
         break;
       case UserAction.DELETE_COMMENT:
@@ -139,7 +131,7 @@ export default class AbstractFilmList {
             const needComment = this._findCommentElementsById(update);
             needComment.deleteBtn.textContent = 'Delete';
             needComment.deleteBtn.disabled = false;
-            AbstractFilmList.shake(needComment.commentBlock);
+            Abstract.shake(needComment.commentBlock);
           });
         break;
     }
@@ -161,11 +153,5 @@ export default class AbstractFilmList {
         }
         this.init();
     }
-  }
-
-
-  static shake(element) {
-    element.style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
-    setTimeout(() => element.style.animation = '', SHAKE_ANIMATION_TIMEOUT);
   }
 }

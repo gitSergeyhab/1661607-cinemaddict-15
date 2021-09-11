@@ -1,6 +1,9 @@
 import {createElement} from '../utils/dom-utils';
 import {getNotImplementedError} from '../utils/utils.js';
 
+const SHAKE_ANIMATION_TIMEOUT = 3000;
+
+
 export default class Abstract {
   constructor () {
     if (new.target === Abstract) {
@@ -23,5 +26,11 @@ export default class Abstract {
 
   removeElement() {
     this._element = null;
+  }
+
+
+  static shake(element) {
+    element.style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+    setTimeout(() => element.style.animation = '', SHAKE_ANIMATION_TIMEOUT);
   }
 }

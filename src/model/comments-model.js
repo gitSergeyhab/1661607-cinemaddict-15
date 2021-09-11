@@ -6,8 +6,8 @@ export default class CommentsModel extends AbstractObserver{
     this._comments = [];
   }
 
-  set comments(commentList) {
-    this._comments = commentList.slice();
+  set comments(comments) {
+    this._comments = comments.slice();
   }
 
   get comments() {

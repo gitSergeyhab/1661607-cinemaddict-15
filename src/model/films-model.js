@@ -21,10 +21,6 @@ export default class FilmsModel extends AbstractObserver{
     this._notify(updateType, update);
   }
 
-  changeFilm(updateType, update) {
-    this._changeOneFilm(FilmsModel.adaptToClient(update));
-    this._notify(updateType, update);
-  }
 
   deleteId(updateType, commentId, filmId) {
     let film = this._films.find((item) => item.id === filmId);

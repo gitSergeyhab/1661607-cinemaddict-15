@@ -3,7 +3,8 @@ import FooterStatistic from './view/films/footer-statistic.js';
 import Statistic from './view/statistic.js';
 
 import FilmListPresenter from './presenter/film-list.js';
-import ExtraFilmListPresenter from './presenter/extra-film-list.js';
+import MostCommentedFilmList from './presenter/most-commented-film.js';
+import TopRatedFilmList from './presenter/top-rated-film.js';
 import MenuPresenter from './presenter/menu.js';
 import ProfilePresenter from './presenter/profile.js';
 
@@ -13,7 +14,7 @@ import CommentsModel from './model/comments-model.js';
 
 import {render, remove} from './utils/dom-utils.js';
 import {notifyNetStatus} from './utils/offline-utils.js';
-import {FilmSectionName, FilterType, UpdateType} from './constants.js';
+import {FilterType, UpdateType} from './constants.js';
 
 import Api from './api/api.js';
 import Store from './api/store.js';
@@ -47,9 +48,9 @@ render(main, filmSection);
 
 const mainFilmListPresenter = new FilmListPresenter(filmSection, filmsModel, commentsModel, apiWithProvider, filtersModel);
 
-new ExtraFilmListPresenter(filmSection, filmsModel, commentsModel, apiWithProvider, FilmSectionName.TOP_RATED);
+new TopRatedFilmList(filmSection, filmsModel, commentsModel, apiWithProvider);
 
-new ExtraFilmListPresenter(filmSection, filmsModel, commentsModel, apiWithProvider, FilmSectionName.MOST_COMMENTED);
+new MostCommentedFilmList(filmSection, filmsModel, commentsModel, apiWithProvider);
 
 // Переключатель статистики
 let statisticsComponent = null;
