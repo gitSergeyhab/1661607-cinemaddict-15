@@ -79,7 +79,7 @@ apiWithProvider.getFilms()
   .catch(() => filmsModel.setFilms(UpdateType.INIT, []));
 
 // Offline
-// window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
 
 notifyNetStatus();
 
