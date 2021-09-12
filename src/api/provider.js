@@ -3,6 +3,14 @@ import {isOnline} from '../utils/offline-utils.js';
 import {showOfflineMessage} from '../utils/show-offline-message.js';
 
 
+const ErrorMessage = {
+  GET_COMMENTS: 'get comments',
+  ADD_COMMENT: 'add comment',
+  DELETE_COMMENT: 'delete comment',
+  SYNC: 'Sync data failed',
+};
+
+
 const createStoreStructure = (items) => items.reduce((acc, current) => ({ ...acc, [current.id]: current }), {});
 const rejectRequest = (typeRequest) => Promise.reject(new Error(`${typeRequest} failed`));
 
@@ -46,7 +54,7 @@ export default class Provider {
     }
 
     showOfflineMessage();
-    return rejectRequest('get Comments');
+    return rejectRequest(ErrorMessage.GET_COMMENTS);
   }
 
   addComment(comment, filmId) {
@@ -55,7 +63,7 @@ export default class Provider {
     }
 
     showOfflineMessage();
-    return rejectRequest('add Comment');
+    return rejectRequest(ErrorMessage.ADD_COMMENT);
   }
 
   deleteComment(commentId) {
@@ -64,7 +72,7 @@ export default class Provider {
     }
 
     showOfflineMessage();
-    return rejectRequest('deleteComment');
+    return rejectRequest(ErrorMessage.DELETE_COMMENT);
   }
 
   sync() {
@@ -77,6 +85,6 @@ export default class Provider {
         });
     }
 
-    return Promise.reject(new Error('Sync data failed'));
+    return Promise.reject(new Error(ErrorMessage.SYNC));
   }
 }

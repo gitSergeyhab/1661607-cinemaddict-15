@@ -8,6 +8,12 @@ const Method = {
   DELETE: 'DELETE',
 };
 
+const EndPoint = {
+  MOVIES: 'movies',
+  COMMENTS: 'comments',
+  SYNC: 'sync',
+};
+
 
 export default class Api {
   constructor(url, authorization) {
@@ -16,14 +22,14 @@ export default class Api {
   }
 
   getFilms(){
-    return this._load({url: 'movies'})
+    return this._load({url: EndPoint.MOVIES})
       .then(Api.toJSON)
       .then((films) => films.map(FilmsModel.adaptToClient));
   }
 
   updateFilm(film) {
     return this._load({
-      url: `movies/${film.id}`,
+      url: `${EndPoint.MOVIES}/${film.id}`,
       method: Method.PUT,
       body: JSON.stringify(FilmsModel.adaptToServer(film)),
       headers: new Headers({'Content-Type': 'application/json'}),
@@ -33,13 +39,13 @@ export default class Api {
   }
 
   getComments(filmId){
-    return this._load({url: `comments/${filmId}`})
+    return this._load({url: `${EndPoint.COMMENTS}/${filmId}`})
       .then(Api.toJSON);
   }
 
   addComment(comment, filmId) {
     return this._load({
-      url: `comments/${filmId}`,
+      url: `${EndPoint.COMMENTS}/${filmId}`,
       method: Method.POST,
       body: JSON.stringify(comment),
       headers: new Headers({'Content-Type': 'application/json'}),
@@ -49,14 +55,14 @@ export default class Api {
 
   deleteComment(commentId) {
     return this._load({
-      url: `comments/${commentId}`,
+      url: `${EndPoint.COMMENTS}/${commentId}`,
       method: Method.DELETE,
     });
   }
 
   sync(film) {
     return this._load({
-      url: 'movies/sync',
+      url: `${EndPoint.MOVIES}/${EndPoint.SYNC}`,
       method: Method.POST,
       body: JSON.stringify(film),
       headers: new Headers({'Content-Type': 'application/json'}),
