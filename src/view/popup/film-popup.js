@@ -7,6 +7,23 @@ import {renderAll} from '../../utils/dom-utils.js';
 
 
 const makeButtonActive = (value) => value ? ActiveClass.POPUP : '';
+
+
+const createPopupButton = (btn) =>`
+<button type="button"
+  class="film-details__control-button film-details__control-button--${btn.name} ${makeButtonActive(btn.active)}"
+  id="${btn.name}" name="${btn.name}">
+  ${btn.shownTitle}
+</button>`;
+
+
+const createPopupRow = (field) => `
+<tr class="film-details__row">
+  <td class="film-details__term">${field.name}</td>
+  <td class="film-details__cell">${field.value}</td>
+</tr>`;
+
+
 const getGenre = (genre) => `<span class="film-details__genre">${genre}</span>`;
 
 const createFilmPopup = ({
@@ -18,86 +35,72 @@ const createFilmPopup = ({
   userDetails: {
     watchList, alreadyWatched, favorite,
   },
-}) => `
-<section class="film-details data-film-id="${id}">
-  <form class="film-details__inner" action="" method="get">
+}) => {
 
-    <div class="film-details__top-container">
-      <div class="film-details__close">
-        <button class="film-details__close-btn" type="button">close</button>
-      </div>
+  const tableValues = { // думаю, это уже нельзя назвать перечислением...
+    DIRECTOR: {name: 'Director', value: director || ''},
+    WRITERS: {name: 'Writers', value: getListWithoutNull(writers)},
+    ACTORS: {name: 'Actors', value: getListWithoutNull(actors)},
+    RELEASE_DATE: {name: 'Release Date', value: getDayMonthYear(date)},
+    RUNTIME: {name: 'Runtime', value: getStringTime(runtime)},
+    COUNTRY: {name: 'Country', value: releaseCountry || ''},
+    GENRE: {name: genre && genre.length > 1 ? 'Genres' : 'Genre', value: renderAll(genre, getGenre)},
+  };
 
-      <div class="film-details__info-wrap">
-          <div class="film-details__poster">
-            <img class="film-details__poster-img" src=${poster || DEFAULT_POSTER} alt=${title}>
-            <p class="film-details__age">${ageRating || ''}</p>
-          </div>
+  const buttonValues = {
+    WATCH_LIST: {name: 'watchlist', shownTitle: 'Add to watchlist', active: watchList} ,
+    WATCHED: {name: 'watched', shownTitle: 'Already watched', active: alreadyWatched},
+    FAVORITE: {name: 'favorite', shownTitle: 'Add to favorites', active: favorite},
+  };
 
-          <div class="film-details__info">
-            <div class="film-details__info-head">
-              <div class="film-details__title-wrap">
-                <h3 class="film-details__title">${title || ''}</h3>
-                <p class="film-details__title-original">Original: ${alternativeTitle || ''}</p>
-              </div>
 
-              <div class="film-details__rating">
-                <p class="film-details__total-rating">${totalRating || ''}</p>
-              </div>
+  return `
+  <section class="film-details data-film-id="${id}">
+    <form class="film-details__inner" action="" method="get">
 
-            </div>
-            <table class="film-details__table">
-              <tr class="film-details__row">
-                <td class="film-details__term">Director</td>
-                <td class="film-details__cell">${director || ''}</td>
-              </tr>
-
-              <tr class="film-details__row">
-                <td class="film-details__term">Writers</td>
-                <td class="film-details__cell">${getListWithoutNull(writers)}</td>
-              </tr>
-              <tr class="film-details__row">
-                <td class="film-details__term">Actors</td>
-                <td class="film-details__cell">${getListWithoutNull(actors)}</td>
-              </tr>
-
-              <tr class="film-details__row">
-                <td class="film-details__term">Release Date</td>
-                <td class="film-details__cell">${getDayMonthYear(date)}</td>
-              </tr>
-
-              <tr class="film-details__row">
-                <td class="film-details__term">Runtime</td>
-                <td class="film-details__cell">${getStringTime(runtime)}</td>
-              </tr>
-              <tr class="film-details__row">
-                <td class="film-details__term">Country</td>
-                <td class="film-details__cell">${releaseCountry || ''}</td>
-              </tr>
-
-              <tr class="film-details__row">
-                <td class="film-details__term"> ${genre && genre.length > 1 ? 'Genres' : 'Genre' }</td>
-                <td class="film-details__cell js-genres">${renderAll(genre, getGenre)}
-                </td>
-              </tr>
-            </table>
-
-            <p class="film-details__film-description">
-              ${description || ''}
-            </p>
-          </div>
+      <div class="film-details__top-container">
+        <div class="film-details__close">
+          <button class="film-details__close-btn" type="button">close</button>
         </div>
 
-        <section class="film-details__controls">
-          <button type="button" class="film-details__control-button film-details__control-button--watchlist ${makeButtonActive(watchList)}" id="watchlist" name="watchlist">Add to watchlist</button>
-          <button type="button" class="film-details__control-button film-details__control-button--watched ${makeButtonActive(alreadyWatched)}" id="watched" name="watched">Already watched</button>
-          <button type="button" class="film-details__control-button film-details__control-button--favorite ${makeButtonActive(favorite)}" id="favorite" name="favorite">Add to favorites</button>
-        </section>
-      </div>
+        <div class="film-details__info-wrap">
+            <div class="film-details__poster">
+              <img class="film-details__poster-img" src=${poster || DEFAULT_POSTER} alt=${title}>
+              <p class="film-details__age">${ageRating || ''}</p>
+            </div>
 
-      <div class="film-details__bottom-container">
-    </div>
-  </form>
-</section>`;
+            <div class="film-details__info">
+              <div class="film-details__info-head">
+                <div class="film-details__title-wrap">
+                  <h3 class="film-details__title">${title || ''}</h3>
+                  <p class="film-details__title-original">Original: ${alternativeTitle || ''}</p>
+                </div>
+
+                <div class="film-details__rating">
+                  <p class="film-details__total-rating">${totalRating || ''}</p>
+                </div>
+
+              </div>
+              <table class="film-details__table">
+                ${Object.values(tableValues).map(createPopupRow).join('\n')}
+              </table>
+
+              <p class="film-details__film-description">
+                ${description || ''}
+              </p>
+            </div>
+          </div>
+
+          <section class="film-details__controls">
+            ${Object.values(buttonValues).map(createPopupButton).join('\n')}
+          </section>
+        </div>
+
+        <div class="film-details__bottom-container">
+      </div>
+    </form>
+  </section>`;
+};
 
 
 export default class FilmPopup extends Abstract {

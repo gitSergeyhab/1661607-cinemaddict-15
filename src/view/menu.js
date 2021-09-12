@@ -5,26 +5,38 @@ import {FilterType} from '../constants.js';
 const ACTIVE_FILTER_BTN_CLASS = 'main-navigation__item--active';
 
 
-const createMenu = (watchListLength, historyLength, favoritestLength, currentFilter) => `
+const createCountsSpan = (count) => `<span class="main-navigation__item-count">${count}</span>`;
+
+const createMenuItem = (currentFilter, filterType, filmCounts) =>`
+<a href="#${filterType}"
+  data-filter="${filterType}"
+  class="main-navigation__item ${currentFilter === filterType ? ACTIVE_FILTER_BTN_CLASS : ''}">
+  ${filterType}
+  ${filmCounts[filterType] ? createCountsSpan(filmCounts[filterType]) : ''}
+</a>`;
+
+
+const createMenuTemplate = (filmCounts, currentFilter) => `
   <nav class="main-navigation">
-
     <div class="main-navigation__items">
-      <a href="#all" data-filter="${FilterType.ALL_MOVIES}" class="main-navigation__item ${currentFilter === FilterType.ALL_MOVIES ? ACTIVE_FILTER_BTN_CLASS : ''} ">All movies</a>
-      <a href="#watchlist" data-filter="${FilterType.WATCH_LIST}" class="main-navigation__item ${currentFilter === FilterType.WATCH_LIST ? ACTIVE_FILTER_BTN_CLASS : ''}">Watchlist <span class="main-navigation__item-count">${watchListLength}</span></a>
-      <a href="#history" data-filter="${FilterType.HISTORY}" class="main-navigation__item ${currentFilter === FilterType.HISTORY ? ACTIVE_FILTER_BTN_CLASS : ''}">History <span class="main-navigation__item-count">${historyLength}</span></a>
-      <a href="#favorites" data-filter="${FilterType.FAVORITES}" class="main-navigation__item ${currentFilter === FilterType.FAVORITES ? ACTIVE_FILTER_BTN_CLASS : ''}">Favorites <span class="main-navigation__item-count">${favoritestLength}</span></a>
+      ${Object.values(FilterType).map((filterType) => {
+    if (filterType !== FilterType.STATS) {
+      return createMenuItem(currentFilter, filterType, filmCounts);
+    }
+  }).join('\n')}
     </div>
-
-    <a href="#stats" data-filter="${FilterType.STATS}" class="main-navigation__additional">Stats</a>
+    <a href="#stats" data-filter="${FilterType.STATS}" class="main-navigation__additional">${FilterType.STATS}</a>
   </nav>`;
 
 export default class Menu extends Abstract{
   constructor(watchListLength, historyLength, favoritesLength, filter) {
     super();
-    this._watchListLength = watchListLength;
-    this._historyLength = historyLength;
-    this._favoritesLength = favoritesLength;
     this._filter = filter;
+    this._filmCounts = {
+      [FilterType.WATCH_LIST]: watchListLength,
+      [FilterType.HISTORY]: historyLength,
+      [FilterType.FAVORITES]: favoritesLength,
+    };
 
     this._statsElement = this.getElement().querySelector('.main-navigation__additional');
 
@@ -35,7 +47,7 @@ export default class Menu extends Abstract{
   }
 
   getTemplate() {
-    return createMenu(this._watchListLength, this._historyLength, this._favoritesLength, this._filter);
+    return createMenuTemplate(this._filmCounts, this._filter);
   }
 
 

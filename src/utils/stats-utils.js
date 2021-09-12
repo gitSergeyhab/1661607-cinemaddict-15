@@ -35,19 +35,13 @@ const getTotalDuration = (films) => getHoursAndMinutes(films.reduce((acc, film) 
 
 const getDatePeriod = (period) => {
   const to = dayjs().toDate();
-  switch (period) {
-    case Period.YEAR:
-      return {from: dayjs().subtract(1, Period.YEAR).toDate(), to};
-    case Period.MONTH:
-      return {from: dayjs().subtract(1, Period.MONTH).toDate(), to};
-    case Period.WEEK:
-      return {from: dayjs().subtract(1, Period.WEEK).toDate(), to};
-    case Period.DAY:
-      return {from: dayjs().subtract(1, Period.DAY).toDate(), to};
-    default:
-      return {from: dayjs().subtract(MAX_PERIOD_IN_YEARS, Period.YEAR).toDate(), to};
+  if (period && period !== Period.ALL) {
+    return {from: dayjs().subtract(1, period).toDate(), to};
   }
+
+  return  {from: dayjs().subtract(MAX_PERIOD_IN_YEARS, Period.YEAR).toDate(), to};
 };
+
 
 export {
   filterWatchedFilmsByTime,

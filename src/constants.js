@@ -36,7 +36,7 @@ const FilterType = {
   WATCH_LIST: 'Watchlist',
   HISTORY: 'History',
   FAVORITES: 'Favorites',
-  STATS: 'stats',
+  STATS: 'Stats',
 };
 
 const Mode = {
@@ -73,7 +73,7 @@ const Rating = {
 };
 
 const Period = {
-  ALL: 'all',
+  ALL: 'all time',
   DAY: 'day',
   WEEK: 'week',
   MONTH: 'month',

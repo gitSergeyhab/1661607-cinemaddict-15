@@ -3,6 +3,20 @@ import he from 'he';
 import {humanizeDate} from '../../utils/date-time-utils.js';
 
 
+const Emoji = {
+  SMILE: 'smile',
+  SLEEPING: 'sleeping',
+  PUKE: 'puke',
+  ANGRY: 'angry',
+};
+
+
+const createEmojiInput = (emoji) => `
+<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${emoji}" value="${emoji}">
+<label class="film-details__emoji-label" for="emoji-${emoji}">
+  <img src="./images/emoji/${emoji}.png" width="30" height="30" alt="emoji">
+</label>`;
+
 const createComment = ({id,author,comment,date,emotion}) => `
   <li class="film-details__comment" data-comment-id=${id}>
     <span class="film-details__comment-emoji">
@@ -38,22 +52,7 @@ const createCommentsBlock = ({hasComments, addedEmoji, addedComment, comments}) 
         <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${addedComment || ''}</textarea>
       </label>
       <div class="film-details__emoji-list">
-        <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile">
-        <label class="film-details__emoji-label" for="emoji-smile">
-          <img src="./images/emoji/smile.png" width="30" height="30" alt="emoji">
-        </label>
-        <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="sleeping">
-        <label class="film-details__emoji-label" for="emoji-sleeping">
-          <img src="./images/emoji/sleeping.png" width="30" height="30" alt="emoji">
-        </label>
-        <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-puke" value="puke">
-        <label class="film-details__emoji-label" for="emoji-puke">
-          <img src="./images/emoji/puke.png" width="30" height="30" alt="emoji">
-        </label>
-        <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="angry">
-        <label class="film-details__emoji-label" for="emoji-angry">
-          <img src="./images/emoji/angry.png" width="30" height="30" alt="emoji">
-        </label>
+        ${Object.values(Emoji).map(createEmojiInput).join('\n')}
       </div>
     </div>
   </section>`;

@@ -5,12 +5,16 @@ import {SortType} from '../constants.js';
 const ACTIVE_SORT_BTN_CLASS = 'sort__button--active';
 
 
-const createSort = (sortType) => `<ul class="sort">
-<li><a href="#" class="sort__button ${sortType === SortType.DEFAULT ? ACTIVE_SORT_BTN_CLASS : ''}" data-sort-Type=${SortType.DEFAULT}>Sort by default</a></li>
-<li><a href="#" class="sort__button ${sortType === SortType.DATE ? ACTIVE_SORT_BTN_CLASS : ''}" data-sort-Type=${SortType.DATE}>Sort by date</a></li>
-<li><a href="#" class="sort__button ${sortType === SortType.RATING ? ACTIVE_SORT_BTN_CLASS : ''}" data-sort-Type=${SortType.RATING}>Sort by rating</a></li>
-</ul>`;
+const createSort = (sortType, sortTypeFromEnum) => `<li>
+  <a href="#" class="sort__button ${sortType === sortTypeFromEnum ? ACTIVE_SORT_BTN_CLASS : ''}"data-sort-Type="${sortTypeFromEnum}">
+    Sort by ${sortTypeFromEnum}
+  </a>
+</li>`;
 
+
+const createSortTemplate = (sortType) => `<ul class="sort">
+  ${Object.values(SortType).map((typeFromEnum) => createSort(sortType, typeFromEnum)).join('\n')}
+</ul>`;
 
 export default class Sort extends Abstract {
   constructor(sortType) {
@@ -20,7 +24,7 @@ export default class Sort extends Abstract {
   }
 
   getTemplate() {
-    return createSort(this._sortType);
+    return createSortTemplate(this._sortType);
   }
 
 
