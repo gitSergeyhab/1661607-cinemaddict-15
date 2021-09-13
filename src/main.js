@@ -78,7 +78,7 @@ apiWithProvider.getFilms()
   .then(() => profile.init())
   .catch(() => filmsModel.setFilms(UpdateType.INIT, []));
 
-// Offline
+//  Offline
 window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
 
 notifyNetStatus();
