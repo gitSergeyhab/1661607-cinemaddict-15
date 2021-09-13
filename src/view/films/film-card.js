@@ -51,7 +51,7 @@ const createFilmCard = ({
     <a class="film-card__comments">${comments.length} comments</a>
 
     <div class="film-card__controls">
-      ${Object.values(buttonValues).map(createCardButton)}
+      ${Object.values(buttonValues).map(createCardButton).join('\n')}
     </div>
   </article>`;
 };

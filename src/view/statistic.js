@@ -11,8 +11,6 @@ import {FilterType, Period} from '../constants.js';
 
 const BAR_HEIGHT = 50;
 
-// console.log(Object.values())
-
 const capitalize = (item) => `${item[0].toUpperCase()}${item.slice(1)}`;
 
 const createFilter = (period) => `
